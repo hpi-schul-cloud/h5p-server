@@ -1,0 +1,25 @@
+{
+	"$schema": "https://json.schemastore.org/nest-cli",
+	"collection": "@nestjs/schematics",
+	"sourceRoot": "src",
+	"builder": "swc",
+	"typeCheck": true,
+	"monorepo": true,
+	"compilerOptions": {
+		"deleteOutDir": true
+	},
+	"projects": {
+		"h5p-editor": {
+			"type": "application",
+			"entryFile": "apps/h5p-editor.app"
+		},
+		"h5p-library-management": {
+			"type": "application",
+			"entryFile": "apps/h5p-library-management.app"
+		},
+		"h5p-editor-consumer": {
+			"type": "application",
+			"entryFile": "apps/h5p-editor-consumer.app"
+		}
+	}
+}
