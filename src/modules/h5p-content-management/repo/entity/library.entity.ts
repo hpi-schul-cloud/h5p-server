@@ -48,6 +48,7 @@ export class FileMetadata implements IFileStats {
 @Index({ properties: ['machineName', 'majorVersion', 'minorVersion'] })
 @Index({ properties: ['machineName', 'majorVersion', 'minorVersion', 'patchVersion'] })
 export class InstalledLibrary extends BaseEntityWithTimestamps implements IInstalledLibrary {
+	[key: string]: unknown;
 	@Property()
 	@Index()
 	machineName: string;

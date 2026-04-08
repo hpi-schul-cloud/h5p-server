@@ -11,9 +11,11 @@ import { H5P_LIBRARIES_S3_CLIENT_CONFIG_TOKEN, H5PLibrariesS3ClientConfig } from
 import { H5PAjaxEndpointProvider, H5PCacheProvider, H5PEditorProvider, H5PPlayerProvider } from './provider';
 import { H5PContentRepo, LibraryRepo } from './repo';
 import { ContentStorage, H5pEditorContentService, LibraryStorage, TemporaryFileStorage } from './service';
+import { ErrorModule } from '@infra/error';
 
 @Module({
 	imports: [
+		ErrorModule,
 		S3ClientModule.register({
 			clientInjectionToken: H5P_CONTENT_S3_CLIENT_INJECTION_TOKEN,
 			configInjectionToken: H5P_CONTENT_S3_CLIENT_CONFIG_TOKEN,
