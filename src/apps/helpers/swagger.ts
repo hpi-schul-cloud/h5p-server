@@ -3,8 +3,8 @@ import { DocumentBuilder, SwaggerDocumentOptions, SwaggerModule } from '@nestjs/
 
 const config = new DocumentBuilder()
 	.addServer('/api/v3/') // add default path as server to have correct urls ald let 'try out' work
-	.setTitle('Schulcloud-Verbund-Software File Storage API')
-	.setDescription('This is the API documentation for the Schulcloud-Verbund-Software File Storage API')
+	.setTitle('Schulcloud-Verbund-Software H5P Editor API')
+	.setDescription('This is the API documentation for the Schulcloud-Verbund-Software H5P Editor API')
 	.setVersion('3.0')
 	/** set authentication for all routes enabled by default */
 	.addBearerAuth({ type: 'http', scheme: 'bearer', bearerFormat: 'JWT' })

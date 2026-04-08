@@ -1,4 +1,4 @@
-import { FilesStorageTestModule } from '@modules/files-storage-app/testing/files-storage.test.module';
+import { H5PEditorTestModule } from '@modules/h5p-content-management/h5p-editor-test.module';
 import { INestApplication } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import type { Server } from 'node:net';
@@ -10,7 +10,7 @@ describe('swagger setup', () => {
 		let app: INestApplication<Server>;
 
 		beforeAll(async () => {
-			app = await NestFactory.create(FilesStorageTestModule);
+			app = await NestFactory.create(H5PEditorTestModule);
 			enableOpenApiDocs(app, 'docs');
 			await app.init();
 		});
@@ -34,8 +34,8 @@ describe('swagger setup', () => {
 
 			expect(response.body.info).toEqual({
 				contact: {},
-				description: 'This is the API documentation for the Schulcloud-Verbund-Software File Storage API',
-				title: 'Schulcloud-Verbund-Software File Storage API',
+				description: 'This is the API documentation for the Schulcloud-Verbund-Software H5P Editor API',
+				title: 'Schulcloud-Verbund-Software H5P Editor API',
 				// care about api changes when version changes
 				version: '3.0',
 			});
