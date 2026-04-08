@@ -12,12 +12,12 @@ metadata:
   labels:
     app: api-h5p
     app.kubernetes.io/part-of: schulcloud-verbund
-    app.kubernetes.io/version: {{ SCHULCLOUD_SERVER_IMAGE_TAG }}
+    app.kubernetes.io/version: {{ H5P_SERVER_IMAGE_TAG }}
     app.kubernetes.io/name: api-h5p
     app.kubernetes.io/component: h5p
     app.kubernetes.io/managed-by: ansible
-    git.branch: {{ SCHULCLOUD_SERVER_BRANCH_NAME }}
-    git.repo: {{ SCHULCLOUD_SERVER_REPO_NAME }}
+    git.branch: {{ H5P_SERVER_BRANCH_NAME }}
+    git.repo: {{ H5P_SERVER_REPO_NAME }}
 spec:
   replicas: {{ API_H5P_EDITOR_REPLICAS|default("1", true) }}
   strategy:
@@ -35,12 +35,12 @@ spec:
       labels:
         app: api-h5p
         app.kubernetes.io/part-of: schulcloud-verbund
-        app.kubernetes.io/version: {{ SCHULCLOUD_SERVER_IMAGE_TAG }}
+        app.kubernetes.io/version: {{ H5P_SERVER_IMAGE_TAG }}
         app.kubernetes.io/name: api-h5p
         app.kubernetes.io/component: h5p
         app.kubernetes.io/managed-by: ansible
-        git.branch: {{ SCHULCLOUD_SERVER_BRANCH_NAME }}
-        git.repo: {{ SCHULCLOUD_SERVER_REPO_NAME }}
+        git.branch: {{ H5P_SERVER_BRANCH_NAME }}
+        git.repo: {{ H5P_SERVER_REPO_NAME }}
     spec:
       securityContext:
         runAsUser: 1000
@@ -51,7 +51,7 @@ spec:
         name: linux
       containers:
       - name: api-h5p
-        image: {{ SCHULCLOUD_SERVER_IMAGE }}:{{ SCHULCLOUD_SERVER_IMAGE_TAG }}
+        image: {{ H5P_SERVER_IMAGE }}:{{ H5P_SERVER_IMAGE_TAG }}
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 4448
