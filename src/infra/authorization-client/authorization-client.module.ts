@@ -1,32 +1,33 @@
 import { ConfigurationModule } from '@infra/configuration';
 import { DynamicModule, Module } from '@nestjs/common';
-import { AuthorizationApi, Configuration, ConfigurationParameters } from './authorization-api-client';
+import { AuthorizationApi, Configuration } from './authorization-api-client';
 import { AuthorizationClientAdapter } from './authorization-client.adapter';
-import { AUTHORIZATION_CONFIG_TOKEN, AuthorizationConfig } from './authorization.config';
-
-export interface AuthorizationClientConfig extends ConfigurationParameters {
-	basePath: string;
-}
+import { InternalAuthorizationClientConfig } from './authorization-client.config';
 
 @Module({})
 export class AuthorizationClientModule {
-	public static register(): DynamicModule {
+	public static register(
+		configInjectionToken: string,
+		configConstructor: new () => InternalAuthorizationClientConfig
+	): DynamicModule {
 		const providers = [
 			AuthorizationClientAdapter,
 			{
 				provide: AuthorizationApi,
-				useFactory: (config: AuthorizationConfig): AuthorizationApi => {
-					const configuration = new Configuration({ basePath: config.authorizationApiUrl });
-
+				useFactory: (configInstance: InternalAuthorizationClientConfig): AuthorizationApi => {
+					const { basePath } = configInstance;
+					const configuration = new Configuration({
+						basePath: `${basePath}/v3`,
+					});
 					return new AuthorizationApi(configuration);
 				},
-				inject: [AUTHORIZATION_CONFIG_TOKEN],
+				inject: [configInjectionToken],
 			},
 		];
 
 		return {
 			module: AuthorizationClientModule,
-			imports: [ConfigurationModule.register(AUTHORIZATION_CONFIG_TOKEN, AuthorizationConfig)],
+			imports: [ConfigurationModule.register(configInjectionToken, configConstructor)],
 			providers,
 			exports: [AuthorizationClientAdapter],
 		};

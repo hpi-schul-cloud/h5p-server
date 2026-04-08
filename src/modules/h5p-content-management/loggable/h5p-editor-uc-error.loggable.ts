@@ -1,5 +1,4 @@
-import { Loggable } from '@core/logger';
-import { ErrorLogMessage, LogMessageDataObject } from '@core/logger/types';
+import { ErrorLogMessage, Loggable, LogMessageDataObject } from '@infra/logger';
 import { InternalServerErrorException } from '@nestjs/common';
 
 export class H5PUcErrorLoggable extends InternalServerErrorException implements Loggable {

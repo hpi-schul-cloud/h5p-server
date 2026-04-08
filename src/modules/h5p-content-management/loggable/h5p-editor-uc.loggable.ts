@@ -1,5 +1,4 @@
-import { Loggable } from '@core/logger';
-import { LogMessage } from '@core/logger/types';
+import { Loggable, LogMessage } from '@infra/logger';
 
 export class H5PUcLoggable implements Loggable {
 	constructor(private readonly message: string) {}

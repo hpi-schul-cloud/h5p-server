@@ -1,3 +1,4 @@
-export * from "./string-to-boolean.transformer";
-export * from "./string-to-number.transformer";
-export * from "./string-to-object.transformer";
+export * from './comma-separated-string-to-array.transformer';
+export * from './string-to-boolean.transformer';
+export * from './string-to-number.transformer';
+export * from './string-to-object.transformer';

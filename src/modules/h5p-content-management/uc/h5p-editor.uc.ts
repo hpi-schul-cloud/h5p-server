@@ -1,4 +1,3 @@
-import { Logger } from '@core/logger';
 import { ICurrentUser } from '@infra/auth-guard';
 import {
 	AuthorizationBodyParamsReferenceType,
@@ -6,6 +5,7 @@ import {
 	AuthorizationContextBuilder,
 	AuthorizationContextParams,
 } from '@infra/authorization-client';
+import { Logger } from '@infra/logger';
 import {
 	AjaxSuccessResponse,
 	H5PAjaxEndpoint,
@@ -23,7 +23,6 @@ import {
 	ILibraryDetailedDataForClient,
 	ILibraryOverviewForClient,
 } from '@lumieducation/h5p-server/build/src/types';
-import { UserService } from '@modules/user';
 import {
 	BadRequestException,
 	HttpException,
@@ -33,7 +32,6 @@ import {
 	NotAcceptableException,
 	NotFoundException,
 } from '@nestjs/common';
-import { LanguageType } from '@shared/domain/interface';
 import { EntityId } from '@shared/domain/types';
 import { randomUUID } from 'crypto';
 import { Request } from 'express';
@@ -48,6 +46,7 @@ import { H5PContentMapper } from '../mapper/h5p-content.mapper';
 import { H5PContentRepo } from '../repo';
 import { LibraryStorage } from '../service';
 import { H5PContentParentType, H5PUploadFile, LumiUserWithContentData } from '../types';
+import { LanguageType } from '../types/language-type.enum';
 import { GetLibraryFile } from './dto/h5p-getLibraryFile';
 
 // As a workaround, we have to assign all files the type “unknown.type” as “tempFilePath,” otherwise the H5P library throws errors.
@@ -62,7 +61,6 @@ export class H5PEditorUc {
 		private readonly h5pPlayer: H5PPlayer,
 		private readonly h5pAjaxEndpoint: H5PAjaxEndpoint,
 		private readonly libraryService: LibraryStorage,
-		private readonly userService: UserService,
 		private readonly authorizationClientAdapter: AuthorizationClientAdapter,
 		private readonly h5pContentRepo: H5PContentRepo,
 		private readonly logger: Logger
@@ -503,11 +501,12 @@ export class H5PEditorUc {
 	}
 
 	private async getUserLanguage(userId: EntityId): Promise<string> {
-		const languageUser = await this.userService.findById(userId);
+		// @TODO replace with me route
+		//const languageUser = await this.userService.findById(userId);
 		let userLanguage = LanguageType.DE;
-		if (languageUser?.language) {
-			userLanguage = languageUser.language;
-		}
+		//if (languageUser?.language) {
+		//	userLanguage = languageUser.language;
+		//}
 		return userLanguage;
 	}
 }

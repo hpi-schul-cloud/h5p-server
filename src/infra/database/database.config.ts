@@ -1,32 +1,38 @@
 import { ConfigProperty, Configuration } from '@infra/configuration';
 import { StringToBoolean } from '@shared/transformer';
-import { IsBoolean, IsOptional, IsString } from 'class-validator';
+import { IsBoolean, IsOptional, IsString, IsUrl } from 'class-validator';
+import { InternalDatabaseConfig } from './interfaces';
 
 export const DATABASE_CONFIG_TOKEN = 'DATABASE_CONFIG_TOKEN';
 
 @Configuration()
-export class DatabaseConfig {
-	@IsString()
+export class DatabaseConfig implements InternalDatabaseConfig {
 	@ConfigProperty('DB_URL')
-	dbUrl!: string;
+	@IsUrl({ require_tld: false, require_protocol: false, protocols: ['mongodb', 'mongodb+srv'] })
+	public dbUrl!: string;
 
-	@IsString()
-	@IsOptional()
 	@ConfigProperty('DB_USERNAME')
-	dbUsername!: string;
-
 	@IsString()
 	@IsOptional()
+	public dbUsername?: string;
+
 	@ConfigProperty('DB_PASSWORD')
-	dbPassword!: string;
+	@IsString()
+	@IsOptional()
+	public dbPassword?: string;
 
-	@IsBoolean()
-	@StringToBoolean()
 	@ConfigProperty('DB_ENSURE_INDEXES')
-	dbEnsureIndexes = true;
-
 	@IsBoolean()
 	@StringToBoolean()
+	public dbEnsureIndexes = false;
+
+	@ConfigProperty('DB_ALLOW_GLOBAL_CONTEXT')
+	@IsBoolean()
+	@StringToBoolean()
+	public dbAllowGlobalContext = true;
+
 	@ConfigProperty('DB_DEBUG')
-	dbDebug = false;
+	@IsBoolean()
+	@StringToBoolean()
+	public dbDebug = false;
 }

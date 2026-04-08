@@ -1,6 +1,6 @@
-import { Logger } from '@core/logger';
 import { createMock, DeepMocked } from '@golevelup/ts-jest';
 import { AuthorizationClientAdapter } from '@infra/authorization-client';
+import { Logger } from '@infra/logger';
 import { H5PAjaxEndpoint, H5PEditor, H5PPlayer } from '@lumieducation/h5p-server';
 import { IHubInfo, IUser as LumiIUser } from '@lumieducation/h5p-server/build/src/types';
 import { UserService } from '@modules/user';

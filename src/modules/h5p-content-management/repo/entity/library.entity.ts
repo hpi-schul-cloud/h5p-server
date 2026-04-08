@@ -1,3 +1,4 @@
+/* eslint-disable max-classes-per-file */
 import { IInstalledLibrary, ILibraryName } from '@lumieducation/h5p-server';
 import { IFileStats, ILibraryMetadata, IPath } from '@lumieducation/h5p-server/build/src/types';
 import { Entity, Index, Property } from '@mikro-orm/core';

@@ -1,5 +1,4 @@
-import { ErrorLogMessage } from '@infra/logger';
-import { Loggable } from '@infra/logger/interfaces';
+import { ErrorLogMessage, Loggable } from '@infra/logger';
 import { ForbiddenException } from '@nestjs/common';
 import { AuthorizationBodyParams } from '../authorization-api-client';
 

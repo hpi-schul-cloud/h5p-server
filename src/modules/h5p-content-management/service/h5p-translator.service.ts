@@ -1,8 +1,8 @@
 import { ITranslationFunction } from '@lumieducation/h5p-server';
-import { LanguageType } from '@shared/domain/interface';
 import i18next from 'i18next';
 import i18nextFsBackend from 'i18next-fs-backend';
 import path from 'path';
+import { LanguageType } from '../types/language-type.enum';
 
 export const Translator = {
 	async translate(availableLanguages: LanguageType[]): Promise<ITranslationFunction> {

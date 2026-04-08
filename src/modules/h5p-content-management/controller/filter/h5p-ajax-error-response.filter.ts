@@ -1,4 +1,4 @@
-import { DomainErrorHandler } from '@core/error';
+import { DomainErrorHandler } from '@infra/error';
 import { AjaxErrorResponse, H5pError } from '@lumieducation/h5p-server';
 import { ArgumentsHost, Catch, ExceptionFilter, HttpException } from '@nestjs/common';
 import { Response } from 'express';

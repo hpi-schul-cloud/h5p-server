@@ -1,7 +1,7 @@
 import { ConfigProperty, Configuration } from '@infra/configuration';
-import { CommaSeparatedStringToArray, StringToNumber } from '@shared/controller/transformer';
-import { LanguageType } from '@shared/domain/interface';
+import { CommaSeparatedStringToArray, StringToNumber } from '@shared/transformer';
 import { IsEnum, IsNumber, IsString } from 'class-validator';
+import { LanguageType } from './types/language-type.enum';
 
 export const H5P_EDITOR_CONFIG_TOKEN = 'H5P_EDITOR_CONFIG_TOKEN';
 

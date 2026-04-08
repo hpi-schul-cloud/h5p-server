@@ -1,4 +1,4 @@
-import { ErrorLogMessage } from '@core/logger';
+import { ErrorLogMessage } from '@infra/logger';
 import { ObjectId } from '@mikro-orm/mongodb';
 import { H5pEditorContentInvalidIdLoggableException } from './h5p-editor-content-invalid-id.loggable-exception';
 

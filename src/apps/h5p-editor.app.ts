@@ -8,7 +8,7 @@ import express from 'express';
 import { install as sourceMapInstall } from 'source-map-support';
 
 // application imports
-import { createRequestLoggerMiddleware, LegacyLogger, LOGGER_CONFIG_TOKEN, LoggerConfig } from '@core/logger';
+import { LOGGER_CONFIG_TOKEN, LoggerConfig } from '@infra/logger';
 import { H5P_EDITOR_CONFIG_TOKEN, H5PEditorConfig } from '@modules/h5p-content-management';
 import { H5PEditorAppModule } from '@modules/h5p-content-management/h5p-editor.app.module';
 import { enableOpenApiDocs } from './helpers';
@@ -22,11 +22,10 @@ async function bootstrap(): Promise<void> {
 	const nestExpressAdapter = new ExpressAdapter(nestExpress);
 
 	const nestApp = await NestFactory.create<NestExpressApplication>(H5PEditorAppModule, nestExpressAdapter);
-	// WinstonLogger
-	nestApp.useLogger(await nestApp.resolve(LegacyLogger));
 
 	const loggerConfig = await nestApp.resolve<LoggerConfig>(LOGGER_CONFIG_TOKEN);
-	nestApp.use(createRequestLoggerMiddleware(loggerConfig));
+	// @TODO fix it
+	// nestApp.use(createRequestLoggerMiddleware(loggerConfig));
 
 	// customize nest app settings
 	nestApp.enableCors({ exposedHeaders: ['Content-Disposition'] });

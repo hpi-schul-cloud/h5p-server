@@ -1,14 +1,10 @@
-import { Logger } from '@core/logger';
 import { RabbitPayload, RabbitSubscribe } from '@golevelup/nestjs-rabbitmq';
-import {
-	CopyContentParams,
-	DeleteContentParams,
-	H5P_EXCHANGE_CONFIG_TOKEN,
-	H5pEditorEvents,
-	H5pExchangeConfig,
-} from '@infra/h5p-editor-client';
+
+import { Logger } from '@infra/logger';
 import { H5PEditor, IUser as LumiIUser } from '@lumieducation/h5p-server';
 import { EnsureRequestContext, MikroORM } from '@mikro-orm/core';
+import { H5P_EXCHANGE_CONFIG_TOKEN, H5pExchangeConfig } from '@modules/h5p-content-management/h5p-exchange.config';
+import { CopyContentParams, DeleteContentParams, H5pEditorEvents } from '@modules/h5p-content-management/interface';
 import { Inject, Injectable } from '@nestjs/common';
 import {
 	H5pEditorContentCopySuccessfulLoggable,

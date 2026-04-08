@@ -574,7 +574,7 @@ export class LibraryStorage implements ILibraryStorage {
 		} else {
 			const s3Path = this.getS3Key(libraryName, fileName);
 			const response = await this.s3Client.get(s3Path);
-			const mimetype = mime.lookup(fileName, 'application/octet-stream');
+			const mimetype = mime.getType(fileName) || 'application/octet-stream';
 
 			result = {
 				stream: response.data,

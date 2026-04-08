@@ -6,7 +6,6 @@ import express from 'express';
 import { install as sourceMapInstall } from 'source-map-support';
 
 // application imports
-import { LegacyLogger } from '@core/logger';
 import { H5PEditorAMQPModule } from '@modules/h5p-content-management';
 
 async function bootstrap(): Promise<void> {
@@ -16,9 +15,6 @@ async function bootstrap(): Promise<void> {
 	const internalServerExpressAdapter = new ExpressAdapter(internalServerExpress);
 
 	const nestApp = await NestFactory.create(H5PEditorAMQPModule, internalServerExpressAdapter);
-
-	// WinstonLogger
-	nestApp.useLogger(await nestApp.resolve(LegacyLogger));
 
 	await nestApp.init();
 

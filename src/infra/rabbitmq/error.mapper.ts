@@ -1,11 +1,6 @@
 import { ErrorUtils } from '@infra/error/utils';
 import { RpcError } from '@infra/rabbitmq';
-import {
-	BadRequestException,
-	ForbiddenException,
-	InternalServerErrorException,
-	UnprocessableEntityException,
-} from '@nestjs/common';
+import { BadRequestException, ForbiddenException, InternalServerErrorException } from '@nestjs/common';
 
 export class ErrorMapper {
 	public static mapRpcErrorResponseToDomainError(
@@ -18,8 +13,6 @@ export class ErrorMapper {
 			error = new ForbiddenException(errorObj.message);
 		} else if (errorObj.status === 500) {
 			error = new InternalServerErrorException(errorObj.message);
-		} else if (errorObj.status === 422) {
-			error = new UnprocessableEntityException(errorObj.message);
 		} else {
 			error = new InternalServerErrorException(null, ErrorUtils.createHttpExceptionOptions(errorObj));
 		}

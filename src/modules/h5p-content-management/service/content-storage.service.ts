@@ -1,4 +1,4 @@
-import { ErrorUtils } from '@core/error/utils';
+import { ErrorUtils } from '@infra/error/utils';
 import { CopyFiles, S3ClientAdapter } from '@infra/s3-client';
 import {
 	ContentId,

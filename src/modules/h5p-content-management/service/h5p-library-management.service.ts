@@ -1,4 +1,4 @@
-import { Logger } from '@core/logger';
+import { Logger } from '@infra/logger';
 import {
 	cacheImplementations,
 	ContentTypeCache,
@@ -19,7 +19,7 @@ import {
 	ILibraryName,
 } from '@lumieducation/h5p-server/build/src/types';
 import { Inject, Injectable } from '@nestjs/common';
-import { TypeGuard } from '@shared/common/guards';
+import { TypeGuard } from '@shared/guard';
 import { Cache } from 'cache-manager';
 import { Readable } from 'stream';
 import { H5pDefaultUserFactory } from '../factory';

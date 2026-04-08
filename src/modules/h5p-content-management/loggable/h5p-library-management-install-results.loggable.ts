@@ -1,5 +1,4 @@
-import { Loggable } from '@core/logger';
-import { LogMessage } from '@core/logger/types';
+import { Loggable, LogMessage } from '@infra/logger';
 import { ILibraryInstallResult } from '@lumieducation/h5p-server';
 
 export class H5PLibraryManagementInstallResultsLoggable implements Loggable {
