@@ -278,7 +278,7 @@ export class H5PEditorUc {
 
 			return result;
 		} catch (err) {
-			throw new NotFoundException('getContentParameters failed', { cause: err });
+			throw new NotFoundException('Not Found', { cause: err });
 		}
 	}
 

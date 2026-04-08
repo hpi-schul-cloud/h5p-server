@@ -7,7 +7,6 @@ import {
 } from '@infra/authorization-client';
 import { Logger } from '@infra/logger';
 import { H5PEditor, H5PPlayer } from '@lumieducation/h5p-server';
-import { UserService } from '@modules/user';
 import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { H5P_EDITOR_CONFIG_TOKEN } from '../h5p-editor.config';
@@ -55,10 +54,6 @@ describe('save or create H5P content', () => {
 				{
 					provide: LibraryStorage,
 					useValue: createMock<LibraryStorage>(),
-				},
-				{
-					provide: UserService,
-					useValue: createMock<UserService>(),
 				},
 				{
 					provide: AuthorizationClientAdapter,

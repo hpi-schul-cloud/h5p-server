@@ -1,4 +1,4 @@
-import { AuthorizableReferenceType } from '@modules/authorization/domain';
+import { AuthorizationBodyParamsReferenceType } from '@infra/authorization-client';
 import { NotImplementedException } from '@nestjs/common';
 import { H5PContentParentType } from '../types';
 import { H5PContentMapper } from './h5p-content.mapper';
@@ -9,7 +9,7 @@ describe(H5PContentMapper.name, () => {
 			it('should return allowed AuthorizableReferenceType equal to BoardNode', () => {
 				const result = H5PContentMapper.mapToAllowedAuthorizationEntityType(H5PContentParentType.BoardElement);
 
-				expect(result).toBe(AuthorizableReferenceType.BoardNode);
+				expect(result).toBe(AuthorizationBodyParamsReferenceType.BOARDNODES);
 			});
 		});
 

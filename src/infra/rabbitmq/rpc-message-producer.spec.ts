@@ -51,7 +51,7 @@ describe('RpcMessageProducer', () => {
 					value: true,
 				};
 
-				const message = [];
+				const message: never[] = [];
 				amqpConnection.request.mockResolvedValueOnce({ message });
 
 				const expectedParams = {

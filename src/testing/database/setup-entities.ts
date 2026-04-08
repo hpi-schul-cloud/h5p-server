@@ -1,5 +1,4 @@
-import { AnyEntity, EntityClass, MikroORM } from '@mikro-orm/core';
-import { MongoDriver } from '@mikro-orm/mongodb';
+import { AnyEntity, EntityClass, MikroORM, MongoDriver } from '@mikro-orm/mongodb';
 
 /**
  * Test-Setup to make all entities available without a database connection.

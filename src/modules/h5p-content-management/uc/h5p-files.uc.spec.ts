@@ -1,16 +1,15 @@
 import { createMock, DeepMocked } from '@golevelup/ts-jest';
 import { ICurrentUser } from '@infra/auth-guard';
+import { currentUserFactory } from '@infra/auth-guard/testing/currentuser.factory';
 import {
-    AuthorizationBodyParamsReferenceType,
-    AuthorizationClientAdapter,
-    AuthorizationContextBuilder,
+	AuthorizationBodyParamsReferenceType,
+	AuthorizationClientAdapter,
+	AuthorizationContextBuilder,
 } from '@infra/authorization-client';
 import { Logger } from '@infra/logger';
 import { H5PAjaxEndpoint, H5PEditor, IPlayerModel } from '@lumieducation/h5p-server';
-import { UserService } from '@modules/user';
 import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
-import { currentUserFactory } from '@testing/factory/currentuser.factory';
 import { Request } from 'express';
 import { Readable } from 'stream';
 import { H5P_EDITOR_CONFIG_TOKEN } from '../h5p-editor.config';
@@ -78,10 +77,6 @@ describe('H5P Files', () => {
 				{
 					provide: TemporaryFileStorage,
 					useValue: createMock<TemporaryFileStorage>(),
-				},
-				{
-					provide: UserService,
-					useValue: createMock<UserService>(),
 				},
 				{
 					provide: AuthorizationClientAdapter,
@@ -217,7 +212,9 @@ describe('H5P Files', () => {
 
 				const getContentParametersPromise = uc.getContentParameters(content.id, mockCurrentUser.userId);
 
-				await expect(getContentParametersPromise).rejects.toThrow(new NotFoundException());
+				await expect(getContentParametersPromise).rejects.toThrow(
+					new NotFoundException('Not Found', { cause: new Error('test') })
+				);
 			});
 		});
 	});

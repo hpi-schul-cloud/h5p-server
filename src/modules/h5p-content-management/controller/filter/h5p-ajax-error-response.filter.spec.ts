@@ -1,5 +1,5 @@
-import { DomainErrorHandler } from '@core/error';
 import { createMock, DeepMocked } from '@golevelup/ts-jest';
+import { DomainErrorHandler } from '@infra/error';
 import { AjaxErrorResponse, H5pError } from '@lumieducation/h5p-server';
 import { ArgumentsHost, HttpException } from '@nestjs/common';
 import { HttpArgumentsHost } from '@nestjs/common/interfaces';
