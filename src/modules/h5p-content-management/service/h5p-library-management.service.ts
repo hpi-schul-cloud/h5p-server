@@ -416,7 +416,7 @@ export class H5PLibraryManagementService {
 			'library.json',
 			true
 		)) as ILibraryMetadata;
-		const filteredJson = this.filterLibraryMetadata(parsedJson);
+		const filteredJson = this.filterLibraryMetadata(parsedJson as unknown as Record<string, unknown>);
 		const newLibraryMetadata = this.checkIsLibraryMetadata(filteredJson);
 
 		const newVersionOfLibrary: IFullLibraryName = {
@@ -730,7 +730,7 @@ export class H5PLibraryManagementService {
 		}
 
 		let fileAdded = false;
-		const filteredMetadata = this.filterInstalledLibrary(metadata);
+		const filteredMetadata = this.filterInstalledLibrary(metadata as unknown as Record<string, unknown>);
 		const dataStream = Readable.from(JSON.stringify(filteredMetadata, null, 2));
 		fileAdded = await this.libraryStorage.addFile(libraryName, 'library.json', dataStream);
 		if (fileAdded) {

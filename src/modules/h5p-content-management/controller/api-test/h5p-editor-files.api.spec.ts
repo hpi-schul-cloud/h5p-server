@@ -1,6 +1,5 @@
 import { createMock, DeepMocked } from '@golevelup/ts-jest';
 import { AuthorizationClientAdapter } from '@infra/authorization-client';
-import { ConfigurationModule } from '@infra/configuration';
 import { S3ClientAdapter } from '@infra/s3-client';
 import { IFileStats, ILibraryName } from '@lumieducation/h5p-server';
 import { ContentMetadata } from '@lumieducation/h5p-server/build/src/ContentMetadata';
@@ -9,7 +8,6 @@ import { HttpStatus, INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { UserAndAccountTestFactory } from '@testing/factory/user-and-account.test.factory';
 import { TestApiClient } from '@testing/test-api-client';
-import { TEST_JWT_CONFIG_TOKEN, TestJwtModuleConfig } from '@testing/test-jwt-module.config';
 import { Readable } from 'stream';
 import { H5PEditorTestModule } from '../../h5p-editor-test.module';
 import { H5P_CONTENT_S3_CLIENT_INJECTION_TOKEN, H5P_LIBRARIES_S3_CLIENT_INJECTION_TOKEN } from '../../h5p-editor.const';
@@ -73,7 +71,6 @@ describe('H5PEditor Controller (api)', () => {
 	let app: INestApplication;
 	let em: EntityManager;
 	let testApiClient: TestApiClient;
-	let jwtConfig: TestJwtModuleConfig;
 
 	let contentStorage: DeepMocked<ContentStorage>;
 	let libraryStorage: DeepMocked<LibraryStorage>;
@@ -81,7 +78,7 @@ describe('H5PEditor Controller (api)', () => {
 
 	beforeAll(async () => {
 		const module = await Test.createTestingModule({
-			imports: [H5PEditorTestModule, ConfigurationModule.register(TEST_JWT_CONFIG_TOKEN, TestJwtModuleConfig)],
+			imports: [H5PEditorTestModule],
 		})
 			.overrideProvider(H5P_CONTENT_S3_CLIENT_INJECTION_TOKEN)
 			.useValue(createMock<S3ClientAdapter>())
@@ -104,7 +101,6 @@ describe('H5PEditor Controller (api)', () => {
 		libraryStorage = app.get(LibraryStorage);
 		temporaryStorage = app.get(TemporaryFileStorage);
 		testApiClient = new TestApiClient(app, 'h5p-editor');
-		jwtConfig = module.get(TEST_JWT_CONFIG_TOKEN);
 	});
 
 	afterAll(async () => {
@@ -130,7 +126,7 @@ describe('H5PEditor Controller (api)', () => {
 			const setup = () => {
 				const { studentUser, studentAccount } = UserAndAccountTestFactory.buildStudent();
 
-				const loggedInClient = testApiClient.loginByUser(studentAccount, studentUser, jwtConfig);
+				const loggedInClient = testApiClient.loginByUser(studentAccount, studentUser);
 
 				return { loggedInClient };
 			};
@@ -183,7 +179,7 @@ describe('H5PEditor Controller (api)', () => {
 			const setup = async () => {
 				const { studentUser, studentAccount } = UserAndAccountTestFactory.buildStudent();
 
-				const loggedInClient = testApiClient.loginByUser(studentAccount, studentUser, jwtConfig);
+				const loggedInClient = testApiClient.loginByUser(studentAccount, studentUser);
 
 				const parentId = new ObjectId().toString();
 
@@ -255,7 +251,7 @@ describe('H5PEditor Controller (api)', () => {
 			const setup = () => {
 				const { studentUser, studentAccount } = UserAndAccountTestFactory.buildStudent();
 
-				const loggedInClient = testApiClient.loginByUser(studentAccount, studentUser, jwtConfig);
+				const loggedInClient = testApiClient.loginByUser(studentAccount, studentUser);
 
 				const mockFile = {
 					name: 'example.txt',
@@ -327,7 +323,7 @@ describe('H5PEditor Controller (api)', () => {
 			const setup = async () => {
 				const { studentUser, studentAccount } = UserAndAccountTestFactory.buildStudent();
 
-				const loggedInClient = testApiClient.loginByUser(studentAccount, studentUser, jwtConfig);
+				const loggedInClient = testApiClient.loginByUser(studentAccount, studentUser);
 
 				const parentId = new ObjectId().toString();
 

@@ -262,7 +262,7 @@ describe('ContentStorage', () => {
 
 				await service.addFile(contentIDString, filename, stream);
 
-				expect(contentRepo.existsOne).toBeCalledWith(contentIDString);
+				expect(contentRepo.existsOne).toHaveBeenCalledWith(contentIDString);
 			});
 
 			it('should call S3ClientAdapter.create', async () => {
@@ -271,7 +271,7 @@ describe('ContentStorage', () => {
 
 				await service.addFile(contentIDString, filename, stream);
 
-				expect(s3ClientAdapter.create).toBeCalledWith(
+				expect(s3ClientAdapter.create).toHaveBeenCalledWith(
 					expect.stringContaining(filename),
 					expect.objectContaining({
 						name: filename,

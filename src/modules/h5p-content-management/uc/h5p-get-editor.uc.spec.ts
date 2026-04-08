@@ -1,9 +1,9 @@
 import { createMock, DeepMocked } from '@golevelup/ts-jest';
 import { ICurrentUser } from '@infra/auth-guard';
 import {
-	AuthorizationBodyParamsReferenceType,
-	AuthorizationClientAdapter,
-	AuthorizationContextBuilder,
+    AuthorizationBodyParamsReferenceType,
+    AuthorizationClientAdapter,
+    AuthorizationContextBuilder,
 } from '@infra/authorization-client';
 import { Logger } from '@infra/logger';
 import { H5PEditor, H5PPlayer, IEditorModel } from '@lumieducation/h5p-server';
@@ -178,7 +178,7 @@ describe('get H5P editor', () => {
 
 				await uc.getH5pEditor(mockCurrentUser.userId, content.id, language);
 
-				expect(authorizationClientAdapter.checkPermissionsByReference).toBeCalledWith(
+				expect(authorizationClientAdapter.checkPermissionsByReference).toHaveBeenCalledWith(
 					AuthorizationBodyParamsReferenceType.BOARDNODES,
 					content.parentId,
 					AuthorizationContextBuilder.write([])

@@ -1,6 +1,6 @@
-import { H5pEditorEvents } from '@infra/h5p-editor-client';
-import { h5pEditorExchangeCopyContentParamsFactory } from '@infra/h5p-editor-client/testing';
 import { ErrorLogMessage } from '@infra/logger';
+import { H5pEditorEvents } from '../interface';
+import { h5pEditorExchangeCopyContentParamsFactory } from '../testing';
 import { H5pEditorExchangeInvalidParamsLoggableException } from './h5p-editor-exchange-invalid-params.loggable-exception';
 
 describe(H5pEditorExchangeInvalidParamsLoggableException.name, () => {

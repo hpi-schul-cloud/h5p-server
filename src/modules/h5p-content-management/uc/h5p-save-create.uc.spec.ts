@@ -1,9 +1,9 @@
 import { createMock, DeepMocked } from '@golevelup/ts-jest';
 import { ICurrentUser } from '@infra/auth-guard';
 import {
-	AuthorizationBodyParamsReferenceType,
-	AuthorizationClientAdapter,
-	AuthorizationContextBuilder,
+    AuthorizationBodyParamsReferenceType,
+    AuthorizationClientAdapter,
+    AuthorizationContextBuilder,
 } from '@infra/authorization-client';
 import { Logger } from '@infra/logger';
 import { H5PEditor, H5PPlayer } from '@lumieducation/h5p-server';
@@ -123,7 +123,7 @@ describe('save or create H5P content', () => {
 					parentId
 				);
 
-				expect(authorizationClientAdapter.checkPermissionsByReference).toBeCalledWith(
+				expect(authorizationClientAdapter.checkPermissionsByReference).toHaveBeenCalledWith(
 					AuthorizationBodyParamsReferenceType.BOARDNODES,
 					parentId,
 					AuthorizationContextBuilder.write([])
@@ -255,7 +255,7 @@ describe('save or create H5P content', () => {
 					parentId
 				);
 
-				expect(authorizationClientAdapter.checkPermissionsByReference).toBeCalledWith(
+				expect(authorizationClientAdapter.checkPermissionsByReference).toHaveBeenCalledWith(
 					AuthorizationBodyParamsReferenceType.BOARDNODES,
 					parentId,
 					AuthorizationContextBuilder.write([])

@@ -110,7 +110,7 @@ describe('save or create H5P content', () => {
 
 				await uc.deleteH5pContent(mockCurrentUser.userId, content.id);
 
-				expect(authorizationClientAdapter.checkPermissionsByReference).toBeCalledWith(
+				expect(authorizationClientAdapter.checkPermissionsByReference).toHaveBeenCalledWith(
 					AuthorizationBodyParamsReferenceType.BOARDNODES,
 					content.parentId,
 					AuthorizationContextBuilder.write([])
@@ -122,7 +122,7 @@ describe('save or create H5P content', () => {
 
 				await uc.deleteH5pContent(mockCurrentUser.userId, content.id);
 
-				expect(h5pEditor.deleteContent).toBeCalledWith(
+				expect(h5pEditor.deleteContent).toHaveBeenCalledWith(
 					content.id,
 					expect.objectContaining({
 						id: mockCurrentUser.userId,

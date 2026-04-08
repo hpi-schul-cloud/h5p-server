@@ -1,11 +1,14 @@
 /** @type {import('ts-jest').JestConfigWithTsJest} */
 module.exports = {
 	extensionsToTreatAsEsm: ['.ts'],
-	transformIgnorePatterns: [],
+	transformIgnorePatterns: [
+		'/node_modules/(?!(mime|p-limit|yocto-queue)/)',
+	],
 	transform: {
 		'^.+\\.tsx?$': [
 			'ts-jest',
 		],
+		'^.+\\.m?js$': '@swc/jest',
 	},
 	moduleFileExtensions: ['js', 'json', 'ts'],
 	rootDir: 'src',

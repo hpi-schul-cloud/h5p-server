@@ -37,7 +37,7 @@ describe(H5pEditorContentService.name, () => {
 	beforeEach(() => {
 		jest.clearAllMocks();
 		jest.useFakeTimers();
-		jest.setSystemTime(new Date('01-01-2020'));
+		jest.setSystemTime(new Date('01-01-2020').getTime());
 	});
 
 	afterAll(async () => {

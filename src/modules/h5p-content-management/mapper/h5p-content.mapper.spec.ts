@@ -18,7 +18,7 @@ describe(H5PContentMapper.name, () => {
 				const exec = () => {
 					H5PContentMapper.mapToAllowedAuthorizationEntityType('' as H5PContentParentType);
 				};
-				expect(exec).toThrowError(NotImplementedException);
+				expect(exec).toThrow(NotImplementedException);
 			});
 		});
 	});

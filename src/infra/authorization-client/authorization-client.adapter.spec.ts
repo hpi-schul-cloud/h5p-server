@@ -5,12 +5,12 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { AxiosResponse } from 'axios';
 import { Request } from 'express';
 import {
-	AuthorizationApi,
-	AuthorizationBodyParams,
-	AuthorizationBodyParamsReferenceType,
-	AuthorizationContextParamsAction,
-	AuthorizationContextParamsRequiredPermissions,
-	AuthorizedResponse,
+    AuthorizationApi,
+    AuthorizationBodyParams,
+    AuthorizationBodyParamsReferenceType,
+    AuthorizationContextParamsAction,
+    AuthorizationContextParamsRequiredPermissions,
+    AuthorizedResponse,
 } from './authorization-api-client';
 import { AuthorizationClientAdapter } from './authorization-client.adapter';
 import { AuthorizationErrorLoggableException, AuthorizationForbiddenLoggableException } from './error';
@@ -123,7 +123,7 @@ describe(AuthorizationClientAdapter.name, () => {
 
 					await expect(
 						service.checkPermissionsByReference(params.referenceType, params.referenceId, params.context)
-					).rejects.toThrowError(expectedError);
+					).rejects.toThrow(expectedError);
 				});
 			});
 		});
@@ -152,7 +152,7 @@ describe(AuthorizationClientAdapter.name, () => {
 
 				await expect(
 					service.checkPermissionsByReference(params.referenceType, params.referenceId, params.context)
-				).rejects.toThrowError(expectedError);
+				).rejects.toThrow(expectedError);
 			});
 		});
 	});
@@ -277,7 +277,7 @@ describe(AuthorizationClientAdapter.name, () => {
 
 				await expect(
 					adapter.hasPermissionsByReference(params.referenceType, params.referenceId, params.context)
-				).rejects.toThrowError(expectedError);
+				).rejects.toThrow(expectedError);
 			});
 		});
 
@@ -305,7 +305,7 @@ describe(AuthorizationClientAdapter.name, () => {
 
 				await expect(
 					service.hasPermissionsByReference(params.referenceType, params.referenceId, params.context)
-				).rejects.toThrowError(expectedError);
+				).rejects.toThrow(expectedError);
 			});
 		});
 

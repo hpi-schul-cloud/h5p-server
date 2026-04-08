@@ -1,9 +1,9 @@
 import { createMock, DeepMocked } from '@golevelup/ts-jest';
 import { ICurrentUser } from '@infra/auth-guard';
 import {
-	AuthorizationBodyParamsReferenceType,
-	AuthorizationClientAdapter,
-	AuthorizationContextBuilder,
+    AuthorizationBodyParamsReferenceType,
+    AuthorizationClientAdapter,
+    AuthorizationContextBuilder,
 } from '@infra/authorization-client';
 import { Logger } from '@infra/logger';
 import { H5PAjaxEndpoint, H5PEditor, IPlayerModel } from '@lumieducation/h5p-server';
@@ -135,7 +135,7 @@ describe('H5P Files', () => {
 
 				await uc.getContentParameters(content.id, mockCurrentUser.userId);
 
-				expect(authorizationClientAdapter.checkPermissionsByReference).toBeCalledWith(
+				expect(authorizationClientAdapter.checkPermissionsByReference).toHaveBeenCalledWith(
 					AuthorizationBodyParamsReferenceType.BOARDNODES,
 					content.parentId,
 					AuthorizationContextBuilder.read([])
@@ -251,7 +251,7 @@ describe('H5P Files', () => {
 
 				await uc.getContentFile(content.id, filename, requestMock, mockCurrentUser.userId);
 
-				expect(authorizationClientAdapter.checkPermissionsByReference).toBeCalledWith(
+				expect(authorizationClientAdapter.checkPermissionsByReference).toHaveBeenCalledWith(
 					AuthorizationBodyParamsReferenceType.BOARDNODES,
 					content.parentId,
 					AuthorizationContextBuilder.read([])

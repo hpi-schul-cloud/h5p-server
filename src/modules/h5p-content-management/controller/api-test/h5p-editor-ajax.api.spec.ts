@@ -1,6 +1,5 @@
 import { DeepMocked, createMock } from '@golevelup/ts-jest';
 import { AuthorizationClientAdapter } from '@infra/authorization-client';
-import { ConfigurationModule } from '@infra/configuration';
 import { S3ClientAdapter } from '@infra/s3-client';
 import { AjaxErrorResponse, H5PAjaxEndpoint, H5pError } from '@lumieducation/h5p-server';
 import { EntityManager } from '@mikro-orm/mongodb';
@@ -9,21 +8,19 @@ import { Test } from '@nestjs/testing';
 import { cleanupCollections } from '@testing/database';
 import { UserAndAccountTestFactory } from '@testing/factory/user-and-account.test.factory';
 import { TestApiClient } from '@testing/test-api-client';
-import { TEST_JWT_CONFIG_TOKEN, TestJwtModuleConfig } from '@testing/test-jwt-module.config';
-import { H5PEditorTestModule } from '../../h5p-editor-test.module';
 import { H5P_CONTENT_S3_CLIENT_INJECTION_TOKEN, H5P_LIBRARIES_S3_CLIENT_INJECTION_TOKEN } from '../../h5p-editor.const';
+import { H5PEditorTestModule } from '@modules/h5p-content-management/h5p-editor-test.module';
 
 describe('H5PEditor Controller (api)', () => {
 	let app: INestApplication;
 	let em: EntityManager;
 	let testApiClient: TestApiClient;
-	let jwtConfig: TestJwtModuleConfig;
 
 	let ajaxEndpoint: DeepMocked<H5PAjaxEndpoint>;
 
 	beforeAll(async () => {
 		const module = await Test.createTestingModule({
-			imports: [H5PEditorTestModule, ConfigurationModule.register(TEST_JWT_CONFIG_TOKEN, TestJwtModuleConfig)],
+			imports: [H5PEditorTestModule],
 		})
 			.overrideProvider(H5P_CONTENT_S3_CLIENT_INJECTION_TOKEN)
 			.useValue(createMock<S3ClientAdapter>())
@@ -40,7 +37,6 @@ describe('H5PEditor Controller (api)', () => {
 		em = app.get(EntityManager);
 		ajaxEndpoint = app.get(H5PAjaxEndpoint);
 		testApiClient = new TestApiClient(app, 'h5p-editor');
-		jwtConfig = module.get(TEST_JWT_CONFIG_TOKEN);
 	});
 
 	afterEach(async () => {
@@ -66,7 +62,7 @@ describe('H5PEditor Controller (api)', () => {
 			const setup = async () => {
 				const { studentUser, studentAccount } = UserAndAccountTestFactory.buildStudent();
 
-				const loggedInClient = testApiClient.loginByUser(studentAccount, studentUser, jwtConfig);
+				const loggedInClient = testApiClient.loginByUser(studentAccount, studentUser);
 
 				await em.persist([studentUser]).flush();
 				em.clear();
@@ -111,7 +107,7 @@ describe('H5PEditor Controller (api)', () => {
 			const setup = async () => {
 				const { teacherUser, teacherAccount } = UserAndAccountTestFactory.buildTeacher();
 
-				const loggedInClient = testApiClient.loginByUser(teacherAccount, teacherUser, jwtConfig);
+				const loggedInClient = testApiClient.loginByUser(teacherAccount, teacherUser);
 
 				await em.persist([teacherUser]).flush();
 				em.clear();
@@ -159,7 +155,7 @@ describe('H5PEditor Controller (api)', () => {
 			const setup = async () => {
 				const { studentUser, studentAccount } = UserAndAccountTestFactory.buildStudent();
 
-				const loggedInClient = testApiClient.loginByUser(studentAccount, studentUser, jwtConfig);
+				const loggedInClient = testApiClient.loginByUser(studentAccount, studentUser);
 
 				await em.persist([studentUser]).flush();
 				em.clear();
@@ -214,7 +210,7 @@ describe('H5PEditor Controller (api)', () => {
 			const setup = async () => {
 				const { teacherUser, teacherAccount } = UserAndAccountTestFactory.buildTeacher();
 
-				const loggedInClient = testApiClient.loginByUser(teacherAccount, teacherUser, jwtConfig);
+				const loggedInClient = testApiClient.loginByUser(teacherAccount, teacherUser);
 
 				await em.persist([teacherUser]).flush();
 				em.clear();

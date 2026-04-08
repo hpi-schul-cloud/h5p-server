@@ -319,7 +319,7 @@ describe('LibraryStorage', () => {
 				repo.findByNameAndExactVersion.mockResolvedValue(testingLib);
 
 				const addLib = storage.addLibrary(testingLib, false);
-				await expect(addLib).rejects.toThrowError("Can't add library because it already exists");
+				await expect(addLib).rejects.toThrow("Can't add library because it already exists");
 			});
 		});
 
@@ -341,7 +341,7 @@ describe('LibraryStorage', () => {
 				});
 
 				const getLibrary = storage.getLibrary(testingLib);
-				await expect(getLibrary).rejects.toThrowError();
+				await expect(getLibrary).rejects.toThrow();
 			});
 		});
 
@@ -396,7 +396,7 @@ describe('LibraryStorage', () => {
 				});
 
 				const updateLibrary = storage.updateLibrary(testingLib);
-				await expect(updateLibrary).rejects.toThrowError('Library is not installed');
+				await expect(updateLibrary).rejects.toThrow('Library is not installed');
 			});
 		});
 
@@ -428,7 +428,7 @@ describe('LibraryStorage', () => {
 				});
 
 				const updateMetadata = storage.updateAdditionalMetadata(testingLib, { restricted: true });
-				await expect(updateMetadata).rejects.toThrowError();
+				await expect(updateMetadata).rejects.toThrow();
 			});
 		});
 
@@ -460,7 +460,7 @@ describe('LibraryStorage', () => {
 				});
 
 				const deleteLibrary = storage.deleteLibrary(testingLib);
-				await expect(deleteLibrary).rejects.toThrowError();
+				await expect(deleteLibrary).rejects.toThrow();
 			});
 		});
 	});
@@ -877,7 +877,7 @@ describe('LibraryStorage', () => {
 				const { testingLib } = await setup(true, false);
 
 				const getStats = storage.getFileStats(testingLib, '../invalid');
-				await expect(getStats).rejects.toThrowError('illegal-filename');
+				await expect(getStats).rejects.toThrow('illegal-filename');
 			});
 
 			it('should throw NotFoundException if the file has no content-length or birthtime', async () => {
@@ -894,7 +894,7 @@ describe('LibraryStorage', () => {
 					});
 
 				const undefinedLength = storage.getFileStats(testingLib, testFile.name);
-				await expect(undefinedLength).rejects.toThrowError(NotFoundException);
+				await expect(undefinedLength).rejects.toThrow(NotFoundException);
 
 				const undefinedBirthtime = storage.getFileStats(testingLib, testFile.name);
 				await expect(undefinedBirthtime).rejects.toThrow(NotFoundException);

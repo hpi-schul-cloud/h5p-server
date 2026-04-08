@@ -1,6 +1,5 @@
 import { createMock, DeepMocked } from '@golevelup/ts-jest/lib/mocks';
 import { AuthorizationClientAdapter } from '@infra/authorization-client';
-import { ConfigurationModule } from '@infra/configuration';
 import { S3ClientAdapter } from '@infra/s3-client';
 import { H5PPlayer, IPlayerModel } from '@lumieducation/h5p-server';
 import { EntityManager, ObjectId } from '@mikro-orm/mongodb';
@@ -9,10 +8,9 @@ import { Test } from '@nestjs/testing';
 import { cleanupCollections } from '@testing/database';
 import { UserAndAccountTestFactory } from '@testing/factory/user-and-account.test.factory';
 import { TestApiClient } from '@testing/test-api-client';
-import { TEST_JWT_CONFIG_TOKEN, TestJwtModuleConfig } from '@testing/test-jwt-module.config';
-import { H5PEditorTestModule } from '../../h5p-editor-test.module';
 import { H5P_CONTENT_S3_CLIENT_INJECTION_TOKEN, H5P_LIBRARIES_S3_CLIENT_INJECTION_TOKEN } from '../../h5p-editor.const';
 import { h5pContentFactory } from '../../testing';
+import { H5PEditorTestModule } from '@modules/h5p-content-management/h5p-editor-test.module';
 
 const buildContent = () => {
 	const contentId = new ObjectId(0).toString();
@@ -36,11 +34,10 @@ describe('H5PEditor Controller (api)', () => {
 	let em: EntityManager;
 	let h5pPlayer: DeepMocked<H5PPlayer>;
 	let testApiClient: TestApiClient;
-	let jwtConfig: TestJwtModuleConfig;
 
 	beforeAll(async () => {
 		const module = await Test.createTestingModule({
-			imports: [H5PEditorTestModule, ConfigurationModule.register(TEST_JWT_CONFIG_TOKEN, TestJwtModuleConfig)],
+			imports: [H5PEditorTestModule],
 		})
 			.overrideProvider(H5P_CONTENT_S3_CLIENT_INJECTION_TOKEN)
 			.useValue(createMock<S3ClientAdapter>())
@@ -58,7 +55,6 @@ describe('H5PEditor Controller (api)', () => {
 
 		testApiClient = new TestApiClient(app, '/h5p-editor/play');
 		em = module.get(EntityManager);
-		jwtConfig = module.get(TEST_JWT_CONFIG_TOKEN);
 	});
 
 	afterAll(async () => {
@@ -85,7 +81,7 @@ describe('H5PEditor Controller (api)', () => {
 				const setup = async () => {
 					const { teacherUser, teacherAccount } = UserAndAccountTestFactory.buildTeacher();
 
-					const loggedInClient = testApiClient.loginByUser(teacherAccount, teacherUser, jwtConfig);
+					const loggedInClient = testApiClient.loginByUser(teacherAccount, teacherUser);
 
 					const parentId = new ObjectId().toHexString();
 
@@ -115,7 +111,7 @@ describe('H5PEditor Controller (api)', () => {
 			const setup = () => {
 				const { teacherUser, teacherAccount } = UserAndAccountTestFactory.buildTeacher();
 
-				const loggedInClient = testApiClient.loginByUser(teacherAccount, teacherUser, jwtConfig);
+				const loggedInClient = testApiClient.loginByUser(teacherAccount, teacherUser);
 				const contentId = new ObjectId().toHexString();
 
 				return { loggedInClient, contentId };
@@ -134,7 +130,7 @@ describe('H5PEditor Controller (api)', () => {
 			const setup = () => {
 				const { teacherUser, teacherAccount } = UserAndAccountTestFactory.buildTeacher();
 
-				const loggedInClient = testApiClient.loginByUser(teacherAccount, teacherUser, jwtConfig);
+				const loggedInClient = testApiClient.loginByUser(teacherAccount, teacherUser);
 
 				return { loggedInClient };
 			};
