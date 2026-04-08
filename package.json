@@ -4,6 +4,7 @@
 	"main": "index.js",
 	"scripts": {
 		"build": "nest build",
+		"format": "prettier --write \"src/**/*.ts\"",
 		"start:h5p": "nest start h5p-editor",
 		"start:h5p:dev": "nest start h5p-editor --debug --watch",
 		"start:h5p:prod": "node dist/apps/h5p-editor.app",
@@ -12,7 +13,10 @@
 		"start:h5p:library-management": "nest start h5p-library-management",
 		"start:h5p:library-management:dev": "nest start h5p-library-management --debug --watch",
 		"start:h5p:library-management:prod": "node dist/apps/h5p-library-management.app",
-		"test": "echo \"Error: no test specified\" && exit 1"
+		"lint": "eslint \"{src,apps,libs,test}/**/*.ts\"",
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"pregenerate-client:authorization-api": "rimraf ./src/infra/authorization-client/authorization-api-client",
+		"generate-client:authorization-api": "openapi-generator-cli generate -c ./openapitools.json --generator-key authorization-api"
 	},
 	"repository": {
 		"type": "git",
