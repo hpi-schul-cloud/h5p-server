@@ -3,7 +3,7 @@
       kubeconfig: ~/.kube/config
       namespace: "{{ NAMESPACE }}"
       template: onepassword.yml.j2
-    when: ONEPASSWORD_OPERATOR is defined and ONEPASSWORD_OPERATOR|bool and WITH_H5P_EDITOR is defined and WITH_H5P_EDITOR|bool
+    when: ONEPASSWORD_OPERATOR is defined and ONEPASSWORD_OPERATOR|bool and WITH_H5P_SERVER is defined and WITH_H5P_SERVER|bool
     tags:
       - 1password
 
@@ -12,7 +12,7 @@
       kubeconfig: ~/.kube/config
       namespace: "{{ NAMESPACE }}"
       template: svc.yml.j2
-    when: WITH_H5P_EDITOR is defined and WITH_H5P_EDITOR|bool
+    when: WITH_H5P_SERVER is defined and WITH_H5P_SERVER|bool
     tags:
       - service
 
@@ -21,7 +21,7 @@
       kubeconfig: ~/.kube/config
       namespace: "{{ NAMESPACE }}"
       template: deployment.yml.j2
-    when: WITH_H5P_EDITOR is defined and WITH_H5P_EDITOR|bool
+    when: WITH_H5P_SERVER is defined and WITH_H5P_SERVER|bool
     tags:
       - deployment
 
@@ -30,7 +30,7 @@
       kubeconfig: ~/.kube/config
       namespace: "{{ NAMESPACE }}"
       template: configmap.yml.j2
-    when: WITH_H5P_EDITOR is defined and WITH_H5P_EDITOR|bool
+    when: WITH_H5P_SERVER is defined and WITH_H5P_SERVER|bool
     tags:
       - configmap
 
@@ -50,6 +50,6 @@
       kubeconfig: ~/.kube/config
       namespace: "{{ NAMESPACE }}"
       template: consumer-deployment.yml.j2
-    when: WITH_H5P_EDITOR is defined and WITH_H5P_EDITOR|bool
+    when: WITH_H5P_SERVER is defined and WITH_H5P_SERVER|bool
     tags:
       - deployment

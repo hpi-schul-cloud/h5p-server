@@ -14,7 +14,7 @@
       kubeconfig: ~/.kube/config
       namespace: "{{ NAMESPACE }}"
       template: onepassword.yml.j2
-      state: "{{ 'present' if WITH_H5P_LIBRARY_MANAGEMENT is defined and WITH_H5P_LIBRARY_MANAGEMENT|bool else 'absent'}}"
+      state: "{{ 'present' if WITH_H5P_CRONJOB is defined and WITH_H5P_CRONJOB|bool else 'absent'}}"
     tags:
       - 1password
 
@@ -23,7 +23,7 @@
       kubeconfig: ~/.kube/config
       namespace: "{{ NAMESPACE }}"
       template: configmap.yml.j2
-      state: "{{ 'present' if WITH_H5P_LIBRARY_MANAGEMENT is defined and WITH_H5P_LIBRARY_MANAGEMENT|bool else 'absent'}}"
+      state: "{{ 'present' if WITH_H5P_CRONJOB is defined and WITH_H5P_CRONJOB|bool else 'absent'}}"
     tags:
       - configmap
 
@@ -32,6 +32,6 @@
       kubeconfig: ~/.kube/config
       namespace: "{{ NAMESPACE }}"
       template: cronjob.yml.j2
-      state: "{{ 'present' if WITH_H5P_LIBRARY_MANAGEMENT is defined and WITH_H5P_LIBRARY_MANAGEMENT|bool else 'absent'}}"
+      state: "{{ 'present' if WITH_H5P_CRONJOB is defined and WITH_H5P_CRONJOB|bool else 'absent'}}"
     tags:
       - cronjob
