@@ -16,7 +16,10 @@
 		"lint": "eslint \"{src,apps,libs,test}/**/*.ts\"",
 		"test": "echo \"Error: no test specified\" && exit 1",
 		"pregenerate-client:authorization-api": "rimraf ./src/infra/authorization-client/authorization-api-client",
-		"generate-client:authorization-api": "openapi-generator-cli generate -c ./openapitools.json --generator-key authorization-api"
+		"generate-client:authorization-api": "openapi-generator-cli generate -c ./openapitools.json --generator-key authorization-api",
+		"h5p:package-h5p-libraries": "tsc scripts/h5p/package-h5p-libraries.ts --esModuleInterop && set -a && source .env && set +a && node ./scripts/h5p/package-h5p-libraries.js",
+		"h5p:update-h5p-map": "tsc scripts/h5p/update-h5p-map.ts --esModuleInterop && set -a && source .env && set +a && node ./scripts/h5p/update-h5p-map.js",
+		"h5p:upload-h5p-libraries": "tsc scripts/h5p/upload-h5p-libraries.ts --esModuleInterop && set -a && source .env && set +a && node ./scripts/h5p/upload-h5p-libraries.js"
 	},
 	"repository": {
 		"type": "git",
