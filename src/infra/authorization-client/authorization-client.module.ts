@@ -19,6 +19,7 @@ export class AuthorizationClientModule {
 					const configuration = new Configuration({
 						basePath: `${basePath}/v3`,
 					});
+
 					return new AuthorizationApi(configuration);
 				},
 				inject: [configInjectionToken],

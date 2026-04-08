@@ -3,25 +3,25 @@ import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 export class AjaxPostQueryParams {
 	@IsString()
 	@IsNotEmpty()
-	action!: string;
+	public action!: string;
 
 	@IsString()
 	@IsOptional()
-	machineName?: string;
+	public machineName?: string;
 
 	@IsString()
 	@IsOptional()
-	majorVersion?: string;
+	public majorVersion?: string;
 
 	@IsString()
 	@IsOptional()
-	minorVersion?: string;
+	public minorVersion?: string;
 
 	@IsString()
 	@IsOptional()
-	language?: string;
+	public language?: string;
 
 	@IsString()
 	@IsOptional()
-	id?: string;
+	public id?: string;
 }

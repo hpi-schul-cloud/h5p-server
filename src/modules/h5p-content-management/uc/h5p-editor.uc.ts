@@ -278,7 +278,7 @@ export class H5PEditorUc {
 
 			return result;
 		} catch (err) {
-			throw new NotFoundException();
+			throw new NotFoundException('getContentParameters failed', { cause: err });
 		}
 	}
 
@@ -309,7 +309,7 @@ export class H5PEditorUc {
 				contentRange: range, // Range can be undefined, typings from @lumieducation/h5p-server are wrong
 			};
 		} catch (err) {
-			throw new NotFoundException();
+			throw new NotFoundException('getContentFile failed', { cause: err });
 		}
 	}
 
@@ -321,10 +321,10 @@ export class H5PEditorUc {
 			return {
 				data: stream,
 				contentType: mimetype,
-				contentLength: size as number,
+				contentLength: size ?? 0,
 			};
 		} catch (err) {
-			throw new NotFoundException();
+			throw new NotFoundException('getLibraryFile failed', { cause: err });
 		}
 	}
 
@@ -344,7 +344,7 @@ export class H5PEditorUc {
 				contentRange: range, // Range can be undefined, typings from @lumieducation/h5p-server are wrong
 			};
 		} catch (err) {
-			throw new NotFoundException();
+			throw new NotFoundException('getTemporaryFile failed', { cause: err });
 		}
 	}
 
@@ -353,7 +353,7 @@ export class H5PEditorUc {
 		await this.checkContentPermission(parentType, parentId, AuthorizationContextBuilder.read([]));
 
 		const user = this.changeUserType(userId);
-		// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+
 		const playerModel: IPlayerModel = await this.h5pPlayer.render(contentId, user);
 
 		return playerModel;
@@ -364,7 +364,6 @@ export class H5PEditorUc {
 		const user = this.changeUserType(currentUser.userId);
 		const fakeUndefinedString = this.fakeUndefinedAsString();
 
-		// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 		const createdH5PEditor: IEditorModel = await this.h5pEditor.render(
 			fakeUndefinedString, // Lumi typings are wrong because they dont "use strict", this method actually accepts both string and undefined
 			language,
@@ -500,13 +499,15 @@ export class H5PEditorUc {
 		return user;
 	}
 
-	private async getUserLanguage(userId: EntityId): Promise<string> {
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	private getUserLanguage(_userId: EntityId): string {
 		// @TODO replace with me route
 		//const languageUser = await this.userService.findById(userId);
-		let userLanguage = LanguageType.DE;
+		const userLanguage = LanguageType.DE;
 		//if (languageUser?.language) {
 		//	userLanguage = languageUser.language;
 		//}
+
 		return userLanguage;
 	}
 }

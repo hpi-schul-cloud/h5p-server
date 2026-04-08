@@ -24,7 +24,7 @@ jest.mock('axios', (): unknown => {
 });
 
 const jwtToken = 'someJwtToken';
-const requiredPermissions: Array<AuthorizationContextParamsRequiredPermissions> = [
+const requiredPermissions: AuthorizationContextParamsRequiredPermissions[] = [
 	AuthorizationContextParamsRequiredPermissions.ACCOUNT_CREATE,
 	AuthorizationContextParamsRequiredPermissions.ACCOUNT_DELETE,
 ];
@@ -321,7 +321,7 @@ describe(AuthorizationClientAdapter.name, () => {
 				};
 
 				const axiosError = new Error('axios error');
-				// eslint-disable-next-line @typescript-eslint/no-var-requires
+
 				const spyIsAxiosError = jest.spyOn(require('axios'), 'isAxiosError').mockReturnValue(true);
 
 				authorizationApi.authorizationReferenceControllerAuthorizeByReference.mockRejectedValueOnce(axiosError);

@@ -128,15 +128,17 @@ describe('InstalledLibrary', () => {
 	});
 
 	describe('compare', () => {
-		describe('when compare', () => {});
-		it('should return -1', () => {
-			const result = addonLibVersionOne.compare(addonLibVersionTwo);
-			expect(result).toBe(-1);
+		describe('when compare', () => {
+			it('should return -1', () => {
+				const result = addonLibVersionOne.compare(addonLibVersionTwo);
+				expect(result).toBe(-1);
+			});
 		});
+
 		describe('when compare library Version', () => {
 			it('should call compareVersions', () => {
 				const compareVersionsSpy = (
-					jest.spyOn(addonLibVersionOne, 'compareVersions') as jest.SpyInstance<any, any>
+					jest.spyOn(addonLibVersionOne, 'compareVersions') as jest.SpyInstance<unknown, unknown[]>
 				).mockReturnValueOnce(0);
 				addonLibVersionOne.compare(addonLibVersionOne);
 				expect(compareVersionsSpy).toHaveBeenCalled();

@@ -99,7 +99,7 @@ export class TemporaryFileStorage implements ITemporaryFileStorage {
 	 * @deprecated do not use this function
 	 */
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	public async listFiles(_user?: IUser): Promise<ITemporaryFile[]> {
+	public listFiles(_user?: IUser): Promise<ITemporaryFile[]> {
 		// Lumi uses this method to find expired files that should be deleted.
 		// Since we use S3 to delete expired files, we just use a barebones implementation
 		// Lumi's reference implementation does it the same way
@@ -140,11 +140,13 @@ export class TemporaryFileStorage implements ITemporaryFileStorage {
 
 	private getUserPath(userId: string): string {
 		const path = `h5p-tempfiles/${userId}/`;
+
 		return path;
 	}
 
 	private getFilePath(userId: string, filename: string): string {
 		const path = `${this.getUserPath(userId)}${filename}`;
+
 		return path;
 	}
 }

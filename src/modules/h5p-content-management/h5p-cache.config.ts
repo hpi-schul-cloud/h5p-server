@@ -7,20 +7,20 @@ export const H5P_CACHE_CONFIG_TOKEN = 'H5P_CACHE_CONFIG_TOKEN';
 export class H5PCacheConfig {
 	@ConfigProperty('DB_URL')
 	@IsUrl({ require_tld: false, require_protocol: false, protocols: ['mongodb', 'mongodb+srv'] })
-	public dbUrl!: string;
+	dbUrl!: string;
 
 	@IsString()
 	@IsOptional()
 	@ConfigProperty('DB_USERNAME')
-	public dbUsername?: string;
+	dbUsername?: string;
 
 	@IsString()
 	@IsOptional()
 	@ConfigProperty('DB_PASSWORD')
-	public dbPassword?: string;
+	dbPassword?: string;
 
 	@IsString()
 	@IsOptional()
 	@ConfigProperty('H5P_CACHE_COLLECTION_NAME')
-	public dbCollectionName = 'h5p-cache';
+	dbCollectionName = 'h5p-cache';
 }

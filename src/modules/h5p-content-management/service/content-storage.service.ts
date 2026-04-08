@@ -53,6 +53,7 @@ export class ContentStorage implements IContentStorage {
 				content,
 			});
 		}
+
 		return h5pContent;
 	}
 
@@ -63,7 +64,7 @@ export class ContentStorage implements IContentStorage {
 		contentId?: ContentId | undefined
 	): Promise<ContentId> {
 		try {
-			const h5pContent = await this.createOrUpdateContent(contentId as string, user, metadata, content);
+			const h5pContent = await this.createOrUpdateContent(contentId ?? '', user, metadata, content);
 			await this.repo.save(h5pContent);
 
 			return h5pContent.id;
@@ -168,11 +169,13 @@ export class ContentStorage implements IContentStorage {
 
 	public async getMetadata(contentId: string): Promise<IContentMetadata> {
 		const h5pContent = await this.repo.findById(contentId);
+
 		return h5pContent.metadata;
 	}
 
 	public async getParameters(contentId: string): Promise<unknown> {
 		const h5pContent = await this.repo.findById(contentId);
+
 		return h5pContent.content;
 	}
 
@@ -256,6 +259,7 @@ export class ContentStorage implements IContentStorage {
 		}
 
 		const path = `h5p-content/${contentId}/`;
+
 		return path;
 	}
 
@@ -267,6 +271,7 @@ export class ContentStorage implements IContentStorage {
 		}
 
 		const path = `${this.getContentPath(contentId)}${filename}`;
+
 		return path;
 	}
 }

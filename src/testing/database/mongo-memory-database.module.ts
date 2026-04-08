@@ -12,8 +12,8 @@ const createMikroOrmModule = (options: MikroOrmModuleAsyncOptions): MaybePromise
 	const mikroOrmModule = MikroOrmModule.forRootAsync({
 		driver: MongoDriver,
 		useFactory: () => {
-			// eslint-disable-next-line @typescript-eslint/restrict-template-expressions, no-process-env
 			const clientUrl = `${process.env.MONGO_TEST_URI}/${dbName()}`;
+
 			return defineConfig({
 				allowGlobalContext: true, // can be overridden by options
 				...options,

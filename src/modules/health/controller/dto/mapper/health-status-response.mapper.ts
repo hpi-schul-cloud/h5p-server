@@ -1,9 +1,9 @@
 import { HealthStatus } from '../../../domain';
-import { HealthStatusResponse, HealthStatusCheckResponse } from '../response';
+import { HealthStatusCheckResponse, HealthStatusResponse } from '../response';
 import { HealthStatusCheckResponseMapper } from './health-status-check-response.mapper';
 
 export class HealthStatusResponseMapper {
-	static mapToResponse(healthStatus: HealthStatus): HealthStatusResponse {
+	public static mapToResponse(healthStatus: HealthStatus): HealthStatusResponse {
 		const response = new HealthStatusResponse({
 			status: healthStatus.status,
 			description: healthStatus.description,
@@ -16,7 +16,7 @@ export class HealthStatusResponseMapper {
 			for (const key of Object.keys(healthStatus.checks)) {
 				const checks = healthStatus.checks[key];
 
-				const responseChecks: Array<HealthStatusCheckResponse> = [];
+				const responseChecks: HealthStatusCheckResponse[] = [];
 
 				checks.forEach((check) => {
 					responseChecks.push(HealthStatusCheckResponseMapper.mapToResponse(check));

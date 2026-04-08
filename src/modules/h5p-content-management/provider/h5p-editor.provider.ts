@@ -33,7 +33,7 @@ export const H5PEditorProvider = {
 			permissionSystem,
 			fileSanitizers: [new SvgSanitizer()],
 		};
-		// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+
 		const translationFunction: ITranslationFunction = await Translator.translate(availableLanguages);
 		const h5pEditor = new H5PEditor(
 			cache,

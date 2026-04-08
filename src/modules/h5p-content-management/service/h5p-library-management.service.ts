@@ -441,10 +441,11 @@ export class H5PLibraryManagementService {
 		}
 
 		this.logLibraryAlreadyInstalled(newVersionOfLibrary);
+
 		return { type: 'none' };
 	}
 
-	private filterLibraryMetadata(obj: Record<string, any>): ILibraryMetadata {
+	private filterLibraryMetadata(obj: Record<string, unknown>): ILibraryMetadata {
 		const allowedKeys: (keyof ILibraryMetadata)[] = [
 			'machineName',
 			'majorVersion',
@@ -645,11 +646,11 @@ export class H5PLibraryManagementService {
 	}
 
 	private getCssPaths(metadata: IInstalledLibrary): string[] {
-		return metadata?.preloadedCss?.map((css) => css.path) || [];
+		return metadata?.preloadedCss?.map((css) => css.path) ?? [];
 	}
 
 	private getJsPaths(metadata: IInstalledLibrary): string[] {
-		return metadata?.preloadedJs?.map((js) => js.path) || [];
+		return metadata?.preloadedJs?.map((js) => js.path) ?? [];
 	}
 
 	private logMetadataMissing(error: unknown, library: ILibraryName): void {
@@ -754,7 +755,7 @@ export class H5PLibraryManagementService {
 		);
 	}
 
-	private filterInstalledLibrary(obj: Record<string, any>): IInstalledLibrary {
+	private filterInstalledLibrary(obj: Record<string, unknown>): IInstalledLibrary {
 		const allowedKeys: (keyof IInstalledLibrary)[] = [
 			'machineName',
 			'majorVersion',
@@ -846,17 +847,18 @@ export class H5PLibraryManagementService {
 		if (error instanceof Error && error.message) {
 			return error.message.includes('S3ClientAdapter') || error.message.includes('S3Client');
 		}
+
 		return false;
 	}
 
-	private filterObjectByInterface<T>(obj: Record<string, any>, allowedKeys: (keyof T)[]): Partial<T> {
+	private filterObjectByInterface<T>(obj: Record<string, unknown>, allowedKeys: (keyof T)[]): Partial<T> {
 		const result: Partial<T> = {};
 		for (const key of allowedKeys) {
 			if (key in obj) {
-				// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-				result[key] = obj[key as string];
+				result[key] = obj[key as string] as T[keyof T];
 			}
 		}
+
 		return result;
 	}
 }

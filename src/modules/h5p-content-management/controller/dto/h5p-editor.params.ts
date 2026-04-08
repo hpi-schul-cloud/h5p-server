@@ -1,3 +1,4 @@
+/* eslint-disable max-classes-per-file */
 import { IContentMetadata } from '@lumieducation/h5p-server';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { EntityId } from '@shared/domain/types';
@@ -9,48 +10,48 @@ export class GetH5PContentParams {
 	@ApiPropertyOptional({ enum: LanguageType, enumName: 'LanguageType' })
 	@IsEnum(LanguageType)
 	@IsOptional()
-	public language?: LanguageType;
+	language?: LanguageType;
 
 	@ApiProperty()
 	@IsMongoId()
-	public contentId!: string;
+	contentId!: string;
 }
 
 export class GetH5PEditorParamsCreate {
 	@ApiProperty({ enum: LanguageType, enumName: 'LanguageType' })
 	@IsEnum(LanguageType)
-	public language!: LanguageType;
+	language!: LanguageType;
 }
 
 export class GetH5PEditorParams {
 	@ApiProperty()
 	@IsMongoId()
-	public contentId!: string;
+	contentId!: string;
 
 	@ApiProperty({ enum: LanguageType, enumName: 'LanguageType' })
 	@IsEnum(LanguageType)
-	public language!: LanguageType;
+	language!: LanguageType;
 }
 
 export class SaveH5PEditorParams {
 	@ApiProperty()
 	@IsMongoId()
-	public contentId!: string;
+	contentId!: string;
 }
 
 export class PostH5PContentCreateParams {
 	@ApiProperty({ enum: H5PContentParentType, enumName: 'H5PContentParentType' })
 	@IsEnum(H5PContentParentType)
-	public parentType!: H5PContentParentType;
+	parentType!: H5PContentParentType;
 
 	@ApiProperty()
 	@IsMongoId()
-	public parentId!: EntityId;
+	parentId!: EntityId;
 
 	@ApiProperty()
 	@IsNotEmpty()
 	@IsObject()
-	public params!: {
+	params!: {
 		params: unknown;
 		metadata: IContentMetadata;
 	};
@@ -58,5 +59,5 @@ export class PostH5PContentCreateParams {
 	@ApiProperty()
 	@IsString()
 	@IsNotEmpty()
-	public library!: string;
+	library!: string;
 }

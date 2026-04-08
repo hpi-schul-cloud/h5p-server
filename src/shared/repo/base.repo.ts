@@ -28,6 +28,7 @@ export abstract class BaseRepo<T extends BaseEntity> {
 
 	public findById(id: EntityId | ObjectId): Promise<T> {
 		const promise: Promise<T> = this._em.findOneOrFail(this.entityName, id as FilterQuery<T>);
+
 		return promise;
 	}
 }

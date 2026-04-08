@@ -8,10 +8,10 @@ export const HEALTH_CONFIG_TOKEN = 'HEALTH_CONFIG_TOKEN';
 export class HealthConfig {
 	@ConfigProperty('HOSTNAME')
 	@IsUrl({ require_tld: false })
-	public hostname!: string;
+	hostname!: string;
 
 	@ConfigProperty('HEALTH_CHECKS_EXCLUDE_MONGODB')
 	@StringToBoolean()
 	@IsBoolean()
-	public excludeMongoDB = false;
+	excludeMongoDB = false;
 }

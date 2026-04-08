@@ -1,13 +1,13 @@
 import { HealthStatusCheckResponse } from './health-status-check.response';
 
 export class HealthStatusResponse {
-	status: string;
+	public status: string;
 
-	description?: string;
+	public description?: string;
 
-	output?: string;
+	public output?: string;
 
-	checks?: Record<string, Array<HealthStatusCheckResponse>>;
+	public checks?: Record<string, HealthStatusCheckResponse[]>;
 
 	constructor({ status, description, output, checks }: HealthStatusResponse) {
 		this.status = status;

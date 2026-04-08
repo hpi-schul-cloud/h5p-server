@@ -61,7 +61,7 @@ export class H5PEditorController {
 	@ApiResponse({ status: 403, type: ForbiddenException })
 	@ApiResponse({ status: 500, type: InternalServerErrorException })
 	@Get('/play/:contentId')
-	public async getPlayer(
+	public getPlayer(
 		@CurrentUser() currentUser: ICurrentUser,
 		@Param() params: GetH5PContentParams
 	): Promise<IPlayerModel> {

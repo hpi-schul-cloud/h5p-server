@@ -645,7 +645,6 @@ describe('ContentStorage', () => {
 				for (const range of testRanges) {
 					s3ClientAdapter.get.mockResolvedValueOnce(fileResponse);
 
-					// eslint-disable-next-line no-await-in-loop
 					await service.getFileStream(contentID, filename, user, range[0], range[1]);
 
 					expect(s3ClientAdapter.get).toHaveBeenCalledWith(expect.stringContaining(filename), range[2]);

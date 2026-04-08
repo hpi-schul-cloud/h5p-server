@@ -6,13 +6,14 @@ import { NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import pLimit from 'p-limit';
 import { Readable } from 'stream';
+import { H5P_LIBRARIES_S3_CLIENT_INJECTION_TOKEN } from '../h5p-editor.const';
 import { FileMetadata, InstalledLibrary, LibraryRepo } from '../repo';
 import { LibraryStorage } from './library-storage.service';
-import { H5P_LIBRARIES_S3_CLIENT_INJECTION_TOKEN } from '../h5p-editor.const';
 
-async function readStream(stream: Readable): Promise<string> {
+function readStream(stream: Readable): Promise<string> {
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	const chunks: any[] = [];
+
 	return new Promise((resolve, reject) => {
 		stream.on('data', (chunk) => chunks.push(chunk));
 		stream.on('error', reject);
@@ -58,6 +59,7 @@ describe('LibraryStorage', () => {
 			for (const lib of installedLibs) {
 				libs.push(lib);
 			}
+
 			return Promise.resolve(libs);
 		});
 
@@ -68,6 +70,7 @@ describe('LibraryStorage', () => {
 					libs.push(lib);
 				}
 			}
+
 			return Promise.resolve(libs);
 		});
 
@@ -82,6 +85,7 @@ describe('LibraryStorage', () => {
 					return Promise.resolve(lib);
 				}
 			}
+
 			return Promise.resolve(null);
 		});
 
@@ -97,6 +101,7 @@ describe('LibraryStorage', () => {
 					latest = lib;
 				}
 			}
+
 			return Promise.resolve(latest);
 		});
 
@@ -118,6 +123,7 @@ describe('LibraryStorage', () => {
 
 		repo.createLibrary.mockImplementation((lib) => {
 			installedLibs.push(lib);
+
 			return Promise.resolve();
 		});
 
@@ -125,9 +131,10 @@ describe('LibraryStorage', () => {
 			if ('concat' in lib) {
 				throw Error('Expected InstalledLibrary, not InstalledLibrary[]');
 			}
-			if (installedLibs.indexOf(lib) === -1) {
+			if (!installedLibs.includes(lib)) {
 				installedLibs.push(lib);
 			}
+
 			return Promise.resolve();
 		});
 
@@ -138,6 +145,7 @@ describe('LibraryStorage', () => {
 			} else {
 				throw new Error('Library not found');
 			}
+
 			return Promise.resolve();
 		});
 
@@ -146,6 +154,7 @@ describe('LibraryStorage', () => {
 		s3ClientAdapter.create.mockImplementation(async (filepath, dto) => {
 			const content = await readStream(dto.data);
 			savedFiles.push([filepath, content]);
+
 			return Promise.resolve({} as ServiceOutputTypes);
 		});
 
@@ -432,6 +441,7 @@ describe('LibraryStorage', () => {
 					repo.findOneByNameAndVersionOrFail.mockImplementation(() => {
 						throw new Error('Library is not installed');
 					});
+
 					return Promise.resolve();
 				});
 
@@ -612,6 +622,7 @@ describe('LibraryStorage', () => {
 				await Promise.all(
 					filenames.map((filename) => {
 						const addFile = () => storage.addFile(testingLib, filename, Readable.from(Buffer.from('')));
+
 						return expect(addFile).rejects.toThrow('illegal-filename');
 					})
 				);
@@ -628,6 +639,7 @@ describe('LibraryStorage', () => {
 					});
 
 					const addFile = () => storage.addFile(testingLib, filename, Readable.from(Buffer.from('')));
+
 					return expect(addFile).rejects.toThrow(error);
 				});
 			});

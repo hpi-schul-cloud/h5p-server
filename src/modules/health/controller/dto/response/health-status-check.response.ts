@@ -1,17 +1,17 @@
 export class HealthStatusCheckResponse {
-	componentType: string;
+	public componentType: string;
 
-	componentId?: string;
+	public componentId?: string;
 
-	observedValue?: string | number | object;
+	public observedValue?: string | number | object;
 
-	observedUnit?: string;
+	public observedUnit?: string;
 
-	status: string;
+	public status: string;
 
-	time?: Date;
+	public time?: Date;
 
-	output?: string;
+	public output?: string;
 
 	constructor({
 		componentType,

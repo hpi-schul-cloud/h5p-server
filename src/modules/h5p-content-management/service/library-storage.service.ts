@@ -44,7 +44,7 @@ export class LibraryStorage implements ILibraryStorage {
 	 * @param filename the requested file
 	 */
 	private checkFilename(filename: string): void {
-		const hasPathTraversal = /\.\.\//.test(filename);
+		const hasPathTraversal = filename.includes('../');
 		const isAbsolutePath = filename.startsWith('/');
 
 		if (hasPathTraversal || isAbsolutePath) {
@@ -259,13 +259,13 @@ export class LibraryStorage implements ILibraryStorage {
 	 * Counts how often libraries are listed in the dependencies of other libraries and returns a list of the number.
 	 * @returns an object with ubernames as key.
 	 */
-	public async getAllDependentsCount(): Promise<{ [ubername: string]: number }> {
+	public async getAllDependentsCount(): Promise<Record<string, number>> {
 		const libraries = await this.libraryRepo.getAll();
 
 		this.removeCircularDependencies(libraries);
 
 		// Count dependencies
-		const dependencyCounts: { [ubername: string]: number } = {};
+		const dependencyCounts: Record<string, number> = {};
 		for (const library of libraries) {
 			const { preloadedDependencies = [], editorDependencies = [], dynamicDependencies = [] } = library;
 			const softDependencies = await this.getSoftDependenciesFromSemantics(library);
@@ -298,19 +298,16 @@ export class LibraryStorage implements ILibraryStorage {
 		return softDependencies;
 	}
 
-	private findLibraryOptions(semantics: any[]): string[] {
+	private findLibraryOptions(semantics: unknown[]): string[] {
 		const results: string[] = [];
 
-		function search(obj: any): void {
+		function search(obj: unknown): void {
 			if (obj && typeof obj === 'object') {
-				// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
 				if ('type' in obj && obj.type && obj.type === 'library' && 'options' in obj && Array.isArray(obj.options)) {
-					// eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
 					results.push(...obj.options);
 				}
 				for (const key in obj) {
-					// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-					const value = obj[key];
+					const value = (obj as Record<string, unknown>)[key];
 					if (Array.isArray(value)) {
 						value.forEach(search);
 					} else if (typeof value === 'object' && value !== null) {
@@ -398,7 +395,7 @@ export class LibraryStorage implements ILibraryStorage {
 	 * Lists all installed libraries or the installed libraries that have the machine name
 	 * @param machineName (optional) only return libraries that have this machine name
 	 */
-	public async getInstalledLibraryNames(machineName?: string): Promise<ILibraryName[]> {
+	public getInstalledLibraryNames(machineName?: string): Promise<ILibraryName[]> {
 		if (machineName) {
 			return this.libraryRepo.findByName(machineName);
 		}
@@ -425,7 +422,7 @@ export class LibraryStorage implements ILibraryStorage {
 	 * Returns the library metadata
 	 * @param library
 	 */
-	public async getLibrary(library: ILibraryName): Promise<InstalledLibrary> {
+	public getLibrary(library: ILibraryName): Promise<InstalledLibrary> {
 		return this.libraryRepo.findOneByNameAndVersionOrFail(
 			library.machineName,
 			library.majorVersion,
@@ -518,7 +515,6 @@ export class LibraryStorage implements ILibraryStorage {
 		let dirty = false;
 		for (const [property, value] of Object.entries(library)) {
 			if (property !== '_id' && value !== existingLibrary[property]) {
-				// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 				existingLibrary[property] = value;
 				dirty = true;
 			}
@@ -574,7 +570,7 @@ export class LibraryStorage implements ILibraryStorage {
 		} else {
 			const s3Path = this.getS3Key(libraryName, fileName);
 			const response = await this.s3Client.get(s3Path);
-			const mimetype = mime.getType(fileName) || 'application/octet-stream';
+			const mimetype = mime.getType(fileName) ?? 'application/octet-stream';
 
 			result = {
 				stream: response.data,

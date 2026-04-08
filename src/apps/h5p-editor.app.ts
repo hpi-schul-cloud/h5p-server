@@ -8,7 +8,6 @@ import express from 'express';
 import { install as sourceMapInstall } from 'source-map-support';
 
 // application imports
-import { LOGGER_CONFIG_TOKEN, LoggerConfig } from '@infra/logger';
 import { H5P_EDITOR_CONFIG_TOKEN, H5PEditorConfig } from '@modules/h5p-content-management';
 import { H5PEditorAppModule } from '@modules/h5p-content-management/h5p-editor.app.module';
 import { enableOpenApiDocs } from './helpers';
@@ -23,7 +22,7 @@ async function bootstrap(): Promise<void> {
 
 	const nestApp = await NestFactory.create<NestExpressApplication>(H5PEditorAppModule, nestExpressAdapter);
 
-	const loggerConfig = await nestApp.resolve<LoggerConfig>(LOGGER_CONFIG_TOKEN);
+	// const loggerConfig = await nestApp.resolve<LoggerConfig>(LOGGER_CONFIG_TOKEN);
 	// @TODO fix it
 	// nestApp.use(createRequestLoggerMiddleware(loggerConfig));
 

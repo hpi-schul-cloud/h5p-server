@@ -8,21 +8,21 @@ export const H5P_CONTENT_S3_CLIENT_CONFIG_TOKEN = 'H5P_CONTENT_S3_CLIENT_CONFIG_
 export class H5PContentS3ClientConfig implements S3Config {
 	@ConfigProperty('H5P_EDITOR__S3_ENDPOINT')
 	@IsUrl({ require_tld: false })
-	public endpoint!: string;
+	endpoint!: string;
 
 	@ConfigProperty('H5P_EDITOR__S3_REGION')
 	@IsString()
-	public region!: string;
+	region!: string;
 
 	@ConfigProperty('H5P_EDITOR__S3_BUCKET_CONTENT')
 	@IsString()
-	public bucket!: string;
+	bucket!: string;
 
 	@ConfigProperty('H5P_EDITOR__S3_ACCESS_KEY_ID')
 	@IsString()
-	public accessKeyId!: string;
+	accessKeyId!: string;
 
 	@ConfigProperty('H5P_EDITOR__S3_SECRET_ACCESS_KEY')
 	@IsString()
-	public secretAccessKey!: string;
+	secretAccessKey!: string;
 }

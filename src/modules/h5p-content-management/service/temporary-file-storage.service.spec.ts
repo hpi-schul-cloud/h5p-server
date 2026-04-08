@@ -283,7 +283,6 @@ describe('TemporaryFileStorage', () => {
 				for (const range of testRanges) {
 					s3clientAdapter.get.mockResolvedValueOnce(fileResponse);
 
-					// eslint-disable-next-line no-await-in-loop
 					await storage.getFileStream(filename, user, range[0], range[1]);
 
 					expect(s3clientAdapter.get).toHaveBeenCalledWith(expect.stringContaining(filename), range[2]);

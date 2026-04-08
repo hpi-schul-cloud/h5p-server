@@ -40,10 +40,10 @@ export class LumiUserWithContentData implements IUser {
 	}
 }
 
-export type H5PUploadFile = {
+export interface H5PUploadFile {
 	data?: Buffer;
 	mimetype: string;
 	name: string;
 	size: number;
 	tempFilePath?: string;
-};
+}
