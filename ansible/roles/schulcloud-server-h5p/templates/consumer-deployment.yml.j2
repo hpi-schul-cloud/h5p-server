@@ -65,7 +65,7 @@ spec:
             name: api-h5p-configmap
         - secretRef:
             name: api-h5p-secret
-        command: ['npm', 'run', 'nest:start:h5p:consumer:prod']
+        command: ['npm', 'run', 'start:h5p:consumer:prod']
         readinessProbe:
           httpGet:
             path: /internal/health
