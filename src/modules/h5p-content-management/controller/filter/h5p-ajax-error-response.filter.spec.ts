@@ -79,7 +79,7 @@ describe(H5pAjaxErrorResponseFilter.name, () => {
 
 				expect(mockedResponse.json).toHaveBeenCalledWith(
 					new AjaxErrorResponse(
-						exception.clientErrorId as string,
+						exception.clientErrorId ?? '',
 						exception.httpStatusCode,
 						'Error - File contains one or more not supported libraries',
 						exception.message
@@ -128,7 +128,7 @@ describe(H5pAjaxErrorResponseFilter.name, () => {
 
 				expect(mockedResponse.json).toHaveBeenCalledWith(
 					new AjaxErrorResponse(
-						exception.clientErrorId as string,
+						exception.clientErrorId ?? '',
 						exception.httpStatusCode,
 						exception.name,
 						exception.message

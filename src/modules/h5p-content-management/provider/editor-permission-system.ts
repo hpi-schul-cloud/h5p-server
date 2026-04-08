@@ -9,7 +9,7 @@ import {
 } from '@lumieducation/h5p-server';
 
 export default class EditorPermissionSystem implements IPermissionSystem<IUser> {
-	checkForUserData(
+	public checkForUserData(
 		actingUser: IUser,
 		permission: UserDataPermission,
 		contentId: string,
@@ -18,7 +18,7 @@ export default class EditorPermissionSystem implements IPermissionSystem<IUser> 
 		return Promise.resolve(false);
 	}
 
-	async checkForContent(
+	public checkForContent(
 		actingUser: IUser | undefined,
 		permission: ContentPermission,
 		contentId?: string
@@ -26,7 +26,7 @@ export default class EditorPermissionSystem implements IPermissionSystem<IUser> 
 		return Promise.resolve(true);
 	}
 
-	async checkForTemporaryFile(
+	public checkForTemporaryFile(
 		user: IUser | undefined,
 		permission: TemporaryFilePermission,
 		filename?: string
@@ -34,7 +34,7 @@ export default class EditorPermissionSystem implements IPermissionSystem<IUser> 
 		return Promise.resolve(true);
 	}
 
-	async checkForGeneralAction(actingUser: IUser | undefined, permission: GeneralPermission): Promise<boolean> {
+	public checkForGeneralAction(actingUser: IUser | undefined, permission: GeneralPermission): Promise<boolean> {
 		return Promise.resolve(false);
 	}
 }

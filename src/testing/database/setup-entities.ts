@@ -13,5 +13,6 @@ export const setupEntities = async (entities: EntityClass<AnyEntity>[]): Promise
 		allowGlobalContext: true,
 		connect: false,
 	});
+
 	return orm;
 };

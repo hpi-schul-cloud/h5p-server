@@ -135,7 +135,7 @@ describe('H5PEditor Controller (api)', () => {
 				expect(response.status).toEqual(exception.httpStatusCode);
 				expect(response.body).toEqual(
 					new AjaxErrorResponse(
-						exception.clientErrorId as string,
+						exception.clientErrorId ?? '',
 						exception.httpStatusCode,
 						exception.name,
 						exception.message
@@ -238,7 +238,7 @@ describe('H5PEditor Controller (api)', () => {
 				expect(response.status).toEqual(exception.httpStatusCode);
 				expect(response.body).toEqual(
 					new AjaxErrorResponse(
-						exception.clientErrorId as string,
+						exception.clientErrorId ?? '',
 						exception.httpStatusCode,
 						exception.name,
 						exception.message

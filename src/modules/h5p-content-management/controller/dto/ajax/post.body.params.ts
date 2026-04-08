@@ -1,3 +1,4 @@
+/* eslint-disable max-classes-per-file */
 import { ApiProperty } from '@nestjs/swagger';
 import { IsArray, IsOptional, IsString } from 'class-validator';
 
@@ -5,23 +6,23 @@ export class LibrariesBodyParams {
 	@ApiProperty()
 	@IsArray()
 	@IsString({ each: true })
-	libraries!: string[];
+	public libraries!: string[];
 }
 
 export class ContentBodyParams {
 	@ApiProperty()
-	contentId!: string;
+	public contentId!: string;
 
 	@ApiProperty()
 	@IsString()
 	@IsOptional()
-	field!: string;
+	public field!: string;
 }
 
 export class LibraryParametersBodyParams {
 	@ApiProperty()
 	@IsString()
-	libraryParameters!: string;
+	public libraryParameters!: string;
 }
 
 export type AjaxPostBodyParams = LibrariesBodyParams | ContentBodyParams | LibraryParametersBodyParams | undefined;

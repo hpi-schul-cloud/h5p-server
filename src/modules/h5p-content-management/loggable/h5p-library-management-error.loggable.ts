@@ -12,7 +12,7 @@ export class H5PLibraryManagementErrorLoggable extends InternalServerErrorExcept
 
 	// istanbul ignore next
 	public getLogMessage(): ErrorLogMessage {
-		const context = this.context || '';
+		const context = this.context ?? '';
 		const error = this.error instanceof Error ? this.error : new Error(`Unknown error ${context}.`);
 
 		const logMessage = {

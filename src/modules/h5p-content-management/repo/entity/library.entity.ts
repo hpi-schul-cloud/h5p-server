@@ -200,6 +200,7 @@ export class InstalledLibrary extends BaseEntityWithTimestamps implements IInsta
 		if (a < b) {
 			return -1;
 		}
+
 		return 0;
 	}
 
@@ -207,6 +208,7 @@ export class InstalledLibrary extends BaseEntityWithTimestamps implements IInsta
 		if (this.machineName === otherLibrary.machineName) {
 			return this.compareVersions(otherLibrary);
 		}
+
 		return this.machineName > otherLibrary.machineName ? 1 : -1;
 	}
 
@@ -219,7 +221,8 @@ export class InstalledLibrary extends BaseEntityWithTimestamps implements IInsta
 		if (result !== 0) {
 			return result;
 		}
-		return InstalledLibrary.simple_compare(this.patchVersion, otherLibrary.patchVersion as number);
+
+		return InstalledLibrary.simple_compare(this.patchVersion, otherLibrary?.patchVersion ?? 0);
 	}
 
 	constructor(libraryMetadata: ILibraryMetadata, restricted = false, files: FileMetadata[] = []) {

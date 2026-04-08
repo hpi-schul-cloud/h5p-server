@@ -6,18 +6,21 @@ import { H5PContent, H5PContentRepo } from '../repo';
 import { H5PContentParentType } from '../types';
 import { ContentStorage } from './content-storage.service';
 
-export type H5pCopyContentParams = {
+export interface H5pCopyContentParams {
 	sourceContentId: EntityId;
 	copiedContentId: EntityId;
 	creatorId: EntityId;
 	schoolId: EntityId;
 	parentType: H5PContentParentType;
 	parentId: EntityId;
-};
+}
 
 @Injectable()
 export class H5pEditorContentService {
-	constructor(private readonly h5PContentRepo: H5PContentRepo, private readonly contentStorage: ContentStorage) {}
+	constructor(
+		private readonly h5PContentRepo: H5PContentRepo,
+		private readonly contentStorage: ContentStorage
+	) {}
 
 	public async copyH5pContent(params: H5pCopyContentParams): Promise<void> {
 		if (!isMongoId(params.copiedContentId)) {

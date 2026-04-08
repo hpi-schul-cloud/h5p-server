@@ -9,7 +9,7 @@ import {
 } from '@lumieducation/h5p-server';
 
 export default class LibraryManagementPermissionSystem implements IPermissionSystem<IUser> {
-	checkForUserData(
+	public checkForUserData(
 		actingUser: IUser,
 		permission: UserDataPermission,
 		contentId: string,
@@ -18,7 +18,7 @@ export default class LibraryManagementPermissionSystem implements IPermissionSys
 		return Promise.resolve(false);
 	}
 
-	async checkForContent(
+	public checkForContent(
 		actingUser: IUser | undefined,
 		permission: ContentPermission,
 		contentId?: string
@@ -26,7 +26,7 @@ export default class LibraryManagementPermissionSystem implements IPermissionSys
 		return Promise.resolve(false);
 	}
 
-	async checkForTemporaryFile(
+	public checkForTemporaryFile(
 		user: IUser | undefined,
 		permission: TemporaryFilePermission,
 		filename?: string
@@ -34,7 +34,7 @@ export default class LibraryManagementPermissionSystem implements IPermissionSys
 		return Promise.resolve(false);
 	}
 
-	async checkForGeneralAction(actingUser: IUser | undefined, permission: GeneralPermission): Promise<boolean> {
+	public checkForGeneralAction(actingUser: IUser | undefined, permission: GeneralPermission): Promise<boolean> {
 		switch (permission) {
 			case GeneralPermission.InstallRecommended:
 				return Promise.resolve(true);
@@ -43,7 +43,7 @@ export default class LibraryManagementPermissionSystem implements IPermissionSys
 			case GeneralPermission.CreateRestricted:
 				return Promise.resolve(true);
 			default:
-				return false;
+				return Promise.resolve(false);
 		}
 	}
 }

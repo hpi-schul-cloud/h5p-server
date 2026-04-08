@@ -1,3 +1,4 @@
+/* eslint-disable max-classes-per-file */
 import { ContentParameters, IContentMetadata, IEditorModel, IIntegration } from '@lumieducation/h5p-server';
 import { ApiProperty } from '@nestjs/swagger';
 import { Readable } from 'stream';

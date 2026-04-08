@@ -17,5 +17,5 @@ export const AUTHORIZATION_CLIENT_CONFIG_TOKEN = 'AUTHORIZATION_CLIENT_CONFIG_TO
 export class AuthorizationClientConfig implements InternalAuthorizationClientConfig {
 	@ConfigProperty('API_HOST')
 	@IsUrl({ require_tld: false })
-	public basePath!: string;
+	basePath!: string;
 }

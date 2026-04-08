@@ -234,6 +234,7 @@ describe('H5P Files', () => {
 				// Mock partial implementation so that range callback gets called
 				ajaxEndpointService.getContentFile.mockImplementationOnce((contentId, filename, user, rangeCallback) => {
 					rangeCallback?.(100);
+
 					return Promise.resolve(fileResponseMock);
 				});
 
@@ -301,6 +302,7 @@ describe('H5P Files', () => {
 				ajaxEndpointService.getContentFile.mockImplementationOnce((contentId, filename, user, rangeCallback) => {
 					const parsedRange = rangeCallback?.(100);
 					if (!parsedRange) throw new Error('no range');
+
 					return Promise.resolve({
 						range: parsedRange,
 						mimetype: '',
@@ -338,6 +340,7 @@ describe('H5P Files', () => {
 				h5pContentRepo.findById.mockResolvedValueOnce(content);
 				ajaxEndpointService.getContentFile.mockImplementationOnce((contentId, filename, user, rangeCallback) => {
 					rangeCallback?.(100);
+
 					return createMock();
 				});
 				authorizationClientAdapter.checkPermissionsByReference.mockResolvedValueOnce();
@@ -542,6 +545,7 @@ describe('H5P Files', () => {
 
 				ajaxEndpointService.getTemporaryFile.mockImplementationOnce((filename, user, rangeCallback) => {
 					rangeCallback?.(100);
+
 					return createMock();
 				});
 				const filename = 'test/file.txt';

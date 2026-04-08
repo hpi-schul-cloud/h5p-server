@@ -211,7 +211,7 @@ describe('LibraryManagementPermissionSystem', () => {
 			const user = buildUser();
 
 			const permissionSystem = new LibraryManagementPermissionSystem();
-			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+
 			// @ts-expect-error
 			const result = await permissionSystem.checkForGeneralAction(user, 'not-existing-permission');
 
