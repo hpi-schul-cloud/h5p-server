@@ -6,7 +6,7 @@ import { H5PPlayer, IPlayerModel } from '@lumieducation/h5p-server';
 import { EntityManager, ObjectId } from '@mikro-orm/mongodb';
 import { HttpStatus, INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
-import { cleanupCollections } from '@testing/cleanup-collections';
+import { cleanupCollections } from '@testing/database';
 import { UserAndAccountTestFactory } from '@testing/factory/user-and-account.test.factory';
 import { TestApiClient } from '@testing/test-api-client';
 import { TEST_JWT_CONFIG_TOKEN, TestJwtModuleConfig } from '@testing/test-jwt-module.config';

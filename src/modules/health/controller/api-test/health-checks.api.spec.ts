@@ -4,7 +4,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import request from 'supertest';
 
 import { InternalServerTestModule } from '@modules/internal-server/internal-server-test.module';
-import { cleanupCollections } from '@testing/cleanup-collections';
+import { cleanupCollections } from '@testing/database';
 import type { Server } from 'node:net';
 import { HealthStatuses } from '../../domain';
 import { HealthStatusResponse } from '../dto';

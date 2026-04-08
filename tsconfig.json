@@ -27,7 +27,8 @@
 			"@infra/*": ["./infra/*"],
 			"@modules/*": ["./modules/*"],
 			"@testing/*": ["./testing/*"]
-		}
+		},
+		"types": ["jest", "multer","node"]
 	},
 	"exclude": ["scripts", "dist"],
 	"include": ["src/**/*.ts", "src/**/*.tsx"],

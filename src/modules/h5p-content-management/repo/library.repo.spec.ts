@@ -1,9 +1,7 @@
+import { ILibraryMetadata } from '@lumieducation/h5p-server';
 import { EntityManager } from '@mikro-orm/mongodb';
 import { Test, TestingModule } from '@nestjs/testing';
-import { MongoMemoryDatabaseModule } from '@testing/database';
-
-import { ILibraryMetadata } from '@lumieducation/h5p-server';
-import { cleanupCollections } from '@testing/cleanup-collections';
+import { cleanupCollections, MongoMemoryDatabaseModule } from '@testing/database';
 import { FileMetadata, InstalledLibrary } from './entity';
 import { LibraryRepo } from './library.repo';
 
