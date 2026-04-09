@@ -11,7 +11,7 @@ import {
 	NotImplementedException,
 } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
-import { IEntity } from '@shared/domain/interface';
+import { BaseEntity } from '@shared/domain/entity';
 import { Readable } from 'stream';
 import { GetH5PFileResponse } from '../controller/dto';
 import { H5P_CONTENT_S3_CLIENT_INJECTION_TOKEN } from '../h5p-editor.const';
@@ -79,7 +79,7 @@ const helpers = {
 		};
 	},
 
-	repoSaveMock: <Entity extends IEntity>(entities: Entity | Entity[]) => {
+	repoSaveMock: <Entity extends BaseEntity>(entities: Entity | Entity[]) => {
 		if (!Array.isArray(entities)) {
 			entities = [entities];
 		}
