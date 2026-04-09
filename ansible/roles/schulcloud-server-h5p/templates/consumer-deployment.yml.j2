@@ -53,10 +53,6 @@ spec:
       - name: api-h5p-consumer
         image: {{ H5P_SERVER_IMAGE }}:{{ H5P_SERVER_IMAGE_TAG }}
         imagePullPolicy: IfNotPresent
-        ports:
-        - containerPort: 4449
-          name: http-health
-          protocol: TCP
         env:
         - name: NODE_OPTIONS
           value: "--max-old-space-size={{ ((API_H5P_CONSUMER_MEMORY_LIMIT | regex_replace('Gi', '')|int * 1024 * 0.8)|int) }}"
@@ -66,27 +62,6 @@ spec:
         - secretRef:
             name: api-h5p-secret
         command: ['npm', 'run', 'start:h5p:consumer:prod']
-        readinessProbe:
-          httpGet:
-            path: /internal/health
-            port: 4449
-          timeoutSeconds: 4
-          failureThreshold: 3
-          periodSeconds: 5
-        livenessProbe:
-          httpGet:
-            path: /internal/health
-            port: 4449
-          timeoutSeconds: 4
-          failureThreshold: 3
-          periodSeconds: 15
-        startupProbe:
-          httpGet:
-            path: /internal/health
-            port: 4449
-          timeoutSeconds: 4
-          failureThreshold:  36
-          periodSeconds: 5
         resources:
           limits:
             cpu: {{ API_H5P_CONSUMER_CPU_LIMITS|default("1000m", true) }}
