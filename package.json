@@ -46,7 +46,6 @@
 		"@aws-sdk/client-s3": "^3.1021.0",
 		"@aws-sdk/lib-storage": "^3.1021.0",
 		"@aws-sdk/util-retry": "^3.374.0",
-		"@faker-js/faker": "^9.6.0",
 		"@golevelup/nestjs-rabbitmq": "^9.0.0",
 		"@keyv/mongo": "^3.1.0",
 		"@lumieducation/h5p-server": "^10.0.4",

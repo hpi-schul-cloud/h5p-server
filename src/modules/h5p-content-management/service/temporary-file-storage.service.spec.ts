@@ -1,5 +1,4 @@
 import { HeadObjectCommandOutput } from '@aws-sdk/client-s3';
-import { faker } from '@faker-js/faker';
 import { createMock, DeepMocked } from '@golevelup/ts-jest';
 import { S3ClientAdapter } from '@infra/s3-client';
 import { HttpException, InternalServerErrorException, NotAcceptableException, NotFoundException } from '@nestjs/common';
@@ -7,8 +6,8 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { ReadStream } from 'fs';
 import { Readable } from 'node:stream';
 import { GetH5PFileResponse } from '../controller/dto';
-import { TemporaryFileStorage } from './temporary-file-storage.service';
 import { H5P_CONTENT_S3_CLIENT_INJECTION_TOKEN } from '../h5p-editor.const';
+import { TemporaryFileStorage } from './temporary-file-storage.service';
 
 const helpers = {
 	createUser() {
@@ -348,8 +347,8 @@ describe('TemporaryFileStorage', () => {
 			const fileDeleteError = new Error('Could not delete file');
 			const fileCreateError = new Error('Could not create file');
 
-			const recentDate = faker.date.recent();
-			const soonDate = faker.date.soon();
+			const recentDate = new Date(Date.now() - 1000 * 60 * 60); // 1 hour ago
+			const soonDate = new Date(Date.now() + 1000 * 60 * 60); // 1 hour later
 
 			return {
 				filename,
