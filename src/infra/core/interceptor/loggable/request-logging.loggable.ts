@@ -1,9 +1,5 @@
 import { Loggable, LogMessage } from '@infra/logger';
-import {
-	FileRecordIdentifier,
-	MultipleFileRecordIdentifier,
-	ParentIdentifier,
-} from '@shared/domain/interface/file-record.interface';
+import { FileRecordIdentifier, MultipleFileRecordIdentifier, ParentIdentifier } from '@shared/domain/interface';
 import { Request } from 'express';
 
 type AllowedProperties = keyof FileRecordIdentifier | keyof MultipleFileRecordIdentifier | keyof ParentIdentifier;
