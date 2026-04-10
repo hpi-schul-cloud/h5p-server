@@ -1,3 +1,4 @@
+/* tslint:disable */
 /* eslint-disable */
 /**
  * Schulcloud-Verbund-Software Server API
@@ -14,4 +15,5 @@
 
 
 export * from './api/authorization-api';
+export * from './api/me-api';
 

@@ -129,7 +129,7 @@ export class H5PEditorUc {
 		await this.checkUserIsAuthenticatedAndEnrolled(currentUser);
 
 		const user = this.changeUserType(currentUser.userId);
-		const language = await this.getUserLanguage(currentUser.userId);
+		const language = await this.getUserLanguage();
 
 		const result = await this.h5pAjaxEndpoint.getAjax(
 			query.action,
@@ -176,7 +176,7 @@ export class H5PEditorUc {
 		let contentUploadFile: H5PUploadFile | undefined;
 		try {
 			const user = this.changeUserType(currentUser.userId);
-			const language = await this.getUserLanguage(currentUser.userId);
+			const language = await this.getUserLanguage();
 			contentUploadFile = await this.createContentUploadFile(contentFile);
 			const libraryUploadFile = this.createLibraryUploadFile(h5pFile);
 
@@ -499,14 +499,9 @@ export class H5PEditorUc {
 		return user;
 	}
 
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	private getUserLanguage(_userId: EntityId): string {
-		// @TODO replace with me route
-		//const languageUser = await this.userService.findById(userId);
-		const userLanguage = LanguageType.DE;
-		//if (languageUser?.language) {
-		//	userLanguage = languageUser.language;
-		//}
+	private async getUserLanguage(): Promise<string> {
+		const userData = await this.authorizationClientAdapter.getUser();
+		const userLanguage = userData.language ?? LanguageType.DE;
 
 		return userLanguage;
 	}

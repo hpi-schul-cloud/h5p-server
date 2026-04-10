@@ -1,6 +1,6 @@
 import { JwtExtractor } from '@infra/auth-guard/utils/jwt';
 import { AxiosErrorLoggable } from '@infra/error/loggable';
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { REQUEST } from '@nestjs/core';
 import { isAxiosError, RawAxiosRequestConfig } from 'axios';
 import { Request } from 'express';
@@ -8,6 +8,8 @@ import {
 	AuthorizationApi,
 	AuthorizationBodyParamsReferenceType,
 	AuthorizationContextParams,
+	MeApi,
+	MeResponse,
 } from './authorization-api-client';
 import { AuthorizationErrorLoggableException, AuthorizationForbiddenLoggableException } from './error';
 
@@ -15,8 +17,24 @@ import { AuthorizationErrorLoggableException, AuthorizationForbiddenLoggableExce
 export class AuthorizationClientAdapter {
 	constructor(
 		private readonly authorizationApi: AuthorizationApi,
+		private readonly meApi: MeApi,
 		@Inject(REQUEST) private request: Request
 	) {}
+
+	public async getUser(): Promise<MeResponse> {
+		try {
+			const options = this.createOptionParams();
+			const response = await this.meApi.meControllerMe(options);
+
+			return response.data;
+		} catch (error) {
+			if (isAxiosError(error)) {
+				error = new AxiosErrorLoggable(error, 'GET_USER_FAILED');
+			}
+
+			throw new InternalServerErrorException("Couldn't get user from authorization service", { cause: error });
+		}
+	}
 
 	public async checkPermissionsByReference(
 		referenceType: AuthorizationBodyParamsReferenceType,

@@ -1,20 +1,19 @@
 import { createMock, DeepMocked } from '@golevelup/ts-jest';
+import { currentUserFactory } from '@infra/auth-guard/testing/currentuser.factory';
 import { AuthorizationClientAdapter } from '@infra/authorization-client';
+import { MeResponse } from '@infra/authorization-client/authorization-api-client';
 import { Logger } from '@infra/logger';
 import { H5PAjaxEndpoint, H5PEditor, H5PPlayer } from '@lumieducation/h5p-server';
 import { IHubInfo, IUser as LumiIUser } from '@lumieducation/h5p-server/build/src/types';
-import { UserService } from '@modules/user';
-import { userDoFactory } from '@modules/user/testing';
 import { InternalServerErrorException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
-import { LanguageType } from '@shared/domain/interface';
-import { currentUserFactory } from '@testing/factory/currentuser.factory';
 import * as fs from 'fs';
 import * as fsPromises from 'fs/promises';
 import { H5P_EDITOR_CONFIG_TOKEN } from '../h5p-editor.config';
 import { H5PContentRepo } from '../repo';
 import { LibraryStorage } from '../service';
 import { H5PUploadFile } from '../types';
+import { LanguageType } from '../types/language-type.enum';
 import { H5PEditorUc } from './h5p-editor.uc';
 
 jest.mock('fs', (): unknown => {
@@ -37,7 +36,7 @@ describe(`${H5PEditorUc.name} Ajax`, () => {
 	let module: TestingModule;
 	let uc: H5PEditorUc;
 	let ajaxEndpoint: DeepMocked<H5PAjaxEndpoint>;
-	let userService: DeepMocked<UserService>;
+	let authorizationClientAdapter: DeepMocked<AuthorizationClientAdapter>;
 
 	beforeAll(async () => {
 		module = await Test.createTestingModule({
@@ -58,10 +57,6 @@ describe(`${H5PEditorUc.name} Ajax`, () => {
 				{
 					provide: H5PAjaxEndpoint,
 					useValue: createMock<H5PAjaxEndpoint>(),
-				},
-				{
-					provide: UserService,
-					useValue: createMock<UserService>(),
 				},
 				{
 					provide: AuthorizationClientAdapter,
@@ -86,7 +81,7 @@ describe(`${H5PEditorUc.name} Ajax`, () => {
 
 		uc = module.get(H5PEditorUc);
 		ajaxEndpoint = module.get(H5PAjaxEndpoint);
-		userService = module.get(UserService);
+		authorizationClientAdapter = module.get(AuthorizationClientAdapter);
 	});
 
 	afterEach(() => {
@@ -102,7 +97,6 @@ describe(`${H5PEditorUc.name} Ajax`, () => {
 			const user = currentUserFactory.build();
 
 			const language = LanguageType.DE;
-			const userDo = userDoFactory.build({ id: user.userId, language });
 
 			const mockedResponse: IHubInfo = {
 				apiVersion: { major: 1, minor: 1 },
@@ -154,7 +148,7 @@ describe(`${H5PEditorUc.name} Ajax`, () => {
 			);
 
 			ajaxEndpoint.getAjax.mockResolvedValueOnce(mockedResponse);
-			userService.findById.mockResolvedValueOnce(userDo);
+			authorizationClientAdapter.getUser.mockResolvedValueOnce({ language } as MeResponse);
 
 			return {
 				user,
@@ -185,7 +179,7 @@ describe(`${H5PEditorUc.name} Ajax`, () => {
 			const user = currentUserFactory.build();
 
 			const language = LanguageType.DE;
-			const userDo = userDoFactory.build({ id: user.userId, language });
+			authorizationClientAdapter.getUser.mockResolvedValueOnce({ language } as MeResponse);
 
 			const mockedResponse = [
 				{
@@ -209,7 +203,6 @@ describe(`${H5PEditorUc.name} Ajax`, () => {
 			};
 
 			ajaxEndpoint.postAjax.mockResolvedValueOnce(mockedResponse);
-			userService.findById.mockResolvedValueOnce(userDo);
 
 			return {
 				user,
@@ -298,9 +291,7 @@ describe(`${H5PEditorUc.name} Ajax`, () => {
 				const user = currentUserFactory.build();
 
 				const language = LanguageType.DE;
-				const userDo = userDoFactory.build({ id: user.userId, language });
-
-				userService.findById.mockResolvedValueOnce(userDo);
+				authorizationClientAdapter.getUser.mockResolvedValueOnce({ language } as MeResponse);
 
 				const mockedLumiUser: LumiIUser = {
 					email: '',

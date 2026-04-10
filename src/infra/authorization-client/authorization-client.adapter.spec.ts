@@ -5,12 +5,13 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { AxiosResponse } from 'axios';
 import { Request } from 'express';
 import {
-    AuthorizationApi,
-    AuthorizationBodyParams,
-    AuthorizationBodyParamsReferenceType,
-    AuthorizationContextParamsAction,
-    AuthorizationContextParamsRequiredPermissions,
-    AuthorizedResponse,
+	AuthorizationApi,
+	AuthorizationBodyParams,
+	AuthorizationBodyParamsReferenceType,
+	AuthorizationContextParamsAction,
+	AuthorizationContextParamsRequiredPermissions,
+	AuthorizedResponse,
+	MeApi,
 } from './authorization-api-client';
 import { AuthorizationClientAdapter } from './authorization-client.adapter';
 import { AuthorizationErrorLoggableException, AuthorizationForbiddenLoggableException } from './error';
@@ -33,6 +34,7 @@ describe(AuthorizationClientAdapter.name, () => {
 	let module: TestingModule;
 	let service: AuthorizationClientAdapter;
 	let authorizationApi: DeepMocked<AuthorizationApi>;
+	let meApi: DeepMocked<MeApi>;
 
 	beforeAll(async () => {
 		module = await Test.createTestingModule({
@@ -41,6 +43,10 @@ describe(AuthorizationClientAdapter.name, () => {
 				{
 					provide: AuthorizationApi,
 					useValue: createMock<AuthorizationApi>(),
+				},
+				{
+					provide: MeApi,
+					useValue: createMock<MeApi>(),
 				},
 				{
 					provide: REQUEST,
@@ -55,6 +61,7 @@ describe(AuthorizationClientAdapter.name, () => {
 
 		service = module.get(AuthorizationClientAdapter);
 		authorizationApi = module.get(AuthorizationApi);
+		meApi = module.get(MeApi);
 	});
 
 	afterAll(async () => {
@@ -230,7 +237,7 @@ describe(AuthorizationClientAdapter.name, () => {
 						cookie: `jwt=${jwtToken}`,
 					},
 				});
-				const adapter = new AuthorizationClientAdapter(authorizationApi, request);
+				const adapter = new AuthorizationClientAdapter(authorizationApi, meApi, request);
 
 				return { params, adapter };
 			};
@@ -263,7 +270,7 @@ describe(AuthorizationClientAdapter.name, () => {
 				const request = createMock<Request>({
 					headers: {},
 				});
-				const adapter = new AuthorizationClientAdapter(authorizationApi, request);
+				const adapter = new AuthorizationClientAdapter(authorizationApi, meApi, request);
 
 				const error = new Error('Authentication is required.');
 

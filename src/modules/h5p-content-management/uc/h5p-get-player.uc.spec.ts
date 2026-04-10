@@ -1,13 +1,12 @@
 import { createMock, DeepMocked } from '@golevelup/ts-jest';
 import { ICurrentUser } from '@infra/auth-guard';
 import {
-    AuthorizationBodyParamsReferenceType,
-    AuthorizationClientAdapter,
-    AuthorizationContextBuilder,
+	AuthorizationBodyParamsReferenceType,
+	AuthorizationClientAdapter,
+	AuthorizationContextBuilder,
 } from '@infra/authorization-client';
 import { Logger } from '@infra/logger';
 import { H5PEditor, H5PPlayer, IPlayerModel } from '@lumieducation/h5p-server';
-import { UserService } from '@modules/user';
 import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { H5P_EDITOR_CONFIG_TOKEN } from '../h5p-editor.config';
@@ -59,10 +58,6 @@ describe('get H5P player', () => {
 				{
 					provide: LibraryStorage,
 					useValue: createMock<LibraryStorage>(),
-				},
-				{
-					provide: UserService,
-					useValue: createMock<UserService>(),
 				},
 				{
 					provide: AuthorizationClientAdapter,

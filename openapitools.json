@@ -11,10 +11,10 @@
 				"skipValidateSpec": true,
 				"enablePostProcessFile": true,
 				"openapiNormalizer": {
-					"FILTER": "operationId:AuthorizationReferenceController_authorizeByReference|AuthorizationReferenceController_authorizeByReferences|AuthorizationReferenceController_createToken|AuthorizationReferenceController_resolveToken"
+					"FILTER": "operationId:AuthorizationReferenceController_authorizeByReference|AuthorizationReferenceController_authorizeByReferences|AuthorizationReferenceController_createToken|AuthorizationReferenceController_resolveToken|MeController_me"
 				},
 				"globalProperty": {
-					"models": "AuthorizationBodyParams:AuthorizationContextParams:AuthorizedResponse:CreateAccessTokenParams:AccessTokenResponse:AccessTokenParams:AccessTokenPayloadResponse:AuthorizedByReferenceResponse:AuthorizationManyReferencesBodyParams",
+					"models": "AuthorizationBodyParams:AuthorizationContextParams:AuthorizedResponse:CreateAccessTokenParams:AccessTokenResponse:AccessTokenParams:AccessTokenPayloadResponse:AuthorizedByReferenceResponse:AuthorizationManyReferencesBodyParams:MeResponse",
 					"apis": "",
 					"supportingFiles": ""
 				},

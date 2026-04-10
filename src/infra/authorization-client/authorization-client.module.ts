@@ -1,6 +1,6 @@
 import { ConfigurationModule } from '@infra/configuration';
 import { DynamicModule, Module } from '@nestjs/common';
-import { AuthorizationApi, Configuration } from './authorization-api-client';
+import { AuthorizationApi, Configuration, MeApi } from './authorization-api-client';
 import { AuthorizationClientAdapter } from './authorization-client.adapter';
 import { InternalAuthorizationClientConfig } from './authorization-client.config';
 
@@ -21,6 +21,18 @@ export class AuthorizationClientModule {
 					});
 
 					return new AuthorizationApi(configuration);
+				},
+				inject: [configInjectionToken],
+			},
+			{
+				provide: MeApi,
+				useFactory: (configInstance: InternalAuthorizationClientConfig): MeApi => {
+					const { basePath } = configInstance;
+					const configuration = new Configuration({
+						basePath: `${basePath}/v3`,
+					});
+
+					return new MeApi(configuration);
 				},
 				inject: [configInjectionToken],
 			},

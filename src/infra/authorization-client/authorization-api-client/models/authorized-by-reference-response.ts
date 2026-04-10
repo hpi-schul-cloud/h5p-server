@@ -17,20 +17,32 @@
 /**
  * 
  * @export
- * @interface AuthorizedResponse
+ * @interface AuthorizedByReferenceResponse
  */
-export interface AuthorizedResponse {
+export interface AuthorizedByReferenceResponse {
     /**
      * 
      * @type {string}
-     * @memberof AuthorizedResponse
+     * @memberof AuthorizedByReferenceResponse
      */
     'userId': string;
     /**
      * 
      * @type {boolean}
-     * @memberof AuthorizedResponse
+     * @memberof AuthorizedByReferenceResponse
      */
     'isAuthorized': boolean;
+    /**
+     * 
+     * @type {string}
+     * @memberof AuthorizedByReferenceResponse
+     */
+    'referenceType': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof AuthorizedByReferenceResponse
+     */
+    'referenceId': string;
 }
 
