@@ -3,6 +3,7 @@ import { AuthorizationClientAdapter } from '@infra/authorization-client';
 import { S3ClientAdapter } from '@infra/s3-client';
 import { H5PEditor } from '@lumieducation/h5p-server';
 import { EntityManager, ObjectId } from '@mikro-orm/mongodb';
+import { H5PEditorTestModule } from '@modules/h5p-content-management/h5p-editor-test.module';
 import { HttpStatus, INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { cleanupCollections } from '@testing/database';
@@ -10,7 +11,6 @@ import { UserAndAccountTestFactory } from '@testing/factory/user-and-account.tes
 import { TestApiClient } from '@testing/test-api-client';
 import { H5P_CONTENT_S3_CLIENT_INJECTION_TOKEN, H5P_LIBRARIES_S3_CLIENT_INJECTION_TOKEN } from '../../h5p-editor.const';
 import { h5pContentFactory } from '../../testing';
-import { H5PEditorTestModule } from '@modules/h5p-content-management/h5p-editor-test.module';
 
 describe('H5PEditor Controller (api)', () => {
 	let app: INestApplication;

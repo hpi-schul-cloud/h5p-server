@@ -1,5 +1,6 @@
 import { createMock, DeepMocked } from '@golevelup/ts-jest';
 import { AuthorizationClientAdapter } from '@infra/authorization-client';
+import { MeResponse } from '@infra/authorization-client/authorization-api-client';
 import { S3ClientAdapter } from '@infra/s3-client';
 import { IFileStats, ILibraryName } from '@lumieducation/h5p-server';
 import { ContentMetadata } from '@lumieducation/h5p-server/build/src/ContentMetadata';
@@ -71,6 +72,7 @@ describe('H5PEditor Controller (api)', () => {
 	let app: INestApplication;
 	let em: EntityManager;
 	let testApiClient: TestApiClient;
+	let authorizationClientAdapter: DeepMocked<AuthorizationClientAdapter>;
 
 	let contentStorage: DeepMocked<ContentStorage>;
 	let libraryStorage: DeepMocked<LibraryStorage>;
@@ -100,6 +102,7 @@ describe('H5PEditor Controller (api)', () => {
 		contentStorage = app.get(ContentStorage);
 		libraryStorage = app.get(LibraryStorage);
 		temporaryStorage = app.get(TemporaryFileStorage);
+		authorizationClientAdapter = app.get(AuthorizationClientAdapter);
 		testApiClient = new TestApiClient(app, 'h5p-editor');
 	});
 
@@ -180,6 +183,7 @@ describe('H5PEditor Controller (api)', () => {
 				const { studentUser, studentAccount } = UserAndAccountTestFactory.buildStudent();
 
 				const loggedInClient = testApiClient.loginByUser(studentAccount, studentUser);
+				authorizationClientAdapter.getUser.mockResolvedValue({ language: 'de' } as MeResponse);
 
 				const parentId = new ObjectId().toString();
 
@@ -195,8 +199,9 @@ describe('H5PEditor Controller (api)', () => {
 
 				const mockFile = { content: 'Test File', size: 9, name: 'test.txt', birthtime: new Date() };
 
-				contentStorage.getFileStream.mockResolvedValueOnce(Readable.from(mockFile.content));
+				// Ensure both getFileStats and getFileStream are mocked for the correct content id and file name
 				contentStorage.getFileStats.mockResolvedValueOnce({ birthtime: mockFile.birthtime, size: mockFile.size });
+				contentStorage.getFileStream.mockResolvedValueOnce(Readable.from(mockFile.content));
 
 				const response = await loggedInClient.get(`content/${content.id}/${mockFile.name}`);
 

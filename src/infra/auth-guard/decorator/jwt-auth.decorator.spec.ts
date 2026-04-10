@@ -40,7 +40,7 @@ describe('Decorators', () => {
 		module = await Test.createTestingModule({
 			imports: [
 				AuthGuardModule.register([AuthGuardOptions.JWT]),
-				MongoMemoryDatabaseModule.forRoot({ entities: [AccountEntity, RoleEntity, UserEntity] }),
+				MongoMemoryDatabaseModule.forRoot([AccountEntity, RoleEntity, UserEntity]),
 			],
 			controllers: [TestDecoratorCurrentUserController, TestDecoratorJWTController],
 		}).compile();

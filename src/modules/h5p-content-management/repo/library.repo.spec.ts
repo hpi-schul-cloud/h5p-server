@@ -15,7 +15,7 @@ describe('LibraryRepo', () => {
 
 	beforeAll(async () => {
 		module = await Test.createTestingModule({
-			imports: [MongoMemoryDatabaseModule.forRoot({ entities: [InstalledLibrary] })],
+			imports: [MongoMemoryDatabaseModule.forRoot([InstalledLibrary])],
 			providers: [LibraryRepo],
 		}).compile();
 		libraryRepo = module.get(LibraryRepo);

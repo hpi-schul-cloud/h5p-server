@@ -29,11 +29,7 @@ describe('BaseRepo', () => {
 
 	beforeAll(async () => {
 		module = await Test.createTestingModule({
-			imports: [
-				MongoMemoryDatabaseModule.forRoot({
-					entities: [TestEntity],
-				}),
-			],
+			imports: [MongoMemoryDatabaseModule.forRoot([TestEntity])],
 			providers: [TestRepo],
 		}).compile();
 

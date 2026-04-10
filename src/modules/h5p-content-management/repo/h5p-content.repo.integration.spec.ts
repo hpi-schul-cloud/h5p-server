@@ -12,7 +12,7 @@ describe('ContentRepo', () => {
 
 	beforeAll(async () => {
 		module = await Test.createTestingModule({
-			imports: [MongoMemoryDatabaseModule.forRoot({ entities: [H5PContent, InstalledLibrary] })],
+			imports: [MongoMemoryDatabaseModule.forRoot([H5PContent, InstalledLibrary])],
 			providers: [H5PContentRepo],
 		}).compile();
 

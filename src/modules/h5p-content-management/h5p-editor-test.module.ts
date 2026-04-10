@@ -4,7 +4,7 @@ import { controllers, imports, providers } from './h5p-editor.app.module';
 import { TEST_ENTITIES } from './h5p-editor.entity.exports';
 
 @Module({
-	imports: [...imports, MongoMemoryDatabaseModule.forRoot({ entities: TEST_ENTITIES })],
+	imports: [...imports, MongoMemoryDatabaseModule.forRoot(TEST_ENTITIES)],
 	controllers,
 	providers,
 })
