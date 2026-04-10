@@ -11,6 +11,7 @@ import { ErrorModule } from '@infra/error';
 import { LoggerModule } from '@infra/logger';
 import { Module } from '@nestjs/common';
 import { H5PEditorController } from './controller';
+import { H5P_SERVER_APP_REQUEST_TIMEOUT_CONFIG_TOKEN, RequestTimeoutConfig } from './h5p-editor.app.config';
 import { H5P_EDITOR_CONFIG_TOKEN, H5PEditorConfig } from './h5p-editor.config';
 import { ENTITIES } from './h5p-editor.entity.exports';
 import { H5PEditorModule } from './h5p-editor.module';
@@ -18,7 +19,7 @@ import { H5PEditorUc } from './uc';
 
 export const imports = [
 	AuthorizationClientModule.register(AUTHORIZATION_CLIENT_CONFIG_TOKEN, AuthorizationClientConfig),
-	CoreModule,
+	CoreModule.register(H5P_SERVER_APP_REQUEST_TIMEOUT_CONFIG_TOKEN, RequestTimeoutConfig),
 	ErrorModule,
 	AuthGuardModule.register([AuthGuardOptions.JWT]),
 	ConfigurationModule.register(H5P_EDITOR_CONFIG_TOKEN, H5PEditorConfig),
