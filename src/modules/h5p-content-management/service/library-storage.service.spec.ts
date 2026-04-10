@@ -336,9 +336,7 @@ describe('LibraryStorage', () => {
 			it("should fail if library doesn't exist", async () => {
 				const { testingLib } = await setup(false);
 
-				repo.findOneByNameAndVersionOrFail.mockImplementation(() => {
-					throw new Error('Library does not exist');
-				});
+				repo.findOneByNameAndVersionOrFail.mockRejectedValue(new NotFoundException('Library does not exist'));
 
 				const getLibrary = storage.getLibrary(testingLib);
 				await expect(getLibrary).rejects.toThrow();
@@ -438,9 +436,7 @@ describe('LibraryStorage', () => {
 
 				repo.findOneByNameAndVersionOrFail.mockResolvedValue(testingLib);
 				repo.delete.mockImplementation(() => {
-					repo.findOneByNameAndVersionOrFail.mockImplementation(() => {
-						throw new Error('Library is not installed');
-					});
+					repo.findOneByNameAndVersionOrFail.mockRejectedValue(new Error('Library is not installed'));
 
 					return Promise.resolve();
 				});

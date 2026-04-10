@@ -285,7 +285,7 @@ describe('ContentStorage', () => {
 		describe('WHEN adding a file to non existant content', () => {
 			it('should throw NotFoundException', async () => {
 				const { contentIDString, filename, stream } = setup();
-				contentRepo.findById.mockRejectedValueOnce(new Error());
+				contentRepo.existsOne.mockResolvedValueOnce(false);
 
 				const addFilePromise = service.addFile(contentIDString, filename, stream);
 
