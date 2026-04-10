@@ -1,22 +1,23 @@
 import { DeepMocked, createMock } from '@golevelup/ts-jest';
 import { AuthorizationClientAdapter } from '@infra/authorization-client';
+import { MeResponse } from '@infra/authorization-client/authorization-api-client';
 import { S3ClientAdapter } from '@infra/s3-client';
 import { AjaxErrorResponse, H5PAjaxEndpoint, H5pError } from '@lumieducation/h5p-server';
 import { EntityManager } from '@mikro-orm/mongodb';
+import { H5PEditorTestModule } from '@modules/h5p-content-management/h5p-editor-test.module';
 import { HttpStatus, INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { cleanupCollections } from '@testing/database';
 import { UserAndAccountTestFactory } from '@testing/factory/user-and-account.test.factory';
 import { TestApiClient } from '@testing/test-api-client';
 import { H5P_CONTENT_S3_CLIENT_INJECTION_TOKEN, H5P_LIBRARIES_S3_CLIENT_INJECTION_TOKEN } from '../../h5p-editor.const';
-import { H5PEditorTestModule } from '@modules/h5p-content-management/h5p-editor-test.module';
 
 describe('H5PEditor Controller (api)', () => {
 	let app: INestApplication;
 	let em: EntityManager;
 	let testApiClient: TestApiClient;
-
 	let ajaxEndpoint: DeepMocked<H5PAjaxEndpoint>;
+	let authorizationClientAdapter: DeepMocked<AuthorizationClientAdapter>;
 
 	beforeAll(async () => {
 		const module = await Test.createTestingModule({
@@ -36,6 +37,7 @@ describe('H5PEditor Controller (api)', () => {
 		await app.init();
 		em = app.get(EntityManager);
 		ajaxEndpoint = app.get(H5PAjaxEndpoint);
+		authorizationClientAdapter = app.get(AuthorizationClientAdapter);
 		testApiClient = new TestApiClient(app, 'h5p-editor');
 	});
 
@@ -64,9 +66,6 @@ describe('H5PEditor Controller (api)', () => {
 
 				const loggedInClient = testApiClient.loginByUser(studentAccount, studentUser);
 
-				await em.persist([studentUser]).flush();
-				em.clear();
-
 				const dummyResponse = {
 					apiVersion: { major: 1, minor: 1 },
 					details: [],
@@ -77,6 +76,7 @@ describe('H5PEditor Controller (api)', () => {
 				};
 
 				ajaxEndpoint.getAjax.mockResolvedValueOnce(dummyResponse);
+				authorizationClientAdapter.getUser.mockResolvedValueOnce({ language: 'de' } as MeResponse);
 
 				return { loggedInClient, studentUser, dummyResponse };
 			};
@@ -109,9 +109,6 @@ describe('H5PEditor Controller (api)', () => {
 
 				const loggedInClient = testApiClient.loginByUser(teacherAccount, teacherUser);
 
-				await em.persist([teacherUser]).flush();
-				em.clear();
-
 				const exception = new H5pError('error-id');
 				exception.httpStatusCode = 500;
 				exception.clientErrorId = 'get-ajax-client-error-id';
@@ -119,6 +116,7 @@ describe('H5PEditor Controller (api)', () => {
 				exception.message = 'get-ajax-error-description';
 
 				ajaxEndpoint.getAjax.mockRejectedValueOnce(exception);
+				authorizationClientAdapter.getUser.mockResolvedValueOnce({ language: 'de' } as MeResponse);
 
 				return { loggedInClient, teacherUser, exception };
 			};
@@ -157,9 +155,6 @@ describe('H5PEditor Controller (api)', () => {
 
 				const loggedInClient = testApiClient.loginByUser(studentAccount, studentUser);
 
-				await em.persist([studentUser]).flush();
-				em.clear();
-
 				const dummyResponse = [
 					{
 						majorVersion: 1,
@@ -177,6 +172,7 @@ describe('H5PEditor Controller (api)', () => {
 				const dummyBody = { contentId: 'id', field: 'field', libraries: ['dummyLibrary-1.0'], libraryParameters: '' };
 
 				ajaxEndpoint.postAjax.mockResolvedValueOnce(dummyResponse);
+				authorizationClientAdapter.getUser.mockResolvedValueOnce({ language: 'de' } as MeResponse);
 
 				return { loggedInClient, studentUser, dummyResponse, dummyBody };
 			};
@@ -212,9 +208,6 @@ describe('H5PEditor Controller (api)', () => {
 
 				const loggedInClient = testApiClient.loginByUser(teacherAccount, teacherUser);
 
-				await em.persist([teacherUser]).flush();
-				em.clear();
-
 				const exception = new H5pError('error-id');
 				exception.httpStatusCode = 404;
 				exception.clientErrorId = 'post-ajax-client-error-id';
@@ -222,6 +215,7 @@ describe('H5PEditor Controller (api)', () => {
 				exception.message = 'post-ajax-error-description';
 
 				ajaxEndpoint.getAjax.mockRejectedValueOnce(exception);
+				authorizationClientAdapter.getUser.mockResolvedValueOnce({ language: 'de' } as MeResponse);
 
 				return { loggedInClient, teacherUser, exception };
 			};
