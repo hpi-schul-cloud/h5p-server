@@ -61,7 +61,7 @@ describe('H5PEditor Controller (api)', () => {
 		});
 
 		describe('when user is logged in', () => {
-			const setup = async () => {
+			const setup = () => {
 				const { studentUser, studentAccount } = UserAndAccountTestFactory.buildStudent();
 
 				const loggedInClient = testApiClient.loginByUser(studentAccount, studentUser);
@@ -104,7 +104,7 @@ describe('H5PEditor Controller (api)', () => {
 		});
 
 		describe('when an error is thrown', () => {
-			const setup = async () => {
+			const setup = () => {
 				const { teacherUser, teacherAccount } = UserAndAccountTestFactory.buildTeacher();
 
 				const loggedInClient = testApiClient.loginByUser(teacherAccount, teacherUser);
@@ -150,7 +150,7 @@ describe('H5PEditor Controller (api)', () => {
 		});
 
 		describe('when user is logged in', () => {
-			const setup = async () => {
+			const setup = () => {
 				const { studentUser, studentAccount } = UserAndAccountTestFactory.buildStudent();
 
 				const loggedInClient = testApiClient.loginByUser(studentAccount, studentUser);
@@ -203,7 +203,7 @@ describe('H5PEditor Controller (api)', () => {
 		});
 
 		describe('when an error is thrown', () => {
-			const setup = async () => {
+			const setup = () => {
 				const { teacherUser, teacherAccount } = UserAndAccountTestFactory.buildTeacher();
 
 				const loggedInClient = testApiClient.loginByUser(teacherAccount, teacherUser);
