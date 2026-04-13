@@ -1,7 +1,5 @@
 FROM docker.io/node:24-alpine
 
-RUN apk add --no-cache gcompat build-base
-
 ENV TZ=Europe/Berlin
 RUN mkdir /app && chown -R node:node /app
 WORKDIR /app
