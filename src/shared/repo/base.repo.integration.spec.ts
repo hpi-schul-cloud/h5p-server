@@ -142,7 +142,7 @@ describe('BaseRepo', () => {
 
 			await expect(async () => {
 				await repo.findById(unknownId);
-			}).rejects.toThrow(`TestEntity not found ('${unknownId}')`);
+			}).rejects.toThrow(`The requested params are not been found.`);
 		});
 	});
 });
