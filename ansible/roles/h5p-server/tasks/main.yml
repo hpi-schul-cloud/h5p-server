@@ -1,3 +1,25 @@
+# Merged tasks from h5p-library-management and schulcloud-server-h5p
+
+# --- h5p-library-management tasks ---
+  - name: H5pLibraryManagement ConfigMap
+    kubernetes.core.k8s:
+      kubeconfig: ~/.kube/config
+      namespace: "{{ NAMESPACE }}"
+      template: cronjob-configmap.yml.j2
+      state: "{{ 'present' if WITH_H5P_CRONJOB is defined and WITH_H5P_CRONJOB|bool else 'absent'}}"
+    tags:
+      - configmap
+
+  - name: H5pLibraryManagement CronJob
+    kubernetes.core.k8s:
+      kubeconfig: ~/.kube/config
+      namespace: "{{ NAMESPACE }}"
+      template: cronjob.yml.j2
+      state: "{{ 'present' if WITH_H5P_CRONJOB is defined and WITH_H5P_CRONJOB|bool else 'absent'}}"
+    tags:
+      - cronjob
+
+# --- schulcloud-server-h5p tasks ---
   - name: Secret by 1Password (H5P S3 Buckets)
     kubernetes.core.k8s:
       kubeconfig: ~/.kube/config

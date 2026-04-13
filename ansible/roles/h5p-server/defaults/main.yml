@@ -1,0 +1,9 @@
+# Merged defaults from h5p-library-management and schulcloud-server-h5p
+# --- h5p-library-management ---
+API_H5P_LIBRARY_MANAGEMENT_MEMORY_LIMITS: "4Gi"
+API_H5P_LIBRARY_MANAGEMENT_MEMORY_REQUESTS: "150Mi"
+# --- schulcloud-server-h5p ---
+API_H5P_EDITOR_MEMORY_LIMIT: "8Gi"
+API_H5P_EDITOR_MEMORY_REQUEST: "2Gi"
+API_H5P_CONSUMER_MEMORY_LIMIT: "2Gi"
+API_H5P_CONSUMER_MEMORY_REQUEST: "512Mi"
