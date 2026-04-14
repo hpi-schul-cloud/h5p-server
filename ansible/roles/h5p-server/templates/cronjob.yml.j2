@@ -47,7 +47,7 @@ spec:
             - configMapRef:
                 name: api-h5p-library-management-configmap
             - secretRef:
-                name: api-h5p-library-management-secret
+                name: api-h5p-secret
             command: ['/bin/sh', '-c']
             args: ['npm run start:h5p:library-management:prod']
             resources:
