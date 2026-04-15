@@ -76,15 +76,16 @@ export class H5PEditorController {
 	// - static files from h5p-core	(e.g. GET `/core/*`)
 	// - static files for editor	(e.g. GET `/editor/*`)
 
-	@Get('libraries/:ubername/:file')
+	@Get('libraries/:ubername/*file')
 	public async getLibraryFile(
 		@Param() params: LibraryFileUrlParams,
 		@Req() req: Request,
 		@CurrentUser() currentUser: ICurrentUser
 	): Promise<StreamableFile> {
+		const filePath = H5PEditorController.normalizeWildcardParam(params.file);
 		const { data, contentType, contentLength } = await this.h5pEditorUc.getLibraryFile(
 			params.ubername,
-			params.file,
+			filePath,
 			currentUser
 		);
 
@@ -110,9 +111,10 @@ export class H5PEditorController {
 		@Res({ passthrough: true }) res: Response,
 		@CurrentUser() currentUser: ICurrentUser
 	): Promise<StreamableFile> {
+		const filenamePath = H5PEditorController.normalizeWildcardParam(params.filename);
 		const { data, contentType, contentLength, contentRange } = await this.h5pEditorUc.getContentFile(
 			params.id,
-			params.filename,
+			filenamePath,
 			req,
 			currentUser.userId
 		);
@@ -129,12 +131,13 @@ export class H5PEditorController {
 	@Get('temp-files/*file')
 	public async getTemporaryFile(
 		@CurrentUser() currentUser: ICurrentUser,
-		@Param('file') file: string,
+		@Param('file') file: string | string[],
 		@Req() req: Request,
 		@Res({ passthrough: true }) res: Response
 	): Promise<StreamableFile> {
+		const filePath = H5PEditorController.normalizeWildcardParam(file);
 		const { data, contentType, contentLength, contentRange } = await this.h5pEditorUc.getTemporaryFile(
-			file,
+			filePath,
 			req,
 			currentUser
 		);
@@ -330,5 +333,9 @@ export class H5PEditorController {
 		}
 
 		return contentLength;
+	}
+
+	private static normalizeWildcardParam(param: string | string[]): string {
+		return Array.isArray(param) ? param.join('/') : param;
 	}
 }

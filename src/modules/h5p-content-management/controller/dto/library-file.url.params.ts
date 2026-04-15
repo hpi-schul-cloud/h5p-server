@@ -7,8 +7,7 @@ export class LibraryFileUrlParams {
 	@IsNotEmpty()
 	ubername!: string;
 
-	@ApiProperty()
-	@IsString()
+	@ApiProperty({ description: 'Wildcard path for file', type: [String] })
 	@IsNotEmpty()
-	file!: string;
+	file!: string | string[];
 }
