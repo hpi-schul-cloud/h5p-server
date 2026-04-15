@@ -1,13 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsMongoId, IsNotEmpty, IsString } from 'class-validator';
+import { IsMongoId, IsNotEmpty } from 'class-validator';
 
 export class ContentFileUrlParams {
 	@ApiProperty()
 	@IsMongoId()
 	id!: string;
 
-	@ApiProperty()
-	@IsString()
+	@ApiProperty({ description: 'Wildcard path for file', type: [String] })
 	@IsNotEmpty()
-	filename!: string;
+	filename!: string | string[];
 }
