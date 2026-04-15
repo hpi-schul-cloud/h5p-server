@@ -53,7 +53,7 @@ import { H5pAjaxErrorResponseFilter } from './filter';
 @JwtAuthentication()
 @Controller('h5p-editor')
 export class H5PEditorController {
-	constructor(private h5pEditorUc: H5PEditorUc) {}
+	constructor(private readonly h5pEditorUc: H5PEditorUc) {}
 
 	@ApiOperation({ summary: 'Return dummy HTML for testing' })
 	@ApiResponse({ status: 400, type: ApiValidationError })
@@ -103,7 +103,7 @@ export class H5PEditorController {
 		return content;
 	}
 
-	@Get('content/:id/:filename')
+	@Get('content/:id/*filename')
 	public async getContentFile(
 		@Param() params: ContentFileUrlParams,
 		@Req() req: Request,
@@ -126,7 +126,7 @@ export class H5PEditorController {
 		return new StreamableFile(data, { type: contentType, length: bodyLength });
 	}
 
-	@Get('temp-files/:file')
+	@Get('temp-files/*file')
 	public async getTemporaryFile(
 		@CurrentUser() currentUser: ICurrentUser,
 		@Param('file') file: string,
