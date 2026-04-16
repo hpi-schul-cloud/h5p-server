@@ -20,9 +20,10 @@
 		"test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
 		"pregenerate-client:authorization-api": "rimraf ./src/infra/authorization-client/authorization-api-client",
 		"generate-client:authorization-api": "openapi-generator-cli generate -c ./openapitools.json --generator-key authorization-api",
-		"h5p:package-h5p-libraries": "tsc scripts/h5p/package-h5p-libraries.ts --esModuleInterop && set -a && source .env && set +a && node ./scripts/h5p/package-h5p-libraries.js",
-		"h5p:update-h5p-map": "tsc scripts/h5p/update-h5p-map.ts --esModuleInterop && set -a && source .env && set +a && node ./scripts/h5p/update-h5p-map.js",
-		"h5p:upload-h5p-libraries": "tsc scripts/h5p/upload-h5p-libraries.ts --esModuleInterop && set -a && source .env && set +a && node ./scripts/h5p/upload-h5p-libraries.js"
+		"h5p:build": "rimraf scripts/h5p/**/*.js scripts/h5p/**/*.js.map && swc scripts/h5p -d .",
+		"h5p:package-h5p-libraries": "npm run h5p:build && set -a && source .env && set +a && node ./scripts/h5p/package-h5p-libraries.js",
+		"h5p:update-h5p-map": "npm run h5p:build && set -a && source .env && set +a && node ./scripts/h5p/update-h5p-map.js",
+		"h5p:upload-h5p-libraries": "npm run h5p:build && set -a && source .env && set +a && node ./scripts/h5p/upload-h5p-libraries.js"
 	},
 	"repository": {
 		"type": "git",

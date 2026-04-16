@@ -136,3 +136,7 @@ dist
 # Vite logs files
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+
+# compiled H5P scripts
+scripts/h5p/**/*.js
+scripts/h5p/**/*.js.map
