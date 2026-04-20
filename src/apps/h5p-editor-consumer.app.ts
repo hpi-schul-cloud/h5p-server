@@ -1,32 +1,22 @@
 /* istanbul ignore file */
 /* eslint-disable no-console */
-import { NestFactory } from '@nestjs/core';
-import { ExpressAdapter } from '@nestjs/platform-express';
-import express from 'express';
-import { install as sourceMapInstall } from 'source-map-support';
-
-// application imports
 import { H5PEditorAMQPModule } from '@modules/h5p-content-management';
+import { NestFactory } from '@nestjs/core';
+
+// register source-map-support for debugging
+import { Logger } from '@infra/logger';
+import { install as sourceMapInstall } from 'source-map-support';
+import { AppStartLoggable } from './helpers';
 
 async function bootstrap(): Promise<void> {
 	sourceMapInstall();
 
-	const internalServerExpress = express();
-	const internalServerExpressAdapter = new ExpressAdapter(internalServerExpress);
-
-	const nestApp = await NestFactory.create(H5PEditorAMQPModule, internalServerExpressAdapter);
-
+	const nestApp = await NestFactory.create(H5PEditorAMQPModule);
 	await nestApp.init();
 
-	const port = 4449;
-	const rootExpress = express();
-	rootExpress.use('/internal', internalServerExpress);
-	rootExpress.listen(port);
-
-	console.log('##########################################');
-	console.log(`### Start H5P Editor AMQP Consumer    ###`);
-	console.log(`### Port:      ${port}                    ###`);
-	console.log('##########################################');
+	const logger = await nestApp.resolve(Logger);
+	const appStartLoggable = new AppStartLoggable({ appName: 'H5P Editor AMQP Consumer' });
+	logger.setContext('H5P_EDITOR_APP');
+	logger.info(appStartLoggable);
 }
-
 void bootstrap();
