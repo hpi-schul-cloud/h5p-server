@@ -32,6 +32,7 @@ async function bootstrap(): Promise<void> {
 	const port = 4448;
 	const basePath = '/api/v3';
 
+	nestApp.setGlobalPrefix(basePath);
 	await nestApp.init();
 
 	const appServer = await nestApp.listen(port, async () => {
