@@ -1,5 +1,5 @@
 /* istanbul ignore file */
-/* eslint-disable no-console */
+
 import { Logger } from '@infra/logger/logger';
 import { H5PLibraryManagementJobModule, H5PLibraryManagementService } from '@modules/h5p-content-management';
 import { NestFactory } from '@nestjs/core';

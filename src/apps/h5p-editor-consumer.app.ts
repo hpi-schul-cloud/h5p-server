@@ -1,5 +1,5 @@
 /* istanbul ignore file */
-/* eslint-disable no-console */
+
 import { H5PEditorAMQPModule } from '@modules/h5p-content-management';
 import { NestFactory } from '@nestjs/core';
 
