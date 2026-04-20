@@ -20,23 +20,21 @@ const args = arg(
 );
 
 if ('--help' in args) {
-	console.info(`Usage: node package-h5p-libraries.js [opts] [input] [map] [tmp]
+	console.info(`Usage: node package-h5p-libraries.js [opts] [map] [tmp]
 POSITIONAL ARGUMENTS:
-    input			The file containing the list of libraries to be installed (alternative to --input).
-    map				The file containing the library to repository map (alternative to --map).
-    tmp				The temporary folder to use for building libraries (alternative to --tmp).
+	    map           The file containing the library to repository map (alternative to --map).
+	    tmp           The temporary folder to use for building libraries (alternative to --tmp).
 
 OPTIONS:
-    --help (-h)		Show this help.
-    --map (-m)		The file containing the library to repository map.
-    --tmp (-t)		The temporary folder to use for building libraries.
-    --verbose (-v)	Enable verbose/debug output.
+	    --help (-h)    Show this help message and exit.
+	    --map (-m)     The file containing the library to repository map.
+	    --tmp (-t)     The temporary folder to use for building libraries.
+	    --verbose (-v) Enable verbose/debug output.
 `);
 	process.exit(0);
 }
 
 interface Params {
-	input?: string;
 	map?: string;
 	tmp?: string;
 	verbose?: boolean;
