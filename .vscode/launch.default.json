@@ -1,0 +1,53 @@
+{
+	"version": "0.2.0",
+	"configurations": [
+		{
+			"type": "node",
+			"request": "launch",
+			"name": "start:h5p:dev",
+			"runtimeExecutable": "npm",
+			"runtimeArgs": ["run-script", "start:h5p:dev"],
+			"skipFiles": ["<node_internals>/**"]
+		},
+		{
+			"type": "node",
+			"request": "launch",
+			"name": "start:h5p:library-management:dev",
+			"runtimeExecutable": "npm",
+			"runtimeArgs": ["run-script", "start:h5p:library-management:dev"],
+			"skipFiles": ["<node_internals>/**"]
+		},
+		{
+			"name": "nest:attach",
+			"port": 9229,
+			"request": "attach",
+			"skipFiles": ["<node_internals>/**"],
+			"type": "node",
+			"restart": true
+		},
+		{
+			"type": "node",
+			"name": "vscode-jest-tests",
+			"request": "launch",
+			"console": "integratedTerminal",
+			"internalConsoleOptions": "neverOpen",
+			"cwd": "${workspaceFolder}",
+			"runtimeExecutable": "npm",
+			"args": ["run", "test:debug"]
+		},
+		{
+			"type": "node",
+			"request": "launch",
+			"name": "Test (unit) Current File",
+			"program": "${workspaceFolder}/node_modules/.bin/jest",
+			"args": ["${fileBasenameNoExtension}", "--config", "jest.config.cjs"],
+			"console": "integratedTerminal",
+			"internalConsoleOptions": "neverOpen",
+			"windows": {
+				"program": "${workspaceFolder}/node_modules/jest/bin/jest"
+			},
+			"skipFiles": ["<node_internals>/**"],
+			"sourceMaps": true
+		}
+	]
+}
