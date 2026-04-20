@@ -192,8 +192,9 @@ export class H5PEditorUc {
 			);
 
 			return result;
-		} catch (err) {
-			throw new InternalServerErrorException('Error processing H5P AJAX request', { cause: err });
+		} catch (err: unknown) {
+			const errorMessage = (err as Error)?.message ?? 'Error processing H5P AJAX request';
+			throw new InternalServerErrorException(errorMessage, { cause: err });
 		} finally {
 			if (this.isTemporarySvgFile(contentUploadFile) && contentUploadFile.tempFilePath) {
 				this.deleteTemporarySvgFile(contentUploadFile.tempFilePath);
