@@ -6,7 +6,7 @@ This folder contains scripts and helper modules for managing H5P libraries in th
 
 ### Main Scripts
 - **update-h5p-map.ts**: Updates the mapping of H5P libraries to their respective GitHub repositories, typically used to keep track of available versions and sources.
-- **package-h5p-libraries.ts**: Packages H5P libraries from GitHub repositories, including downloading, building, and running consistency checks.
+- **package-h5p-libraries.ts**: Packages H5P libraries from GitHub repositories, including downloading, building, and running consistency checks. **Note:** This script requires Unix-based tools (bash, nvm) and only runs on Linux, macOS, or WSL. It does not work on native Windows.
 - **upload-h5p-libraries.ts**: Handles the upload of packaged H5P libraries to S3 cloud storage.
 
 ### Subfolders
@@ -35,47 +35,45 @@ This folder contains scripts and helper modules for managing H5P libraries in th
 
 ## Running scripts
 
-
 ### Running scripts manually
 
-To run any of the main scripts in this folder manually, you need to first compile the TypeScript file to JavaScript, then run the compiled file.
+To run any of the main scripts in this folder manually, you need to first compile the TypeScript files to JavaScript, then run the compiled file with environment variables loaded.
 
 #### Step 1: Compile TypeScript to JavaScript
 
 ```bash
-tsc scripts/h5p/<script-name>.ts --esModuleInterop
+npm run h5p:build
 ```
 
-This generates a corresponding `.js` file in the same directory.
+This compiles all TypeScript files in `scripts/h5p/` to JavaScript using SWC.
 
-#### Step 2: Load environment variables (optional)
+#### Step 2: Load environment variables and run
 
-If the script requires environment variables, load them from your `.env` file:
+**Using npm (recommended, cross-platform):**
+
+The npm scripts automatically load environment variables from `.env`:
 
 ```bash
-source .env
+npm run h5p:package-h5p-libraries
+npm run h5p:update-h5p-map
+npm run h5p:upload-h5p-libraries
 ```
 
-#### Step 3: Run the compiled JavaScript file
+**Manual execution (cross-platform):**
+
+If you need to run the scripts manually with custom options, use `dotenv` (included as a dev dependency):
 
 ```bash
-node scripts/h5p/<script-name>.js
+npm run h5p:build
+npx dotenv -- node ./scripts/h5p/package-h5p-libraries.js
 ```
 
-#### Combined example
-
-To compile and run `package-h5p-libraries.ts`:
+**Manual execution (Unix/macOS/WSL only):**
 
 ```bash
-tsc scripts/h5p/package-h5p-libraries.ts --esModuleInterop
+npm run h5p:build
 set -a && source .env && set +a
 node scripts/h5p/package-h5p-libraries.js
-```
-
-Or as a single command:
-
-```bash
-tsc scripts/h5p/package-h5p-libraries.ts --esModuleInterop && set -a && source .env && set +a && node ./scripts/h5p/package-h5p-libraries.js
 ```
 
 ### Running scripts using npm
@@ -102,11 +100,14 @@ Set this variable in your environment before running the script.
 
 ### package-h5p-libraries.ts
 
-To package H5P libraries using `package-h5p-libraries.ts`, you need the following environment variable:
+> **Platform Requirements:** This script only runs on **Linux, macOS, or WSL**. It uses Unix-specific tools (bash, nvm) for building H5P libraries with legacy Node.js versions and does not work on native Windows.
 
+To package H5P libraries using `package-h5p-libraries.ts`, you need the following environment variables:
+
+- `H5P_EDITOR__LIBRARY_LIST`: Required. A comma-separated list of H5P library machine names to package (e.g., `H5P.Blanks,H5P.MultiChoice,H5P.DragQuestion`). See [`src/modules/h5p-content-management/h5p-editor.config.ts`](../../src/modules/h5p-content-management/h5p-editor.config.ts) for the default list of supported libraries.
 - `GITHUB_PERSONAL_ACCESS_TOKEN`: Required. Set this variable to a valid GitHub personal access token. Without a token, the script uses unauthenticated GitHub API access, which is limited to 60 requests per hour and will likely fail for larger operations. With a token, the rate limit increases to 5,000 requests per hour. A token is also required to access private repositories.
 
-Set this variable in your environment before running the script.
+Set these variables in your environment before running the script.
 
 ### upload-h5p-libraries.ts
 
