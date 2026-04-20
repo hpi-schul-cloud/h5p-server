@@ -20,10 +20,10 @@
 		"test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
 		"pregenerate-client:authorization-api": "rimraf ./src/infra/authorization-client/authorization-api-client",
 		"generate-client:authorization-api": "openapi-generator-cli generate -c ./openapitools.json --generator-key authorization-api",
-		"h5p:build": "rimraf scripts/h5p/**/*.js scripts/h5p/**/*.js.map && swc scripts/h5p -d .",
-		"h5p:package-h5p-libraries": "npm run h5p:build && set -a && source .env && set +a && node ./scripts/h5p/package-h5p-libraries.js",
-		"h5p:update-h5p-map": "npm run h5p:build && set -a && source .env && set +a && node ./scripts/h5p/update-h5p-map.js",
-		"h5p:upload-h5p-libraries": "npm run h5p:build && set -a && source .env && set +a && node ./scripts/h5p/upload-h5p-libraries.js"
+		"h5p:build": "rimraf --glob \"scripts/h5p/**/*.js\" \"scripts/h5p/**/*.js.map\" && swc scripts/h5p -d .",
+		"h5p:package-h5p-libraries": "npm run h5p:build && dotenv -- node ./scripts/h5p/package-h5p-libraries.js",
+		"h5p:update-h5p-map": "npm run h5p:build && dotenv -- node ./scripts/h5p/update-h5p-map.js",
+		"h5p:upload-h5p-libraries": "npm run h5p:build && dotenv -- node ./scripts/h5p/upload-h5p-libraries.js"
 	},
 	"repository": {
 		"type": "git",
@@ -110,6 +110,7 @@
 		"@types/response-time": "^2.3.9",
 		"@types/source-map-support": "^0.5.10",
 		"@types/supertest": "^7.2.0",
+		"dotenv-cli": "^11.0.0",
 		"eslint": "^10.1.0",
 		"eslint-config-prettier": "^10.1.8",
 		"eslint-plugin-jest": "^29.15.1",
