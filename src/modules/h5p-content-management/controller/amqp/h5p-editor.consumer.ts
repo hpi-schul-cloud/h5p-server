@@ -1,10 +1,10 @@
-import { RabbitPayload, RabbitSubscribe } from '@golevelup/nestjs-rabbitmq';
+import { AmqpConnection } from '@golevelup/nestjs-rabbitmq';
 
 import { Logger } from '@infra/logger';
 import { H5PEditor, IUser as LumiIUser } from '@lumieducation/h5p-server';
-import { EnsureRequestContext, MikroORM } from '@mikro-orm/core';
-import { Injectable } from '@nestjs/common';
-import { H5P_EXCHANGE_NAME } from '../../h5p-exchange.config';
+import { MikroORM, RequestContext } from '@mikro-orm/core';
+import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
+import { H5P_EXCHANGE_CONFIG_TOKEN, H5pExchangeConfig } from '../../h5p-exchange.config';
 import { CopyContentParams, DeleteContentParams, H5pEditorEvents } from '../../interface';
 import {
 	H5pEditorContentCopySuccessfulLoggable,
@@ -15,55 +15,78 @@ import { H5pEditorContentService } from '../../service';
 import { H5PContentParentType } from '../../types';
 
 @Injectable()
-export class H5pEditorConsumer {
+export class H5pEditorConsumer implements OnModuleInit {
 	constructor(
 		private readonly logger: Logger,
 		private readonly h5pEditor: H5PEditor,
 		private readonly h5pEditorContentService: H5pEditorContentService,
-		private readonly orm: MikroORM
+		private readonly orm: MikroORM,
+		private readonly amqpConnection: AmqpConnection,
+		@Inject(H5P_EXCHANGE_CONFIG_TOKEN)
+		private readonly exchangeConfig: H5pExchangeConfig
 	) {
 		this.logger.setContext(H5pEditorConsumer.name);
 	}
 
-	@RabbitSubscribe({
-		exchange: H5P_EXCHANGE_NAME,
-		routingKey: H5pEditorEvents.DELETE_CONTENT,
-		queue: H5pEditorEvents.DELETE_CONTENT,
-	})
-	@EnsureRequestContext()
-	public async deleteContent(@RabbitPayload() payload: DeleteContentParams): Promise<void> {
-		const user: LumiIUser = {
-			email: '',
-			id: '',
-			name: '',
-			type: '',
-		};
+	public async onModuleInit(): Promise<void> {
+		await this.registerSubscriber(H5pEditorEvents.DELETE_CONTENT, (payload: DeleteContentParams) =>
+			this.deleteContent(payload)
+		);
 
-		await this.h5pEditor.deleteContent(payload.contentId, user);
-
-		this.logger.info(new H5pEditorContentDeletionSuccessfulLoggable(payload.contentId));
+		await this.registerSubscriber(H5pEditorEvents.COPY_CONTENT, (payload: CopyContentParams) =>
+			this.copyContent(payload)
+		);
 	}
 
-	@RabbitSubscribe({
-		exchange: H5P_EXCHANGE_NAME,
-		routingKey: H5pEditorEvents.COPY_CONTENT,
-		queue: H5pEditorEvents.COPY_CONTENT,
-	})
-	@EnsureRequestContext()
-	public async copyContent(@RabbitPayload() payload: CopyContentParams): Promise<void> {
-		const parentType: H5PContentParentType | undefined = Object.values(H5PContentParentType).find(
-			(type: H5PContentParentType) => type === payload.parentType?.valueOf()
+	private async registerSubscriber<T>(event: H5pEditorEvents, handler: (payload: T) => Promise<void>): Promise<void> {
+		await this.amqpConnection.createSubscriber<T>(
+			(payload) => {
+				if (!payload) {
+					throw new Error(`Received empty payload for ${event} event`);
+				}
+
+				return handler(payload);
+			},
+			{
+				exchange: this.exchangeConfig.exchangeName,
+				routingKey: event,
+				queue: event,
+			},
+			H5pEditorConsumer.name
 		);
-		if (!parentType) {
-			throw new H5pEditorExchangeInvalidParamsLoggableException(H5pEditorEvents.COPY_CONTENT, payload);
-		}
+	}
 
-		await this.h5pEditorContentService.copyH5pContent({
-			...payload,
-			parentType,
-			creatorId: payload.userId,
+	public async deleteContent(payload: DeleteContentParams): Promise<void> {
+		await RequestContext.create(this.orm.em, async () => {
+			const user: LumiIUser = {
+				email: '',
+				id: '',
+				name: '',
+				type: '',
+			};
+
+			await this.h5pEditor.deleteContent(payload.contentId, user);
+
+			this.logger.info(new H5pEditorContentDeletionSuccessfulLoggable(payload.contentId));
 		});
+	}
 
-		this.logger.info(new H5pEditorContentCopySuccessfulLoggable(payload.sourceContentId, payload.copiedContentId));
+	public async copyContent(payload: CopyContentParams): Promise<void> {
+		await RequestContext.create(this.orm.em, async () => {
+			const parentType: H5PContentParentType | undefined = Object.values(H5PContentParentType).find(
+				(type: H5PContentParentType) => type === payload.parentType?.valueOf()
+			);
+			if (!parentType) {
+				throw new H5pEditorExchangeInvalidParamsLoggableException(H5pEditorEvents.COPY_CONTENT, payload);
+			}
+
+			await this.h5pEditorContentService.copyH5pContent({
+				...payload,
+				parentType,
+				creatorId: payload.userId,
+			});
+
+			this.logger.info(new H5pEditorContentCopySuccessfulLoggable(payload.sourceContentId, payload.copiedContentId));
+		});
 	}
 }

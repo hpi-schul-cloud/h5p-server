@@ -1,3 +1,4 @@
+import { AmqpConnection } from '@golevelup/nestjs-rabbitmq';
 import { createMock, DeepMocked } from '@golevelup/ts-jest';
 import { Logger } from '@infra/logger';
 import { H5PEditor } from '@lumieducation/h5p-server';
@@ -45,6 +46,10 @@ describe(H5pEditorConsumer.name, () => {
 				{
 					provide: MikroORM,
 					useValue: await setupEntities(ENTITIES),
+				},
+				{
+					provide: AmqpConnection,
+					useValue: createMock<AmqpConnection>(),
 				},
 				{
 					provide: H5P_EXCHANGE_CONFIG_TOKEN,
