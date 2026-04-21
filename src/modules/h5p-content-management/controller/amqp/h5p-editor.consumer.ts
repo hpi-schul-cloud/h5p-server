@@ -3,9 +3,9 @@ import { RabbitPayload, RabbitSubscribe } from '@golevelup/nestjs-rabbitmq';
 import { Logger } from '@infra/logger';
 import { H5PEditor, IUser as LumiIUser } from '@lumieducation/h5p-server';
 import { EnsureRequestContext, MikroORM } from '@mikro-orm/core';
-import { H5P_EXCHANGE_CONFIG_TOKEN, H5pExchangeConfig } from '@modules/h5p-content-management/h5p-exchange.config';
-import { CopyContentParams, DeleteContentParams, H5pEditorEvents } from '@modules/h5p-content-management/interface';
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
+import { H5P_EXCHANGE_NAME } from '../../h5p-exchange.config';
+import { CopyContentParams, DeleteContentParams, H5pEditorEvents } from '../../interface';
 import {
 	H5pEditorContentCopySuccessfulLoggable,
 	H5pEditorContentDeletionSuccessfulLoggable,
@@ -14,23 +14,19 @@ import {
 import { H5pEditorContentService } from '../../service';
 import { H5PContentParentType } from '../../types';
 
-// Using a variable here to access the exchange name in the decorator
-let h5pExchange: string | undefined;
 @Injectable()
 export class H5pEditorConsumer {
 	constructor(
 		private readonly logger: Logger,
 		private readonly h5pEditor: H5PEditor,
 		private readonly h5pEditorContentService: H5pEditorContentService,
-		private readonly orm: MikroORM,
-		@Inject(H5P_EXCHANGE_CONFIG_TOKEN) private readonly h5pExchangeConfig: H5pExchangeConfig
+		private readonly orm: MikroORM
 	) {
 		this.logger.setContext(H5pEditorConsumer.name);
-		h5pExchange = this.h5pExchangeConfig.exchangeName;
 	}
 
 	@RabbitSubscribe({
-		exchange: h5pExchange,
+		exchange: H5P_EXCHANGE_NAME,
 		routingKey: H5pEditorEvents.DELETE_CONTENT,
 		queue: H5pEditorEvents.DELETE_CONTENT,
 	})
@@ -49,7 +45,7 @@ export class H5pEditorConsumer {
 	}
 
 	@RabbitSubscribe({
-		exchange: h5pExchange,
+		exchange: H5P_EXCHANGE_NAME,
 		routingKey: H5pEditorEvents.COPY_CONTENT,
 		queue: H5pEditorEvents.COPY_CONTENT,
 	})
