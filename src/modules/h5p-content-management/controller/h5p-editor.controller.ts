@@ -31,6 +31,7 @@ import { H5PEditorUc } from '../uc';
 
 import { ApiValidationError } from '@infra/error';
 import { RequestTimeout } from '@shared/decorator';
+import { H5P_EDITOR_INCOMING_REQUEST_TIMEOUT_POST_AJAX_KEY } from '../h5p-editor.app.config';
 import {
 	AjaxGetQueryParams,
 	AjaxPostBodyParams,
@@ -49,7 +50,6 @@ import {
 } from './dto';
 import { AjaxPostBodyParamsTransformPipe } from './dto/ajax/post.body.params.transform-pipe';
 import { H5pAjaxErrorResponseFilter } from './filter';
-import { H5P_SERVER_INCOMING_REQUEST_TIMEOUT_COPY_API_KEY } from '../h5p-editor.app.config';
 
 @ApiTags('h5p-editor')
 @JwtAuthentication()
@@ -166,7 +166,7 @@ export class H5PEditorController {
 
 	@Post('ajax')
 	@UseFilters(H5pAjaxErrorResponseFilter)
-	@RequestTimeout(H5P_SERVER_INCOMING_REQUEST_TIMEOUT_COPY_API_KEY)
+	@RequestTimeout(H5P_EDITOR_INCOMING_REQUEST_TIMEOUT_POST_AJAX_KEY)
 	@UseInterceptors(
 		FileFieldsInterceptor([
 			{ name: 'file', maxCount: 1 },
