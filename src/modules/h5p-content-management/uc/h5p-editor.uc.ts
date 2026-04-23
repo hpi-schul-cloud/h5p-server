@@ -39,6 +39,7 @@ import { mkdtempSync, rmSync, unlinkSync } from 'fs';
 import { writeFile } from 'fs/promises';
 import { tmpdir } from 'os';
 import { dirname, join } from 'path';
+import { PassThrough, Readable } from 'stream';
 import { AjaxGetQueryParams, AjaxPostBodyParams, AjaxPostQueryParams, H5PContentResponse } from '../controller/dto';
 import { H5P_EDITOR_CONFIG_TOKEN, H5PEditorConfig } from '../h5p-editor.config';
 import { H5PUcErrorLoggable, H5PUcLoggable } from '../loggable';
@@ -200,6 +201,18 @@ export class H5PEditorUc {
 				this.deleteTemporarySvgFile(contentUploadFile.tempFilePath);
 			}
 		}
+	}
+
+	public downloadH5pContent(currentUser: ICurrentUser, contentId: string): { stream: Readable; contentId: string } {
+		const user = this.changeUserType(currentUser.userId);
+		const passThrough = new PassThrough();
+
+		// Start the download without awaiting - data will be piped as it's written
+		this.h5pAjaxEndpoint.getDownload(contentId, user, passThrough).catch((error: unknown) => {
+			passThrough.destroy(error instanceof Error ? error : new Error(String(error)));
+		});
+
+		return { stream: passThrough, contentId };
 	}
 
 	private async createContentUploadFile(contentFile?: Express.Multer.File): Promise<H5PUploadFile | undefined> {

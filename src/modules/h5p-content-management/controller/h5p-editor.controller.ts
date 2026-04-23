@@ -30,6 +30,7 @@ import { Request, Response } from 'express';
 import { H5PEditorUc } from '../uc';
 
 import { ApiValidationError } from '@infra/error';
+
 import {
 	AjaxGetQueryParams,
 	AjaxPostBodyParams,
@@ -272,6 +273,26 @@ export class H5PEditorController {
 		const saveResponse = new H5PSaveResponse(response.id, response.metadata);
 
 		return saveResponse;
+	}
+
+	@Get('/download/:contentId')
+	@ApiResponse({ status: 200, description: 'Returns the H5P content as a downloadable .h5p file' })
+	public downloadH5pContent(
+		@Param() params: SaveH5PEditorParams,
+		@CurrentUser() currentUser: ICurrentUser,
+		@Req() req: Request,
+		@Res({ passthrough: true }) res: Response
+	): StreamableFile {
+		const { stream, contentId } = this.h5pEditorUc.downloadH5pContent(currentUser, params.contentId);
+
+		res.set({
+			'Content-Type': 'application/zip',
+			'Content-Disposition': `attachment; filename="${contentId}.h5p"`,
+		});
+
+		req.on('close', () => stream.destroy());
+
+		return new StreamableFile(stream);
 	}
 
 	// Content user data endpoints - stub implementations since contentUserStateSaveInterval is disabled
