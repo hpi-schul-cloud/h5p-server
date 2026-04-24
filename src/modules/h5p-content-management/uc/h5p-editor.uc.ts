@@ -203,7 +203,7 @@ export class H5PEditorUc {
 		}
 	}
 
-	public downloadH5pContent(currentUser: ICurrentUser, contentId: string): { stream: Readable; contentId: string } {
+	public downloadH5pContent(currentUser: ICurrentUser, contentId: string): Readable {
 		const user = this.changeUserType(currentUser.userId);
 		const passThrough = new PassThrough();
 
@@ -212,7 +212,7 @@ export class H5PEditorUc {
 			passThrough.destroy(error instanceof Error ? error : new Error(String(error)));
 		});
 
-		return { stream: passThrough, contentId };
+		return passThrough;
 	}
 
 	private async createContentUploadFile(contentFile?: Express.Multer.File): Promise<H5PUploadFile | undefined> {
