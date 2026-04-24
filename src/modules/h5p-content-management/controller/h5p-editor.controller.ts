@@ -284,7 +284,13 @@ export class H5PEditorController {
 	): StreamableFile {
 		const stream = this.h5pEditorUc.downloadH5pContent(currentUser, params.contentId);
 		req.on('close', () => stream.destroy());
-		const streamableFile = new StreamableFile(stream, { type: 'application/zip', disposition: 'attachment' });
+
+		res.set({
+			'Content-Type': 'application/zip',
+			'Content-Disposition': `attachment;`,
+		});
+
+		const streamableFile = new StreamableFile(stream);
 
 		return streamableFile;
 	}
