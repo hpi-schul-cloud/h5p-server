@@ -1,4 +1,4 @@
-import { AnyEntity, EntityClass, MikroORM, MongoDriver } from '@mikro-orm/mongodb';
+import { AnyEntity, EntityClass, MikroORM } from '@mikro-orm/mongodb';
 
 /**
  * Test-Setup to make all entities available without a database connection.
@@ -6,11 +6,10 @@ import { AnyEntity, EntityClass, MikroORM, MongoDriver } from '@mikro-orm/mongod
  */
 export const setupEntities = async (entities: EntityClass<AnyEntity>[]): Promise<MikroORM> => {
 	const orm = await MikroORM.init({
-		driver: MongoDriver,
-		dbName: 'dummy',
 		entities,
-		allowGlobalContext: true,
+		dbName: ':memory:',
 		connect: false,
+		allowGlobalContext: true,
 	});
 
 	return orm;

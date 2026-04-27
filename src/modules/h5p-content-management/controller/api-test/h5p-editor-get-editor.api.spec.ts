@@ -3,14 +3,13 @@ import { AuthorizationClientAdapter } from '@infra/authorization-client';
 import { S3ClientAdapter } from '@infra/s3-client';
 import { H5PEditor, IContentMetadata } from '@lumieducation/h5p-server';
 import { EntityManager, ObjectId } from '@mikro-orm/mongodb';
+import { H5PEditorTestModule } from '@modules/h5p-content-management/h5p-editor-test.module';
 import { HttpStatus, INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { cleanupCollections } from '@testing/database';
-import { UserAndAccountTestFactory } from '@testing/factory/user-and-account.test.factory';
 import { TestApiClient } from '@testing/test-api-client';
 import { H5P_CONTENT_S3_CLIENT_INJECTION_TOKEN, H5P_LIBRARIES_S3_CLIENT_INJECTION_TOKEN } from '../../h5p-editor.const';
 import { h5pContentFactory } from '../../testing';
-import { H5PEditorTestModule } from '@modules/h5p-content-management/h5p-editor-test.module';
 
 const buildContent = () => {
 	const contentId = new ObjectId(0).toString();
@@ -36,9 +35,10 @@ const buildContent = () => {
 
 describe('H5PEditor Controller (api)', () => {
 	let app: INestApplication;
-	let testApiClient: TestApiClient;
 	let em: EntityManager;
 	let h5pEditor: DeepMocked<H5PEditor>;
+
+	const baseRoute = '/h5p-editor/edit';
 
 	beforeAll(async () => {
 		const module = await Test.createTestingModule({
@@ -57,8 +57,6 @@ describe('H5PEditor Controller (api)', () => {
 
 		app = module.createNestApplication();
 		await app.init();
-
-		testApiClient = new TestApiClient(app, '/h5p-editor/edit');
 		em = module.get(EntityManager);
 		h5pEditor = module.get(H5PEditor);
 	});
@@ -75,7 +73,7 @@ describe('H5PEditor Controller (api)', () => {
 	describe('get new h5p editor', () => {
 		describe('when user is not logged in', () => {
 			it('should return UNAUTHORIZED status', async () => {
-				const response = await testApiClient.get('de');
+				const response = await TestApiClient.createUnauthenticated(app, baseRoute).get('de');
 
 				expect(response.status).toEqual(HttpStatus.UNAUTHORIZED);
 			});
@@ -84,9 +82,7 @@ describe('H5PEditor Controller (api)', () => {
 		describe('when user is logged in', () => {
 			describe('when editor is created successfully', () => {
 				const setup = () => {
-					const { studentUser, studentAccount } = UserAndAccountTestFactory.buildStudent();
-
-					const loggedInClient = testApiClient.loginByUser(studentAccount, studentUser);
+					const loggedInClient = TestApiClient.createWithJwt(app, baseRoute);
 
 					const { editorModel } = buildContent();
 					h5pEditor.render.mockResolvedValueOnce(editorModel);
@@ -105,9 +101,7 @@ describe('H5PEditor Controller (api)', () => {
 
 			describe('when editor throws error', () => {
 				const setup = () => {
-					const { studentUser, studentAccount } = UserAndAccountTestFactory.buildStudent();
-
-					const loggedInClient = testApiClient.loginByUser(studentAccount, studentUser);
+					const loggedInClient = TestApiClient.createWithJwt(app, baseRoute);
 
 					h5pEditor.render.mockRejectedValueOnce(new Error('Could not get H5P editor'));
 
@@ -128,7 +122,7 @@ describe('H5PEditor Controller (api)', () => {
 	describe('get h5p editor', () => {
 		describe('when user is not logged in', () => {
 			it('should return UNAUTHORIZED status', async () => {
-				const response = await testApiClient.get('123/de');
+				const response = await TestApiClient.createUnauthenticated(app, baseRoute).get('123/de');
 
 				expect(response.status).toEqual(HttpStatus.UNAUTHORIZED);
 			});
@@ -137,9 +131,7 @@ describe('H5PEditor Controller (api)', () => {
 		describe('when user is logged in', () => {
 			describe('when editor is returned successfully', () => {
 				const setup = async () => {
-					const { teacherUser, teacherAccount } = UserAndAccountTestFactory.buildTeacher();
-
-					const loggedInClient = testApiClient.loginByUser(teacherAccount, teacherUser);
+					const loggedInClient = TestApiClient.createWithJwt(app, baseRoute);
 
 					const parentId = new ObjectId().toHexString();
 					const h5pContent = h5pContentFactory.build({ parentId });
@@ -165,9 +157,7 @@ describe('H5PEditor Controller (api)', () => {
 
 			describe('when content is not existing', () => {
 				const setup = () => {
-					const { studentUser, studentAccount } = UserAndAccountTestFactory.buildStudent();
-
-					const loggedInClient = testApiClient.loginByUser(studentAccount, studentUser);
+					const loggedInClient = TestApiClient.createWithJwt(app, baseRoute);
 
 					const { contentId } = buildContent();
 
@@ -185,9 +175,7 @@ describe('H5PEditor Controller (api)', () => {
 
 			describe('when id is not a mongo id', () => {
 				const setup = () => {
-					const { studentUser, studentAccount } = UserAndAccountTestFactory.buildStudent();
-
-					const loggedInClient = testApiClient.loginByUser(studentAccount, studentUser);
+					const loggedInClient = TestApiClient.createWithJwt(app, baseRoute);
 
 					return { loggedInClient };
 				};
