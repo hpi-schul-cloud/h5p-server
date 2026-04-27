@@ -2,8 +2,10 @@ import { findOneOrFailHandler } from '@infra/database/database.not-found.error';
 import { defineConfig, EntityClass, EntityManager } from '@mikro-orm/mongodb';
 import { MikroOrmModule } from '@mikro-orm/nestjs';
 import { DynamicModule, Module, OnModuleDestroy } from '@nestjs/common';
+import crypto from 'node:crypto';
 
-const getDbName = (): string => Array.from({ length: 20 }, () => Math.floor(Math.random() * 36).toString(36)).join('');
+const getDbName = (): string =>
+	Array.from({ length: 20 }, () => Math.floor((crypto.randomBytes(1)[0] * 36) / 256).toString(36)).join('');
 
 @Module({})
 export class MongoMemoryDatabaseModule implements OnModuleDestroy {
