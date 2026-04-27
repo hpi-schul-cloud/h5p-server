@@ -203,11 +203,13 @@ export class H5PEditorUc {
 		}
 	}
 
-	public downloadH5pContent(currentUser: ICurrentUser, contentId: string): Readable {
+	public async downloadH5pContent(currentUser: ICurrentUser, contentId: string): Promise<Readable> {
+		const { parentType, parentId } = await this.h5pContentRepo.findById(contentId);
+		await this.checkContentPermission(parentType, parentId, AuthorizationContextBuilder.read([]));
+
 		const user = this.changeUserType(currentUser.userId);
 		const passThrough = new PassThrough();
 
-		// Start the download without awaiting - data will be piped as it's written
 		this.h5pAjaxEndpoint.getDownload(contentId, user, passThrough).catch((error: unknown) => {
 			passThrough.destroy(error instanceof Error ? error : new Error(String(error)));
 		});

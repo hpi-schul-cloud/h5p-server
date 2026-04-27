@@ -276,13 +276,13 @@ export class H5PEditorController {
 
 	@Get('/download/:contentId')
 	@ApiResponse({ status: 200, description: 'Returns the H5P content as a downloadable .h5p file' })
-	public downloadH5pContent(
+	public async downloadH5pContent(
 		@Param() params: SaveH5PEditorParams,
 		@CurrentUser() currentUser: ICurrentUser,
 		@Req() req: Request,
 		@Res({ passthrough: true }) res: Response
-	): StreamableFile {
-		const stream = this.h5pEditorUc.downloadH5pContent(currentUser, params.contentId);
+	): Promise<StreamableFile> {
+		const stream = await this.h5pEditorUc.downloadH5pContent(currentUser, params.contentId);
 		req.on('close', () => stream.destroy());
 
 		res.set({
