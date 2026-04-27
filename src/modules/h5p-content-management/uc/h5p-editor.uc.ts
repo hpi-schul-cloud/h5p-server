@@ -535,12 +535,16 @@ export class H5PEditorUc {
 	}
 
 	private sanitizeFilename(filename: string): string {
-		const sanitized = filename
-			.replaceAll(/[<>:"/\\|?*\x00-\x1f]/g, '_')
-			.replaceAll(/\.+$/g, '')
-			.trim()
-			.slice(0, 200);
+		const truncated = filename.slice(0, 250);
 
-		return sanitized || 'content';
+		let sanitized = truncated.replaceAll(/[<>:"/\\|?*\x00-\x1f]/g, '_');
+
+		while (sanitized.endsWith('.')) {
+			sanitized = sanitized.slice(0, -1);
+		}
+
+		const result = sanitized.trim().slice(0, 200);
+
+		return result || 'content';
 	}
 }
