@@ -282,15 +282,15 @@ export class H5PEditorController {
 		@Req() req: Request,
 		@Res({ passthrough: true }) res: Response
 	): Promise<StreamableFile> {
-		const stream = await this.h5pEditorUc.downloadH5pContent(currentUser, params.contentId);
-		req.on('close', () => stream.destroy());
+		const { filename, passThrough } = await this.h5pEditorUc.downloadH5pContent(currentUser, params.contentId);
+		req.on('close', () => passThrough.destroy());
 
 		res.set({
 			'Content-Type': 'application/zip',
-			'Content-Disposition': `attachment;`,
+			'Content-Disposition': `attachment; filename="${filename}"; filename*=UTF-8''${encodeURIComponent(filename)}`,
 		});
 
-		const streamableFile = new StreamableFile(stream);
+		const streamableFile = new StreamableFile(passThrough);
 
 		return streamableFile;
 	}

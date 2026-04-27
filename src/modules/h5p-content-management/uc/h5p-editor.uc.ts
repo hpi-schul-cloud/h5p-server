@@ -203,9 +203,19 @@ export class H5PEditorUc {
 		}
 	}
 
-	public async downloadH5pContent(currentUser: ICurrentUser, contentId: string): Promise<Readable> {
-		const { parentType, parentId } = await this.h5pContentRepo.findById(contentId);
+	public async downloadH5pContent(
+		currentUser: ICurrentUser,
+		contentId: string
+	): Promise<{ filename: string; passThrough: Readable }> {
+		const {
+			parentType,
+			parentId,
+			metadata: { title },
+		} = await this.h5pContentRepo.findById(contentId);
 		await this.checkContentPermission(parentType, parentId, AuthorizationContextBuilder.read([]));
+
+		const sanitizedTitle = this.sanitizeFilename(title);
+		const filename = `${sanitizedTitle}.h5p`;
 
 		const user = this.changeUserType(currentUser.userId);
 		const passThrough = new PassThrough();
@@ -214,7 +224,9 @@ export class H5PEditorUc {
 			passThrough.destroy(error instanceof Error ? error : new Error(String(error)));
 		});
 
-		return passThrough;
+		const result = { filename, passThrough };
+
+		return result;
 	}
 
 	private async createContentUploadFile(contentFile?: Express.Multer.File): Promise<H5PUploadFile | undefined> {
@@ -520,5 +532,15 @@ export class H5PEditorUc {
 		const userLanguage = userData.language ?? LanguageType.DE;
 
 		return userLanguage;
+	}
+
+	private sanitizeFilename(filename: string): string {
+		const sanitized = filename
+			.replaceAll(/[<>:"/\\|?*\x00-\x1f]/g, '_')
+			.replaceAll(/\.+$/g, '')
+			.trim()
+			.slice(0, 200);
+
+		return sanitized || 'content';
 	}
 }
