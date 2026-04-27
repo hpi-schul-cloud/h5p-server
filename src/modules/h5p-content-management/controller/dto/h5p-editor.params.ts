@@ -61,3 +61,9 @@ export class PostH5PContentCreateParams {
 	@IsNotEmpty()
 	library!: string;
 }
+
+export class DownloadH5PEditorParams {
+	@ApiProperty()
+	@IsMongoId()
+	contentId!: string;
+}

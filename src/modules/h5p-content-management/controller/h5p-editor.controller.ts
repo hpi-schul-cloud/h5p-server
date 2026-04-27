@@ -35,6 +35,7 @@ import {
 	AjaxPostBodyParams,
 	AjaxPostQueryParams,
 	ContentFileUrlParams,
+	DownloadH5PEditorParams,
 	GetH5PContentParams,
 	GetH5PEditorParams,
 	GetH5PEditorParamsCreate,
@@ -277,7 +278,7 @@ export class H5PEditorController {
 	@Get('/download/:contentId')
 	@ApiResponse({ status: 200, description: 'Returns the H5P content as a downloadable .h5p file' })
 	public async downloadH5pContent(
-		@Param() params: SaveH5PEditorParams,
+		@Param() params: DownloadH5PEditorParams,
 		@CurrentUser() currentUser: ICurrentUser,
 		@Req() req: Request,
 		@Res({ passthrough: true }) res: Response
