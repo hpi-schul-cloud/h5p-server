@@ -5,7 +5,7 @@ import { DynamicModule, Module, OnModuleDestroy } from '@nestjs/common';
 import crypto from 'node:crypto';
 
 const getDbName = (): string =>
-	Array.from({ length: 20 }, () => Math.floor((crypto.randomBytes(1)[0] * 36) / 256).toString(36)).join('');
+	Array.from({ length: 20 }, () => crypto.randomInt(36).toString(36)).join('');
 
 @Module({})
 export class MongoMemoryDatabaseModule implements OnModuleDestroy {
