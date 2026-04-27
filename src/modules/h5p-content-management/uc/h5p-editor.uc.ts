@@ -212,7 +212,7 @@ export class H5PEditorUc {
 			parentId,
 			metadata: { title },
 		} = await this.h5pContentRepo.findById(contentId);
-		await this.checkContentPermission(parentType, parentId, AuthorizationContextBuilder.read([]));
+		await this.checkContentPermission(parentType, parentId, AuthorizationContextBuilder.write([]));
 
 		const sanitizedTitle = this.sanitizeFilename(title);
 		const filename = `${sanitizedTitle}.h5p`;

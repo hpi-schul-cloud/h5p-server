@@ -118,7 +118,7 @@ describe('downloadH5pContent', () => {
 			expect(authorizationClientAdapter.checkPermissionsByReference).toHaveBeenCalledWith(
 				AuthorizationBodyParamsReferenceType.BOARDNODES,
 				content.parentId,
-				AuthorizationContextBuilder.read([])
+				AuthorizationContextBuilder.write([])
 			);
 		});
 
