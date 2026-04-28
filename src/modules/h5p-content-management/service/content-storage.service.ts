@@ -18,7 +18,7 @@ import {
 	NotImplementedException,
 	UnprocessableEntityException,
 } from '@nestjs/common';
-import { Readable } from 'stream';
+import { Readable } from 'node:stream';
 import { H5pFileDto } from '../controller/dto/h5p-file.dto';
 import { H5P_CONTENT_S3_CLIENT_INJECTION_TOKEN } from '../h5p-editor.const';
 import { H5PContent, H5PContentRepo } from '../repo';

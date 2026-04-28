@@ -26,7 +26,7 @@ export class LumiUserWithContentData implements IUser {
 
 	public name: string;
 
-	public type: 'local' | string;
+	public type: string;
 
 	constructor(user: IUser, parentParams: H5PContentParentParams) {
 		this.contentParentType = parentParams.parentType;
