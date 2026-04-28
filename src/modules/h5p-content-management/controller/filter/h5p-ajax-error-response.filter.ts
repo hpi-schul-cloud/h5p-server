@@ -39,7 +39,7 @@ export class H5pAjaxErrorResponseFilter implements ExceptionFilter {
 	}
 
 	private mapErrorMessageFromH5pError(error: H5pError): string {
-		if (error.errorId == 'install-missing-libraries') {
+		if (error.errorId === 'install-missing-libraries') {
 			return 'Error - File contains one or more not supported libraries';
 		} else {
 			return error.name;
