@@ -19,5 +19,5 @@ export class RequestTimeoutConfig implements TimeoutInterceptorConfig {
 	@ConfigProperty('H5P_EDITOR__INCOMING_REQUEST_TIMEOUT_POST_AJAX')
 	@IsNumber()
 	@StringToNumber()
-	[H5P_EDITOR_INCOMING_REQUEST_TIMEOUT_POST_AJAX_KEY] = 60000;
+	[H5P_EDITOR_INCOMING_REQUEST_TIMEOUT_POST_AJAX_KEY] = 600000;
 }
