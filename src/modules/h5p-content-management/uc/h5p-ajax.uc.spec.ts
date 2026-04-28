@@ -1,5 +1,4 @@
 import { createMock, DeepMocked } from '@golevelup/ts-jest';
-import { currentUserFactory } from '@infra/auth-guard/testing/currentuser.factory';
 import { AuthorizationClientAdapter } from '@infra/authorization-client';
 import { MeResponse } from '@infra/authorization-client/authorization-api-client';
 import { Logger } from '@infra/logger';
@@ -7,6 +6,7 @@ import { H5PAjaxEndpoint, H5PEditor, H5PPlayer } from '@lumieducation/h5p-server
 import { IHubInfo, IUser as LumiIUser } from '@lumieducation/h5p-server/build/src/types';
 import { InternalServerErrorException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
+import { currentUserFactory } from '@testing/factory/currentuser.factory';
 import * as fs from 'fs';
 import * as fsPromises from 'fs/promises';
 import { H5P_EDITOR_CONFIG_TOKEN } from '../h5p-editor.config';
