@@ -1,8 +1,10 @@
 name: Test
 
 on:
+  push:
+    branches: [ main ]
   pull_request:
-    branches: [main]
+    branches: [ main ]
   workflow_dispatch:
 
 permissions:
@@ -20,7 +22,7 @@ jobs:
           - 5672:5672
     strategy:
       matrix:
-        shard: [1]
+        shard: [ 1 ]
     steps:
       - name: checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
@@ -39,7 +41,10 @@ jobs:
           password: "miniouser"
       - name: test:cov - test all with coverage
         timeout-minutes: 15
-        run: export RUN_WITHOUT_JEST_COVERAGE='true' && export NODE_OPTIONS='--max_old_space_size=4096' && ./node_modules/.bin/jest --shard=${{ matrix.shard }}/${{ strategy.job-total }} --coverage --force-exit
+        run: export RUN_WITHOUT_JEST_COVERAGE='true' && export
+          NODE_OPTIONS='--max_old_space_size=4096' && ./node_modules/.bin/jest
+          --shard=${{ matrix.shard }}/${{ strategy.job-total }} --coverage
+          --force-exit
       - name: save-coverage
         run: mv coverage/lcov.info coverage/${{matrix.shard}}.info
       - name: "upload-artifacts"
@@ -50,7 +55,7 @@ jobs:
   sonarcloud:
     name: SonarCloud coverage
     runs-on: ubuntu-latest
-    needs: [tests_cov]
+    needs: [ tests_cov ]
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
