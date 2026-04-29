@@ -3,18 +3,18 @@ import { AuthorizationClientAdapter } from '@infra/authorization-client';
 import { S3ClientAdapter } from '@infra/s3-client';
 import { H5PEditor } from '@lumieducation/h5p-server';
 import { EntityManager, ObjectId } from '@mikro-orm/mongodb';
+import { H5PEditorTestModule } from '@modules/h5p-content-management/h5p-editor-test.module';
 import { HttpStatus, INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { cleanupCollections } from '@testing/database';
-import { UserAndAccountTestFactory } from '@testing/factory/user-and-account.test.factory';
+import { currentUserFactory } from '@testing/factory/currentuser.factory';
 import { TestApiClient } from '@testing/test-api-client';
 import { H5P_CONTENT_S3_CLIENT_INJECTION_TOKEN, H5P_LIBRARIES_S3_CLIENT_INJECTION_TOKEN } from '../../h5p-editor.const';
-import { H5PEditorTestModule } from '@modules/h5p-content-management/h5p-editor-test.module';
 
 describe('H5PEditor Controller - Content User Data (api)', () => {
 	let app: INestApplication;
 	let em: EntityManager;
-	let testApiClient: TestApiClient;
+	const baseRoute = '/h5p-editor/contentUserData';
 
 	beforeAll(async () => {
 		const module = await Test.createTestingModule({
@@ -33,7 +33,6 @@ describe('H5PEditor Controller - Content User Data (api)', () => {
 		app = module.createNestApplication();
 		await app.init();
 
-		testApiClient = new TestApiClient(app, '/h5p-editor/contentUserData');
 		em = module.get(EntityManager);
 	});
 
@@ -50,7 +49,7 @@ describe('H5PEditor Controller - Content User Data (api)', () => {
 		describe('when user is not logged in', () => {
 			it('should return UNAUTHORIZED status', async () => {
 				const contentId = new ObjectId().toHexString();
-				const response = await testApiClient.get(`${contentId}/state/0`);
+				const response = await TestApiClient.createUnauthenticated(app, baseRoute).get(`${contentId}/state/0`);
 
 				expect(response.status).toEqual(HttpStatus.UNAUTHORIZED);
 			});
@@ -58,8 +57,8 @@ describe('H5PEditor Controller - Content User Data (api)', () => {
 
 		describe('when user is logged in', () => {
 			const setup = () => {
-				const { teacherUser, teacherAccount } = UserAndAccountTestFactory.buildTeacher();
-				const loggedInClient = testApiClient.loginByUser(teacherAccount, teacherUser);
+				const teacherUser = currentUserFactory.withRoleTeacher().build();
+				const loggedInClient = TestApiClient.createWithJwt(app, baseRoute, teacherUser);
 				const contentId = new ObjectId().toHexString();
 
 				return { loggedInClient, contentId };
@@ -96,7 +95,7 @@ describe('H5PEditor Controller - Content User Data (api)', () => {
 		describe('when user is not logged in', () => {
 			it('should return UNAUTHORIZED status', async () => {
 				const contentId = new ObjectId().toHexString();
-				const response = await testApiClient.post(`${contentId}/state/0`);
+				const response = await TestApiClient.createUnauthenticated(app, baseRoute).post(`${contentId}/state/0`);
 
 				expect(response.status).toEqual(HttpStatus.UNAUTHORIZED);
 			});
@@ -104,8 +103,8 @@ describe('H5PEditor Controller - Content User Data (api)', () => {
 
 		describe('when user is logged in', () => {
 			const setup = () => {
-				const { teacherUser, teacherAccount } = UserAndAccountTestFactory.buildTeacher();
-				const loggedInClient = testApiClient.loginByUser(teacherAccount, teacherUser);
+				const teacherUser = currentUserFactory.withRoleTeacher().build();
+				const loggedInClient = TestApiClient.createWithJwt(app, baseRoute, teacherUser);
 				const contentId = new ObjectId().toHexString();
 
 				return { loggedInClient, contentId };

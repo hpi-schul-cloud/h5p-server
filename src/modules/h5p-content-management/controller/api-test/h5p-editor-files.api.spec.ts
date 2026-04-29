@@ -7,7 +7,6 @@ import { ContentMetadata } from '@lumieducation/h5p-server/build/src/ContentMeta
 import { EntityManager, ObjectId } from '@mikro-orm/mongodb';
 import { HttpStatus, INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
-import { UserAndAccountTestFactory } from '@testing/factory/user-and-account.test.factory';
 import { TestApiClient } from '@testing/test-api-client';
 import { Readable } from 'stream';
 import { H5PEditorTestModule } from '../../h5p-editor-test.module';
@@ -71,12 +70,13 @@ const helpers = {
 describe('H5PEditor Controller (api)', () => {
 	let app: INestApplication;
 	let em: EntityManager;
-	let testApiClient: TestApiClient;
 	let authorizationClientAdapter: DeepMocked<AuthorizationClientAdapter>;
 
 	let contentStorage: DeepMocked<ContentStorage>;
 	let libraryStorage: DeepMocked<LibraryStorage>;
 	let temporaryStorage: DeepMocked<TemporaryFileStorage>;
+
+	const baseRoute = '/h5p-editor';
 
 	beforeAll(async () => {
 		const module = await Test.createTestingModule({
@@ -103,7 +103,6 @@ describe('H5PEditor Controller (api)', () => {
 		libraryStorage = app.get(LibraryStorage);
 		temporaryStorage = app.get(TemporaryFileStorage);
 		authorizationClientAdapter = app.get(AuthorizationClientAdapter);
-		testApiClient = new TestApiClient(app, 'h5p-editor');
 	});
 
 	afterAll(async () => {
@@ -113,7 +112,7 @@ describe('H5PEditor Controller (api)', () => {
 	describe('when requesting library files', () => {
 		describe('when user not exists', () => {
 			it('should respond with unauthorized exception', async () => {
-				const response = await testApiClient.get('libraries/dummyLib/test.txt');
+				const response = await TestApiClient.createUnauthenticated(app, baseRoute).get('libraries/dummyLib/test.txt');
 
 				expect(response.statusCode).toEqual(HttpStatus.UNAUTHORIZED);
 				expect(response.body).toEqual({
@@ -127,9 +126,7 @@ describe('H5PEditor Controller (api)', () => {
 
 		describe('when user is logged in', () => {
 			const setup = () => {
-				const { studentUser, studentAccount } = UserAndAccountTestFactory.buildStudent();
-
-				const loggedInClient = testApiClient.loginByUser(studentAccount, studentUser);
+				const loggedInClient = TestApiClient.createWithJwt(app, baseRoute);
 
 				return { loggedInClient };
 			};
@@ -166,7 +163,7 @@ describe('H5PEditor Controller (api)', () => {
 	describe('when requesting content files', () => {
 		describe('when user not exists', () => {
 			it('should respond with unauthorized exception', async () => {
-				const response = await testApiClient.get('content/dummyId/test.txt');
+				const response = await TestApiClient.createUnauthenticated(app, baseRoute).get('content/dummyId/test.txt');
 
 				expect(response.statusCode).toEqual(HttpStatus.UNAUTHORIZED);
 				expect(response.body).toEqual({
@@ -180,9 +177,7 @@ describe('H5PEditor Controller (api)', () => {
 
 		describe('when user is logged in', () => {
 			const setup = async () => {
-				const { studentUser, studentAccount } = UserAndAccountTestFactory.buildStudent();
-
-				const loggedInClient = testApiClient.loginByUser(studentAccount, studentUser);
+				const loggedInClient = TestApiClient.createWithJwt(app, baseRoute);
 				authorizationClientAdapter.getUser.mockResolvedValue({ language: 'de' } as MeResponse);
 
 				const parentId = new ObjectId().toString();
@@ -240,7 +235,7 @@ describe('H5PEditor Controller (api)', () => {
 	describe('when requesting temporary files', () => {
 		describe('when user not exists', () => {
 			it('should respond with unauthorized exception', async () => {
-				const response = await testApiClient.get('temp-files/test.txt');
+				const response = await TestApiClient.createUnauthenticated(app, baseRoute).get('temp-files/test.txt');
 
 				expect(response.statusCode).toEqual(HttpStatus.UNAUTHORIZED);
 				expect(response.body).toEqual({
@@ -254,9 +249,7 @@ describe('H5PEditor Controller (api)', () => {
 
 		describe('when user is logged in', () => {
 			const setup = () => {
-				const { studentUser, studentAccount } = UserAndAccountTestFactory.buildStudent();
-
-				const loggedInClient = testApiClient.loginByUser(studentAccount, studentUser);
+				const loggedInClient = TestApiClient.createWithJwt(app, baseRoute);
 
 				const mockFile = {
 					name: 'example.txt',
@@ -312,7 +305,7 @@ describe('H5PEditor Controller (api)', () => {
 	describe('when requesting content parameters', () => {
 		describe('when user not exists', () => {
 			it('should respond with unauthorized exception', async () => {
-				const response = await testApiClient.get('params/dummyId');
+				const response = await TestApiClient.createUnauthenticated(app, baseRoute).get('params/dummyId');
 
 				expect(response.statusCode).toEqual(HttpStatus.UNAUTHORIZED);
 				expect(response.body).toEqual({
@@ -326,9 +319,7 @@ describe('H5PEditor Controller (api)', () => {
 
 		describe('when user is logged in', () => {
 			const setup = async () => {
-				const { studentUser, studentAccount } = UserAndAccountTestFactory.buildStudent();
-
-				const loggedInClient = testApiClient.loginByUser(studentAccount, studentUser);
+				const loggedInClient = TestApiClient.createWithJwt(app, baseRoute);
 
 				const parentId = new ObjectId().toString();
 

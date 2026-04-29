@@ -7,7 +7,6 @@ import { H5PEditorTestModule } from '@modules/h5p-content-management/h5p-editor-
 import { HttpStatus, INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { cleanupCollections } from '@testing/database';
-import { UserAndAccountTestFactory } from '@testing/factory/user-and-account.test.factory';
 import { TestApiClient } from '@testing/test-api-client';
 import { H5P_CONTENT_S3_CLIENT_INJECTION_TOKEN, H5P_LIBRARIES_S3_CLIENT_INJECTION_TOKEN } from '../../h5p-editor.const';
 import { h5pContentFactory } from '../../testing';
@@ -15,7 +14,7 @@ import { h5pContentFactory } from '../../testing';
 describe('H5PEditor Controller (api)', () => {
 	let app: INestApplication;
 	let em: EntityManager;
-	let testApiClient: TestApiClient;
+	const baseRoute = '/h5p-editor';
 
 	beforeAll(async () => {
 		const moduleFixture = await Test.createTestingModule({
@@ -34,7 +33,6 @@ describe('H5PEditor Controller (api)', () => {
 		app = moduleFixture.createNestApplication();
 		await app.init();
 		em = app.get(EntityManager);
-		testApiClient = new TestApiClient(app, 'h5p-editor');
 	});
 
 	afterAll(async () => {
@@ -50,7 +48,7 @@ describe('H5PEditor Controller (api)', () => {
 			it('should return 401', async () => {
 				const someId = new ObjectId().toHexString();
 
-				const response = await testApiClient.post(`delete/${someId}`);
+				const response = await TestApiClient.createUnauthenticated(app, baseRoute).post(`delete/${someId}`);
 
 				expect(response.status).toEqual(HttpStatus.UNAUTHORIZED);
 			});
@@ -59,9 +57,7 @@ describe('H5PEditor Controller (api)', () => {
 		describe('when user is logged in', () => {
 			describe('when id in params is not a mongo id', () => {
 				const setup = () => {
-					const { studentUser, studentAccount } = UserAndAccountTestFactory.buildStudent();
-
-					const loggedInClient = testApiClient.loginByUser(studentAccount, studentUser);
+					const loggedInClient = TestApiClient.createWithJwt(app, baseRoute);
 
 					return { loggedInClient };
 				};
@@ -82,9 +78,7 @@ describe('H5PEditor Controller (api)', () => {
 
 			describe('when requested content is not found', () => {
 				const setup = () => {
-					const { studentUser, studentAccount } = UserAndAccountTestFactory.buildStudent();
-
-					const loggedInClient = testApiClient.loginByUser(studentAccount, studentUser);
+					const loggedInClient = TestApiClient.createWithJwt(app, baseRoute);
 
 					return { loggedInClient };
 				};
@@ -101,9 +95,7 @@ describe('H5PEditor Controller (api)', () => {
 
 			describe('when content is found', () => {
 				const setup = async () => {
-					const { teacherAccount, teacherUser } = UserAndAccountTestFactory.buildTeacher();
-
-					const loggedInClient = testApiClient.loginByUser(teacherAccount, teacherUser);
+					const loggedInClient = TestApiClient.createWithJwt(app, baseRoute);
 
 					const parentId = new ObjectId().toHexString();
 					const h5pContent = h5pContentFactory.build({ parentId });

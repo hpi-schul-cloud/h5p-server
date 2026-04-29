@@ -3,18 +3,17 @@ import { AuthorizationClientAdapter } from '@infra/authorization-client';
 import { S3ClientAdapter } from '@infra/s3-client';
 import { H5PPlayer, IPlayerModel } from '@lumieducation/h5p-server';
 import { EntityManager, ObjectId } from '@mikro-orm/mongodb';
+import { H5PEditorTestModule } from '@modules/h5p-content-management/h5p-editor-test.module';
 import { HttpStatus, INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { cleanupCollections } from '@testing/database';
-import { UserAndAccountTestFactory } from '@testing/factory/user-and-account.test.factory';
 import { TestApiClient } from '@testing/test-api-client';
 import { H5P_CONTENT_S3_CLIENT_INJECTION_TOKEN, H5P_LIBRARIES_S3_CLIENT_INJECTION_TOKEN } from '../../h5p-editor.const';
 import { h5pContentFactory } from '../../testing';
-import { H5PEditorTestModule } from '@modules/h5p-content-management/h5p-editor-test.module';
 
 const buildContent = () => {
-	const contentId = new ObjectId(0).toString();
-	const notExistingContentId = new ObjectId(1).toString();
+	const contentId = new ObjectId().toString();
+	const notExistingContentId = new ObjectId().toString();
 
 	// @ts-expect-error partial object
 	const playerResult: IPlayerModel = {
@@ -33,7 +32,8 @@ describe('H5PEditor Controller (api)', () => {
 	let app: INestApplication;
 	let em: EntityManager;
 	let h5pPlayer: DeepMocked<H5PPlayer>;
-	let testApiClient: TestApiClient;
+
+	const baseRoute = '/h5p-editor/play';
 
 	beforeAll(async () => {
 		const module = await Test.createTestingModule({
@@ -52,8 +52,6 @@ describe('H5PEditor Controller (api)', () => {
 		app = module.createNestApplication();
 		h5pPlayer = module.get(H5PPlayer);
 		await app.init();
-
-		testApiClient = new TestApiClient(app, '/h5p-editor/play');
 		em = module.get(EntityManager);
 	});
 
@@ -70,7 +68,7 @@ describe('H5PEditor Controller (api)', () => {
 		describe('when user is not logged in', () => {
 			it('should return UNAUTHORIZED status', async () => {
 				const mongoId = new ObjectId().toHexString();
-				const response = await testApiClient.get(mongoId);
+				const response = await TestApiClient.createUnauthenticated(app, baseRoute).get(mongoId);
 
 				expect(response.status).toEqual(HttpStatus.UNAUTHORIZED);
 			});
@@ -79,9 +77,7 @@ describe('H5PEditor Controller (api)', () => {
 		describe('when user is not logged in', () => {
 			describe('when content is existing', () => {
 				const setup = async () => {
-					const { teacherUser, teacherAccount } = UserAndAccountTestFactory.buildTeacher();
-
-					const loggedInClient = testApiClient.loginByUser(teacherAccount, teacherUser);
+					const loggedInClient = TestApiClient.createWithJwt(app, baseRoute);
 
 					const parentId = new ObjectId().toHexString();
 
@@ -109,9 +105,7 @@ describe('H5PEditor Controller (api)', () => {
 
 		describe('when content is not existing', () => {
 			const setup = () => {
-				const { teacherUser, teacherAccount } = UserAndAccountTestFactory.buildTeacher();
-
-				const loggedInClient = testApiClient.loginByUser(teacherAccount, teacherUser);
+				const loggedInClient = TestApiClient.createWithJwt(app, baseRoute);
 				const contentId = new ObjectId().toHexString();
 
 				return { loggedInClient, contentId };
@@ -128,9 +122,7 @@ describe('H5PEditor Controller (api)', () => {
 
 		describe('when id is not a mongo id', () => {
 			const setup = () => {
-				const { teacherUser, teacherAccount } = UserAndAccountTestFactory.buildTeacher();
-
-				const loggedInClient = testApiClient.loginByUser(teacherAccount, teacherUser);
+				const loggedInClient = TestApiClient.createWithJwt(app, baseRoute);
 
 				return { loggedInClient };
 			};
