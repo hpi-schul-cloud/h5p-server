@@ -11,8 +11,8 @@ import { cleanupCollections } from '@testing/database';
 import { currentUserFactory } from '@testing/factory/currentuser.factory';
 import { TestApiClient } from '@testing/test-api-client';
 import {
-	H5P_EDITOR_INCOMING_REQUEST_TIMEOUT_POST_AJAX_KEY,
 	H5P_SERVER_APP_REQUEST_TIMEOUT_CONFIG_TOKEN,
+	POST_AJAX_INCOMING_REQUEST_TIMEOUT_MS_KEY,
 	RequestTimeoutConfig,
 } from '../../h5p-editor.app.config';
 import { H5P_CONTENT_S3_CLIENT_INJECTION_TOKEN, H5P_LIBRARIES_S3_CLIENT_INJECTION_TOKEN } from '../../h5p-editor.const';
@@ -200,7 +200,7 @@ describe('H5PEditor Controller (api)', () => {
 
 		describe('when request takes longer than configured timeout', () => {
 			const setup = () => {
-				requestTimeoutConfig[H5P_EDITOR_INCOMING_REQUEST_TIMEOUT_POST_AJAX_KEY] = 1;
+				requestTimeoutConfig[POST_AJAX_INCOMING_REQUEST_TIMEOUT_MS_KEY] = 1;
 
 				const studentUser = currentUserFactory.withRoleStudent().build();
 
