@@ -9,8 +9,8 @@ import {
 	NotAcceptableException,
 	NotFoundException,
 } from '@nestjs/common';
-import { ReadStream } from 'fs';
-import { Readable } from 'stream';
+import { ReadStream } from 'node:fs';
+import { Readable } from 'node:stream';
 import { H5pFileDto } from '../controller/dto';
 import { H5P_CONTENT_S3_CLIENT_INJECTION_TOKEN } from '../h5p-editor.const';
 

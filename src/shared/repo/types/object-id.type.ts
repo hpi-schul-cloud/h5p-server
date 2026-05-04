@@ -16,7 +16,7 @@ export class ObjectIdType extends Type<EntityId, ObjectId> {
 
 	private validatePlatformSupport(platform: Platform): void {
 		if (!(platform instanceof MongoPlatform)) {
-			throw new Error('ObjectId custom type implemented only for Mongo.');
+			throw new TypeError('ObjectId custom type implemented only for Mongo.');
 		}
 	}
 }
