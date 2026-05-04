@@ -17,6 +17,7 @@ import {
 import { H5pEditorContentService } from '../../service';
 import { h5pCopyContentParamsFactory, h5pEditorExchangeCopyContentParamsFactory } from '../../testing';
 import { H5PContentParentType } from '../../types';
+import * as AmqpSubscriberHelper from './amqp-subscriber.helper';
 import { H5pEditorConsumer } from './h5p-editor.consumer';
 
 describe(H5pEditorConsumer.name, () => {
@@ -26,6 +27,7 @@ describe(H5pEditorConsumer.name, () => {
 	let logger: DeepMocked<Logger>;
 	let h5pEditor: DeepMocked<H5PEditor>;
 	let h5pEditorContentService: DeepMocked<H5pEditorContentService>;
+	let amqpConnection: DeepMocked<AmqpConnection>;
 
 	beforeAll(async () => {
 		module = await Test.createTestingModule({
@@ -65,6 +67,7 @@ describe(H5pEditorConsumer.name, () => {
 		logger = module.get(Logger);
 		h5pEditor = module.get(H5PEditor);
 		h5pEditorContentService = module.get(H5pEditorContentService);
+		amqpConnection = module.get(AmqpConnection);
 	});
 
 	afterAll(async () => {
@@ -73,6 +76,48 @@ describe(H5pEditorConsumer.name, () => {
 
 	afterEach(() => {
 		jest.resetAllMocks();
+	});
+
+	describe('onModuleInit', () => {
+		describe('when module is initialized', () => {
+			const setup = () => {
+				const registerAmqpSubscriberSpy = jest
+					.spyOn(AmqpSubscriberHelper, 'registerAmqpSubscriber')
+					.mockResolvedValue();
+
+				return { registerAmqpSubscriberSpy };
+			};
+
+			it('should register a subscriber for DELETE_CONTENT event', async () => {
+				const { registerAmqpSubscriberSpy } = setup();
+
+				await consumer.onModuleInit();
+
+				expect(registerAmqpSubscriberSpy).toHaveBeenCalledWith(
+					amqpConnection,
+					'h5p-exchange',
+					H5pEditorEvents.DELETE_CONTENT,
+					expect.any(Function),
+					H5pEditorConsumer.name,
+					logger
+				);
+			});
+
+			it('should register a subscriber for COPY_CONTENT event', async () => {
+				const { registerAmqpSubscriberSpy } = setup();
+
+				await consumer.onModuleInit();
+
+				expect(registerAmqpSubscriberSpy).toHaveBeenCalledWith(
+					amqpConnection,
+					'h5p-exchange',
+					H5pEditorEvents.COPY_CONTENT,
+					expect.any(Function),
+					H5pEditorConsumer.name,
+					logger
+				);
+			});
+		});
 	});
 
 	describe('deleteContent', () => {
