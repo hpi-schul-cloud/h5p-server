@@ -18,7 +18,7 @@ export class AuthorizationClientAdapter {
 	constructor(
 		private readonly authorizationApi: AuthorizationApi,
 		private readonly meApi: MeApi,
-		@Inject(REQUEST) private request: Request
+		@Inject(REQUEST) private readonly request: Request
 	) {}
 
 	public async getUser(): Promise<MeResponse> {

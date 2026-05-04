@@ -13,8 +13,8 @@ import {
 import { ConflictException, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import mime from 'mime';
 import path from 'node:path/posix';
+import { Readable } from 'node:stream';
 import pLimit from 'p-limit';
-import { Readable } from 'stream';
 import { H5pFileDto } from '../controller/dto';
 import { H5P_LIBRARIES_S3_CLIENT_INJECTION_TOKEN } from '../h5p-editor.const';
 import { InstalledLibrary, LibraryRepo } from '../repo';
@@ -555,7 +555,7 @@ export class LibraryStorage implements ILibraryStorage {
 
 		this.checkFilename(fileName);
 
-		let result: { stream: Readable | never; mimetype: string; size: number | undefined } | null = null;
+		let result: { stream: Readable; mimetype: string; size: number | undefined } | null = null;
 
 		if (fileName === 'library.json' && !readLibraryJsonFromS3) {
 			const metadata = await this.getMetadata(libraryName);

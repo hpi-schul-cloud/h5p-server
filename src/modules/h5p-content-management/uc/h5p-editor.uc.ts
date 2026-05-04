@@ -33,12 +33,12 @@ import {
 	NotFoundException,
 } from '@nestjs/common';
 import { EntityId } from '@shared/domain/types';
-import { randomUUID } from 'crypto';
 import { Request } from 'express';
-import { mkdtempSync, rmSync, unlinkSync } from 'fs';
-import { writeFile } from 'fs/promises';
-import { tmpdir } from 'os';
-import { dirname, join } from 'path';
+import { randomUUID } from 'node:crypto';
+import { mkdtempSync, rmSync, unlinkSync } from 'node:fs';
+import { writeFile } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { dirname, join } from 'node:path';
 import { AjaxGetQueryParams, AjaxPostBodyParams, AjaxPostQueryParams, H5PContentResponse } from '../controller/dto';
 import { H5P_EDITOR_CONFIG_TOKEN, H5PEditorConfig } from '../h5p-editor.config';
 import { H5PUcErrorLoggable, H5PUcLoggable } from '../loggable';
@@ -87,7 +87,7 @@ export class H5PEditorUc {
 		);
 	}
 
-	private fakeUndefinedAsString = (): string => {
+	private readonly fakeUndefinedAsString = (): string => {
 		const value = undefined as unknown as string;
 
 		return value;
