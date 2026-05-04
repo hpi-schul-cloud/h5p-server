@@ -13,6 +13,7 @@ import {
 } from '../../loggable';
 import { H5pEditorContentService } from '../../service';
 import { H5PContentParentType } from '../../types';
+import { registerAmqpSubscriber } from './amqp-subscriber.helper';
 
 @Injectable()
 export class H5pEditorConsumer implements OnModuleInit {
@@ -29,30 +30,22 @@ export class H5pEditorConsumer implements OnModuleInit {
 	}
 
 	public async onModuleInit(): Promise<void> {
-		await this.registerSubscriber(H5pEditorEvents.DELETE_CONTENT, (payload: DeleteContentParams) =>
-			this.deleteContent(payload)
+		await registerAmqpSubscriber(
+			this.amqpConnection,
+			this.exchangeConfig.exchangeName,
+			H5pEditorEvents.DELETE_CONTENT,
+			(payload: DeleteContentParams) => this.deleteContent(payload),
+			H5pEditorConsumer.name,
+			this.logger
 		);
 
-		await this.registerSubscriber(H5pEditorEvents.COPY_CONTENT, (payload: CopyContentParams) =>
-			this.copyContent(payload)
-		);
-	}
-
-	private async registerSubscriber<T>(event: H5pEditorEvents, handler: (payload: T) => Promise<void>): Promise<void> {
-		await this.amqpConnection.createSubscriber<T>(
-			(payload) => {
-				if (!payload) {
-					throw new Error(`Received empty payload for ${event} event`);
-				}
-
-				return handler(payload);
-			},
-			{
-				exchange: this.exchangeConfig.exchangeName,
-				routingKey: event,
-				queue: event,
-			},
-			H5pEditorConsumer.name
+		await registerAmqpSubscriber(
+			this.amqpConnection,
+			this.exchangeConfig.exchangeName,
+			H5pEditorEvents.COPY_CONTENT,
+			(payload: CopyContentParams) => this.copyContent(payload),
+			H5pEditorConsumer.name,
+			this.logger
 		);
 	}
 

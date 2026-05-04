@@ -21,7 +21,7 @@ import {
 import { Inject, Injectable } from '@nestjs/common';
 import { TypeGuard } from '@shared/guard';
 import { Cache } from 'cache-manager';
-import { Readable } from 'stream';
+import { Readable } from 'node:stream';
 import { H5pDefaultUserFactory } from '../factory';
 import { H5P_EDITOR_CONFIG_TOKEN, H5PEditorConfig } from '../h5p-editor.config';
 import { H5pConsistencyError, H5pTimeoutError } from '../interface';
