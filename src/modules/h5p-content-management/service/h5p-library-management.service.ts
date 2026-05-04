@@ -21,7 +21,7 @@ import {
 import { Inject, Injectable } from '@nestjs/common';
 import { TypeGuard } from '@shared/guard';
 import { Cache } from 'cache-manager';
-import { Readable } from 'stream';
+import { Readable } from 'node:stream';
 import { H5pDefaultUserFactory } from '../factory';
 import { H5P_EDITOR_CONFIG_TOKEN, H5PEditorConfig } from '../h5p-editor.config';
 import { H5pConsistencyError, H5pTimeoutError } from '../interface';
@@ -343,7 +343,7 @@ export class H5PLibraryManagementService {
 
 	private async checkContentTypeExistsOnH5pHub(library: string): Promise<boolean> {
 		const contentType = await this.contentTypeCache.get(library);
-		const contentTypeExists = !(contentType === undefined);
+		const contentTypeExists = contentType !== undefined;
 
 		return contentTypeExists;
 	}
@@ -445,7 +445,7 @@ export class H5PLibraryManagementService {
 		return { type: 'none' };
 	}
 
-	private filterLibraryMetadata(obj: Record<string, unknown>): ILibraryMetadata {
+	private filterLibraryMetadata(obj: Record<string, unknown>): Partial<ILibraryMetadata> {
 		const allowedKeys: (keyof ILibraryMetadata)[] = [
 			'machineName',
 			'majorVersion',
@@ -475,7 +475,7 @@ export class H5PLibraryManagementService {
 
 		const filteredObject = this.filterObjectByInterface<ILibraryMetadata>(obj, allowedKeys);
 
-		return filteredObject as ILibraryMetadata;
+		return filteredObject;
 	}
 	private checkIsLibraryMetadata(obj: unknown): ILibraryMetadata {
 		const definedObject = TypeGuard.checkDefinedObject(obj);
@@ -755,7 +755,7 @@ export class H5PLibraryManagementService {
 		);
 	}
 
-	private filterInstalledLibrary(obj: Record<string, unknown>): IInstalledLibrary {
+	private filterInstalledLibrary(obj: Record<string, unknown>): Partial<IInstalledLibrary> {
 		const allowedKeys: (keyof IInstalledLibrary)[] = [
 			'machineName',
 			'majorVersion',
@@ -788,7 +788,7 @@ export class H5PLibraryManagementService {
 
 		const filteredObject = this.filterObjectByInterface<IInstalledLibrary>(obj, allowedKeys);
 
-		return filteredObject as IInstalledLibrary;
+		return filteredObject;
 	}
 
 	private logLibraryJsonAddedToS3(metadata: IInstalledLibrary): void {

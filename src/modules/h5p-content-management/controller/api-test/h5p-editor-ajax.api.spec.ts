@@ -8,16 +8,17 @@ import { H5PEditorTestModule } from '@modules/h5p-content-management/h5p-editor-
 import { HttpStatus, INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { cleanupCollections } from '@testing/database';
-import { UserAndAccountTestFactory } from '@testing/factory/user-and-account.test.factory';
+import { currentUserFactory } from '@testing/factory/currentuser.factory';
 import { TestApiClient } from '@testing/test-api-client';
 import { H5P_CONTENT_S3_CLIENT_INJECTION_TOKEN, H5P_LIBRARIES_S3_CLIENT_INJECTION_TOKEN } from '../../h5p-editor.const';
 
 describe('H5PEditor Controller (api)', () => {
 	let app: INestApplication;
 	let em: EntityManager;
-	let testApiClient: TestApiClient;
 	let ajaxEndpoint: DeepMocked<H5PAjaxEndpoint>;
 	let authorizationClientAdapter: DeepMocked<AuthorizationClientAdapter>;
+
+	const baseRoute = '/h5p-editor';
 
 	beforeAll(async () => {
 		const module = await Test.createTestingModule({
@@ -38,7 +39,6 @@ describe('H5PEditor Controller (api)', () => {
 		em = app.get(EntityManager);
 		ajaxEndpoint = app.get(H5PAjaxEndpoint);
 		authorizationClientAdapter = app.get(AuthorizationClientAdapter);
-		testApiClient = new TestApiClient(app, 'h5p-editor');
 	});
 
 	afterEach(async () => {
@@ -53,7 +53,7 @@ describe('H5PEditor Controller (api)', () => {
 	describe('when calling AJAX GET', () => {
 		describe('when user not exists', () => {
 			it('should respond with unauthorized exception', async () => {
-				const response = await testApiClient.get('ajax');
+				const response = await TestApiClient.createUnauthenticated(app, baseRoute).get('ajax');
 
 				expect(response.statusCode).toEqual(HttpStatus.UNAUTHORIZED);
 				expect(response.body).toEqual(new AjaxErrorResponse('', 401, 'UnauthorizedException', 'Unauthorized'));
@@ -62,9 +62,8 @@ describe('H5PEditor Controller (api)', () => {
 
 		describe('when user is logged in', () => {
 			const setup = () => {
-				const { studentUser, studentAccount } = UserAndAccountTestFactory.buildStudent();
-
-				const loggedInClient = testApiClient.loginByUser(studentAccount, studentUser);
+				const studentUser = currentUserFactory.withRoleStudent().build();
+				const loggedInClient = TestApiClient.createWithJwt(app, baseRoute, studentUser);
 
 				const dummyResponse = {
 					apiVersion: { major: 1, minor: 1 },
@@ -82,12 +81,7 @@ describe('H5PEditor Controller (api)', () => {
 			};
 
 			it('should call H5PAjaxEndpoint', async () => {
-				const {
-					loggedInClient,
-					studentUser: { id },
-					dummyResponse,
-				} = await setup();
-
+				const { loggedInClient, studentUser, dummyResponse } = setup();
 				const response = await loggedInClient.get(`ajax?action=content-type-cache`);
 
 				expect(response.statusCode).toEqual(HttpStatus.OK);
@@ -98,16 +92,16 @@ describe('H5PEditor Controller (api)', () => {
 					undefined, // MajorVersion
 					undefined, // MinorVersion
 					'de', // Language
-					expect.objectContaining({ id })
+					expect.objectContaining({ id: studentUser.userId })
 				);
 			});
 		});
 
 		describe('when an error is thrown', () => {
 			const setup = () => {
-				const { teacherUser, teacherAccount } = UserAndAccountTestFactory.buildTeacher();
+				const teacherUser = currentUserFactory.withRoleTeacher().build();
 
-				const loggedInClient = testApiClient.loginByUser(teacherAccount, teacherUser);
+				const loggedInClient = TestApiClient.createWithJwt(app, baseRoute, teacherUser);
 
 				const exception = new H5pError('error-id');
 				exception.httpStatusCode = 500;
@@ -122,7 +116,7 @@ describe('H5PEditor Controller (api)', () => {
 			};
 
 			it('should return an AjaxErrorResponse with correct error status code', async () => {
-				const { loggedInClient, exception } = await setup();
+				const { loggedInClient, exception } = setup();
 
 				const response = await loggedInClient.get(`ajax?action=content-type-cache`);
 
@@ -142,7 +136,7 @@ describe('H5PEditor Controller (api)', () => {
 	describe('when calling AJAX POST', () => {
 		describe('when user not exists', () => {
 			it('should respond with unauthorized exception', async () => {
-				const response = await testApiClient.post('ajax');
+				const response = await TestApiClient.createUnauthenticated(app, baseRoute).post('ajax');
 
 				expect(response.statusCode).toEqual(HttpStatus.UNAUTHORIZED);
 				expect(response.body).toEqual(new AjaxErrorResponse('', 401, 'UnauthorizedException', 'Unauthorized'));
@@ -151,9 +145,9 @@ describe('H5PEditor Controller (api)', () => {
 
 		describe('when user is logged in', () => {
 			const setup = () => {
-				const { studentUser, studentAccount } = UserAndAccountTestFactory.buildStudent();
+				const studentUser = currentUserFactory.withRoleStudent().build();
 
-				const loggedInClient = testApiClient.loginByUser(studentAccount, studentUser);
+				const loggedInClient = TestApiClient.createWithJwt(app, baseRoute, studentUser);
 
 				const dummyResponse = [
 					{
@@ -178,12 +172,7 @@ describe('H5PEditor Controller (api)', () => {
 			};
 
 			it('should call H5PAjaxEndpoint', async () => {
-				const {
-					loggedInClient,
-					studentUser: { id },
-					dummyResponse,
-					dummyBody,
-				} = await setup();
+				const { loggedInClient, studentUser, dummyResponse, dummyBody } = await setup();
 
 				const response = await loggedInClient.post(`ajax?action=libraries`, dummyBody);
 
@@ -193,7 +182,7 @@ describe('H5PEditor Controller (api)', () => {
 					'libraries',
 					dummyBody,
 					'de',
-					expect.objectContaining({ id }),
+					expect.objectContaining({ id: studentUser.userId }),
 					undefined,
 					undefined,
 					undefined,
@@ -204,9 +193,9 @@ describe('H5PEditor Controller (api)', () => {
 
 		describe('when an error is thrown', () => {
 			const setup = () => {
-				const { teacherUser, teacherAccount } = UserAndAccountTestFactory.buildTeacher();
+				const teacherUser = currentUserFactory.withRoleTeacher().build();
 
-				const loggedInClient = testApiClient.loginByUser(teacherAccount, teacherUser);
+				const loggedInClient = TestApiClient.createWithJwt(app, baseRoute, teacherUser);
 
 				const exception = new H5pError('error-id');
 				exception.httpStatusCode = 404;

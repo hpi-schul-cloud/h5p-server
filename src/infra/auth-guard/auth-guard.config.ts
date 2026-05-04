@@ -8,7 +8,7 @@ export const AUTH_GUARD_CONFIG_TOKEN = 'AUTH_GUARD_CONFIG_TOKEN';
 @Configuration()
 export class AuthGuardConfig {
 	@IsString()
-	@Transform(({ value }) => value.replace(/\\n/g, '\n'))
+	@Transform(({ value }) => value.replaceAll(String.raw`\n`, '\n'))
 	@ConfigProperty('JWT_PUBLIC_KEY')
 	jwtPublicKey!: string;
 

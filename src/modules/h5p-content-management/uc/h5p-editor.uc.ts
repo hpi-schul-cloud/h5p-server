@@ -33,10 +33,10 @@ import {
 	NotFoundException,
 } from '@nestjs/common';
 import { EntityId } from '@shared/domain/types';
-import { randomUUID } from 'crypto';
 import { Request } from 'express';
 import { mkdtempSync, rmSync, unlinkSync } from 'fs';
 import { writeFile } from 'fs/promises';
+import { randomUUID } from 'node:crypto';
 import { tmpdir } from 'os';
 import { dirname, join } from 'path';
 import { PassThrough, Readable } from 'stream';
@@ -88,7 +88,7 @@ export class H5PEditorUc {
 		);
 	}
 
-	private fakeUndefinedAsString = (): string => {
+	private readonly fakeUndefinedAsString = (): string => {
 		const value = undefined as unknown as string;
 
 		return value;

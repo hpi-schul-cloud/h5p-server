@@ -1,7 +1,7 @@
 /* eslint-disable max-classes-per-file */
 import { ContentParameters, IContentMetadata, IEditorModel, IIntegration } from '@lumieducation/h5p-server';
 import { ApiProperty } from '@nestjs/swagger';
-import { Readable } from 'stream';
+import type { Readable } from 'node:stream';
 
 export class H5PEditorModelResponse {
 	constructor(editorModel: IEditorModel) {

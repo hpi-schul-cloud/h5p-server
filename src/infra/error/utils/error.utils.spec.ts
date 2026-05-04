@@ -12,7 +12,7 @@ describe('ErrorUtils', () => {
 		});
 
 		it('should return true if error is not NestHttpException', () => {
-			const error = new Error();
+			const error = new Error('Test error');
 
 			const result = ErrorUtils.isNestHttpException(error);
 

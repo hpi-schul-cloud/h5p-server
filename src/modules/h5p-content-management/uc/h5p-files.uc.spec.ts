@@ -1,6 +1,5 @@
 import { createMock, DeepMocked } from '@golevelup/ts-jest';
 import { ICurrentUser } from '@infra/auth-guard';
-import { currentUserFactory } from '@infra/auth-guard/testing/currentuser.factory';
 import {
 	AuthorizationBodyParamsReferenceType,
 	AuthorizationClientAdapter,
@@ -10,6 +9,7 @@ import { Logger } from '@infra/logger';
 import { H5PAjaxEndpoint, H5PEditor, IPlayerModel } from '@lumieducation/h5p-server';
 import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
+import { currentUserFactory } from '@testing/factory/currentuser.factory';
 import { Request } from 'express';
 import { Readable } from 'stream';
 import { H5P_EDITOR_CONFIG_TOKEN } from '../h5p-editor.config';

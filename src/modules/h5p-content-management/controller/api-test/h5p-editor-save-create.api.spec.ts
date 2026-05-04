@@ -6,7 +6,6 @@ import { EntityManager, ObjectId } from '@mikro-orm/mongodb';
 import { HttpStatus, INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { cleanupCollections } from '@testing/database';
-import { UserAndAccountTestFactory } from '@testing/factory/user-and-account.test.factory';
 import { TestApiClient } from '@testing/test-api-client';
 import { H5PEditorTestModule } from '../../h5p-editor-test.module';
 import { H5P_CONTENT_S3_CLIENT_INJECTION_TOKEN, H5P_LIBRARIES_S3_CLIENT_INJECTION_TOKEN } from '../../h5p-editor.const';
@@ -17,7 +16,8 @@ describe('H5PEditor Controller (api)', () => {
 	let app: INestApplication;
 	let em: EntityManager;
 	let h5pEditor: DeepMocked<H5PEditor>;
-	let testApiClient: TestApiClient;
+
+	const baseRoute = '/h5p-editor';
 
 	beforeAll(async () => {
 		const module = await Test.createTestingModule({
@@ -37,7 +37,6 @@ describe('H5PEditor Controller (api)', () => {
 		await app.init();
 		h5pEditor = module.get(H5PEditor);
 		em = module.get(EntityManager);
-		testApiClient = new TestApiClient(app, 'h5p-editor');
 	});
 
 	afterAll(async () => {
@@ -80,9 +79,7 @@ describe('H5PEditor Controller (api)', () => {
 					library: '123',
 				};
 
-				const { studentUser, studentAccount } = UserAndAccountTestFactory.buildStudent();
-
-				const loggedInClient = testApiClient.loginByUser(studentAccount, studentUser);
+				const loggedInClient = TestApiClient.createWithJwt(app, baseRoute);
 
 				const result1 = { id, metadata };
 				h5pEditor.saveOrUpdateContentReturnMetaData.mockResolvedValueOnce(result1);
@@ -131,9 +128,8 @@ describe('H5PEditor Controller (api)', () => {
 					},
 					library: '123',
 				};
-				const { studentUser, studentAccount } = UserAndAccountTestFactory.buildStudent();
 
-				const loggedInClient = testApiClient.loginByUser(studentAccount, studentUser);
+				const loggedInClient = TestApiClient.createWithJwt(app, baseRoute);
 
 				const result1 = { id, metadata };
 				h5pEditor.saveOrUpdateContentReturnMetaData.mockResolvedValueOnce(result1);
@@ -169,9 +165,8 @@ describe('H5PEditor Controller (api)', () => {
 					},
 					library: '123',
 				};
-				const { studentUser, studentAccount } = UserAndAccountTestFactory.buildStudent();
 
-				const loggedInClient = testApiClient.loginByUser(studentAccount, studentUser);
+				const loggedInClient = TestApiClient.createWithJwt(app, baseRoute);
 
 				return { loggedInClient, params };
 			};
