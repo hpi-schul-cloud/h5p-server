@@ -5,7 +5,7 @@ import { IsNumber } from 'class-validator';
 
 export const H5P_SERVER_APP_REQUEST_TIMEOUT_CONFIG_TOKEN = 'H5P_SERVER_APP_REQUEST_TIMEOUT_CONFIG_TOKEN';
 
-export const POST_AJAX_INCOMING_REQUEST_TIMEOUT_MS_KEY = 'postAjaxIncomingRequestTimeoutMs';
+export const H5P_EDITOR_INCOMING_REQUEST_TIMEOUT_MS_KEY = 'h5pEditorIncomingRequestTimeoutMs';
 
 @Configuration()
 export class RequestTimeoutConfig implements TimeoutInterceptorConfig {
@@ -16,8 +16,8 @@ export class RequestTimeoutConfig implements TimeoutInterceptorConfig {
 	@ConfigProperty('CORE_INCOMING_REQUEST_TIMEOUT_MS')
 	coreIncomingRequestTimeoutMs!: number;
 
-	@ConfigProperty('POST_AJAX_INCOMING_REQUEST_TIMEOUT_MS')
+	@ConfigProperty('H5P_EDITOR_INCOMING_REQUEST_TIMEOUT_MS')
 	@IsNumber()
 	@StringToNumber()
-	[POST_AJAX_INCOMING_REQUEST_TIMEOUT_MS_KEY] = 600000;
+	[H5P_EDITOR_INCOMING_REQUEST_TIMEOUT_MS_KEY] = 600000;
 }
