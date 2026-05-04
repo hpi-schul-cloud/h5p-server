@@ -234,6 +234,7 @@ export class H5PEditorController {
 	}
 
 	@Post('/edit')
+	@RequestTimeout(POST_AJAX_INCOMING_REQUEST_TIMEOUT_MS_KEY)
 	@ApiResponse({ status: 201, type: H5PSaveResponse })
 	public async createH5pContent(
 		@Body() body: PostH5PContentCreateParams,
