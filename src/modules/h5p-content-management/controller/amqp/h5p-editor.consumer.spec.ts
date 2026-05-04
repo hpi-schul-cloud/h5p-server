@@ -5,7 +5,12 @@ import { H5PEditor } from '@lumieducation/h5p-server';
 import { MikroORM } from '@mikro-orm/core';
 import { ObjectId } from '@mikro-orm/mongodb';
 import { H5P_EXCHANGE_CONFIG_TOKEN } from '@modules/h5p-content-management/h5p-exchange.config';
-import { CopyContentParentType, H5pEditorEvents } from '@modules/h5p-content-management/interface';
+import {
+	CopyContentParams,
+	CopyContentParentType,
+	DeleteContentParams,
+	H5pEditorEvents,
+} from '@modules/h5p-content-management/interface';
 import { Test, TestingModule } from '@nestjs/testing';
 import { setupEntities } from '@testing/database';
 import { ENTITIES } from '../../h5p-editor.entity.exports';
@@ -17,6 +22,7 @@ import {
 import { H5pEditorContentService } from '../../service';
 import { h5pCopyContentParamsFactory, h5pEditorExchangeCopyContentParamsFactory } from '../../testing';
 import { H5PContentParentType } from '../../types';
+import * as AmqpSubscriberHelper from './amqp-subscriber.helper';
 import { H5pEditorConsumer } from './h5p-editor.consumer';
 
 describe(H5pEditorConsumer.name, () => {
@@ -26,6 +32,7 @@ describe(H5pEditorConsumer.name, () => {
 	let logger: DeepMocked<Logger>;
 	let h5pEditor: DeepMocked<H5PEditor>;
 	let h5pEditorContentService: DeepMocked<H5pEditorContentService>;
+	let amqpConnection: DeepMocked<AmqpConnection>;
 
 	beforeAll(async () => {
 		module = await Test.createTestingModule({
@@ -65,6 +72,7 @@ describe(H5pEditorConsumer.name, () => {
 		logger = module.get(Logger);
 		h5pEditor = module.get(H5PEditor);
 		h5pEditorContentService = module.get(H5pEditorContentService);
+		amqpConnection = module.get(AmqpConnection);
 	});
 
 	afterAll(async () => {
@@ -73,6 +81,80 @@ describe(H5pEditorConsumer.name, () => {
 
 	afterEach(() => {
 		jest.resetAllMocks();
+	});
+
+	describe('onModuleInit', () => {
+		describe('when module is initialized', () => {
+			let registerAmqpSubscriberSpy: jest.SpyInstance;
+
+			beforeEach(() => {
+				registerAmqpSubscriberSpy = jest.spyOn(AmqpSubscriberHelper, 'registerAmqpSubscriber').mockResolvedValue();
+			});
+
+			afterEach(() => {
+				registerAmqpSubscriberSpy.mockRestore();
+			});
+
+			it('should register a subscriber for DELETE_CONTENT event', async () => {
+				await consumer.onModuleInit();
+
+				expect(registerAmqpSubscriberSpy).toHaveBeenCalledWith(
+					amqpConnection,
+					'h5p-exchange',
+					H5pEditorEvents.DELETE_CONTENT,
+					expect.any(Function),
+					H5pEditorConsumer.name,
+					logger
+				);
+			});
+
+			it('should register a subscriber for COPY_CONTENT event', async () => {
+				await consumer.onModuleInit();
+
+				expect(registerAmqpSubscriberSpy).toHaveBeenCalledWith(
+					amqpConnection,
+					'h5p-exchange',
+					H5pEditorEvents.COPY_CONTENT,
+					expect.any(Function),
+					H5pEditorConsumer.name,
+					logger
+				);
+			});
+
+			it('should pass a handler that calls deleteContent for DELETE_CONTENT event', async () => {
+				const deleteContentSpy = jest.spyOn(consumer, 'deleteContent').mockResolvedValue();
+				const payload: DeleteContentParams = { contentId: new ObjectId().toHexString() };
+
+				await consumer.onModuleInit();
+
+				const deleteContentHandler = registerAmqpSubscriberSpy.mock.calls.find(
+					(call) => call[2] === H5pEditorEvents.DELETE_CONTENT
+				)?.[3] as (payload: DeleteContentParams) => Promise<void>;
+
+				await deleteContentHandler(payload);
+
+				expect(deleteContentSpy).toHaveBeenCalledWith(payload);
+
+				deleteContentSpy.mockRestore();
+			});
+
+			it('should pass a handler that calls copyContent for COPY_CONTENT event', async () => {
+				const copyContentSpy = jest.spyOn(consumer, 'copyContent').mockResolvedValue();
+				const payload = h5pEditorExchangeCopyContentParamsFactory.build();
+
+				await consumer.onModuleInit();
+
+				const copyContentHandler = registerAmqpSubscriberSpy.mock.calls.find(
+					(call) => call[2] === H5pEditorEvents.COPY_CONTENT
+				)?.[3] as (payload: CopyContentParams) => Promise<void>;
+
+				await copyContentHandler(payload);
+
+				expect(copyContentSpy).toHaveBeenCalledWith(payload);
+
+				copyContentSpy.mockRestore();
+			});
+		});
 	});
 
 	describe('deleteContent', () => {
