@@ -30,6 +30,8 @@ import { Request, Response } from 'express';
 import { H5PEditorUc } from '../uc';
 
 import { ApiValidationError } from '@infra/error';
+import { RequestTimeout } from '@shared/decorator';
+import { H5P_EDITOR_INCOMING_REQUEST_TIMEOUT_MS_KEY } from '../h5p-editor.app.config';
 import {
 	AjaxGetQueryParams,
 	AjaxPostBodyParams,
@@ -164,6 +166,7 @@ export class H5PEditorController {
 
 	@Post('ajax')
 	@UseFilters(H5pAjaxErrorResponseFilter)
+	@RequestTimeout(H5P_EDITOR_INCOMING_REQUEST_TIMEOUT_MS_KEY)
 	@UseInterceptors(
 		FileFieldsInterceptor([
 			{ name: 'file', maxCount: 1 },
@@ -231,6 +234,7 @@ export class H5PEditorController {
 	}
 
 	@Post('/edit')
+	@RequestTimeout(H5P_EDITOR_INCOMING_REQUEST_TIMEOUT_MS_KEY)
 	@ApiResponse({ status: 201, type: H5PSaveResponse })
 	public async createH5pContent(
 		@Body() body: PostH5PContentCreateParams,

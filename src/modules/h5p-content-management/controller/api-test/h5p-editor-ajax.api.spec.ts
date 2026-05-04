@@ -10,6 +10,11 @@ import { Test } from '@nestjs/testing';
 import { cleanupCollections } from '@testing/database';
 import { currentUserFactory } from '@testing/factory/currentuser.factory';
 import { TestApiClient } from '@testing/test-api-client';
+import {
+	H5P_EDITOR_INCOMING_REQUEST_TIMEOUT_MS_KEY,
+	H5P_SERVER_APP_REQUEST_TIMEOUT_CONFIG_TOKEN,
+	RequestTimeoutConfig,
+} from '../../h5p-editor.app.config';
 import { H5P_CONTENT_S3_CLIENT_INJECTION_TOKEN, H5P_LIBRARIES_S3_CLIENT_INJECTION_TOKEN } from '../../h5p-editor.const';
 
 describe('H5PEditor Controller (api)', () => {
@@ -17,6 +22,7 @@ describe('H5PEditor Controller (api)', () => {
 	let em: EntityManager;
 	let ajaxEndpoint: DeepMocked<H5PAjaxEndpoint>;
 	let authorizationClientAdapter: DeepMocked<AuthorizationClientAdapter>;
+	let requestTimeoutConfig: RequestTimeoutConfig;
 
 	const baseRoute = '/h5p-editor';
 
@@ -39,6 +45,7 @@ describe('H5PEditor Controller (api)', () => {
 		em = app.get(EntityManager);
 		ajaxEndpoint = app.get(H5PAjaxEndpoint);
 		authorizationClientAdapter = app.get(AuthorizationClientAdapter);
+		requestTimeoutConfig = app.get(H5P_SERVER_APP_REQUEST_TIMEOUT_CONFIG_TOKEN);
 	});
 
 	afterEach(async () => {
@@ -188,6 +195,32 @@ describe('H5PEditor Controller (api)', () => {
 					undefined,
 					undefined
 				);
+			});
+		});
+
+		describe('when request takes longer than configured timeout', () => {
+			const setup = () => {
+				requestTimeoutConfig[H5P_EDITOR_INCOMING_REQUEST_TIMEOUT_MS_KEY] = 1;
+
+				const studentUser = currentUserFactory.withRoleStudent().build();
+
+				const loggedInClient = TestApiClient.createWithJwt(app, baseRoute, studentUser);
+
+				const dummyBody = { contentId: 'id', field: 'field', libraries: ['dummyLibrary-1.0'], libraryParameters: '' };
+
+				// Mock to delay longer than the 1ms timeout
+				ajaxEndpoint.postAjax.mockImplementation(() => new Promise((resolve) => setTimeout(() => resolve([]), 100)));
+				authorizationClientAdapter.getUser.mockResolvedValueOnce({ language: 'de' } as MeResponse);
+
+				return { loggedInClient, dummyBody };
+			};
+
+			it('should return an AjaxErrorResponse with a 408 Request Timeout status code', async () => {
+				const { loggedInClient, dummyBody } = setup();
+
+				const response = await loggedInClient.post(`ajax?action=libraries`, dummyBody);
+
+				expect(response.status).toEqual(HttpStatus.REQUEST_TIMEOUT);
 			});
 		});
 
