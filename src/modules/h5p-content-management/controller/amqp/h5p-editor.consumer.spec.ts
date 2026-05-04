@@ -5,7 +5,12 @@ import { H5PEditor } from '@lumieducation/h5p-server';
 import { MikroORM } from '@mikro-orm/core';
 import { ObjectId } from '@mikro-orm/mongodb';
 import { H5P_EXCHANGE_CONFIG_TOKEN } from '@modules/h5p-content-management/h5p-exchange.config';
-import { CopyContentParentType, H5pEditorEvents } from '@modules/h5p-content-management/interface';
+import {
+	CopyContentParams,
+	CopyContentParentType,
+	DeleteContentParams,
+	H5pEditorEvents,
+} from '@modules/h5p-content-management/interface';
 import { Test, TestingModule } from '@nestjs/testing';
 import { setupEntities } from '@testing/database';
 import { ENTITIES } from '../../h5p-editor.entity.exports';
@@ -80,17 +85,17 @@ describe(H5pEditorConsumer.name, () => {
 
 	describe('onModuleInit', () => {
 		describe('when module is initialized', () => {
-			const setup = () => {
-				const registerAmqpSubscriberSpy = jest
-					.spyOn(AmqpSubscriberHelper, 'registerAmqpSubscriber')
-					.mockResolvedValue();
+			let registerAmqpSubscriberSpy: jest.SpyInstance;
 
-				return { registerAmqpSubscriberSpy };
-			};
+			beforeEach(() => {
+				registerAmqpSubscriberSpy = jest.spyOn(AmqpSubscriberHelper, 'registerAmqpSubscriber').mockResolvedValue();
+			});
+
+			afterEach(() => {
+				registerAmqpSubscriberSpy.mockRestore();
+			});
 
 			it('should register a subscriber for DELETE_CONTENT event', async () => {
-				const { registerAmqpSubscriberSpy } = setup();
-
 				await consumer.onModuleInit();
 
 				expect(registerAmqpSubscriberSpy).toHaveBeenCalledWith(
@@ -104,8 +109,6 @@ describe(H5pEditorConsumer.name, () => {
 			});
 
 			it('should register a subscriber for COPY_CONTENT event', async () => {
-				const { registerAmqpSubscriberSpy } = setup();
-
 				await consumer.onModuleInit();
 
 				expect(registerAmqpSubscriberSpy).toHaveBeenCalledWith(
@@ -116,6 +119,40 @@ describe(H5pEditorConsumer.name, () => {
 					H5pEditorConsumer.name,
 					logger
 				);
+			});
+
+			it('should pass a handler that calls deleteContent for DELETE_CONTENT event', async () => {
+				const deleteContentSpy = jest.spyOn(consumer, 'deleteContent').mockResolvedValue();
+				const payload: DeleteContentParams = { contentId: new ObjectId().toHexString() };
+
+				await consumer.onModuleInit();
+
+				const deleteContentHandler = registerAmqpSubscriberSpy.mock.calls.find(
+					(call) => call[2] === H5pEditorEvents.DELETE_CONTENT
+				)?.[3] as (payload: DeleteContentParams) => Promise<void>;
+
+				await deleteContentHandler(payload);
+
+				expect(deleteContentSpy).toHaveBeenCalledWith(payload);
+
+				deleteContentSpy.mockRestore();
+			});
+
+			it('should pass a handler that calls copyContent for COPY_CONTENT event', async () => {
+				const copyContentSpy = jest.spyOn(consumer, 'copyContent').mockResolvedValue();
+				const payload = h5pEditorExchangeCopyContentParamsFactory.build();
+
+				await consumer.onModuleInit();
+
+				const copyContentHandler = registerAmqpSubscriberSpy.mock.calls.find(
+					(call) => call[2] === H5pEditorEvents.COPY_CONTENT
+				)?.[3] as (payload: CopyContentParams) => Promise<void>;
+
+				await copyContentHandler(payload);
+
+				expect(copyContentSpy).toHaveBeenCalledWith(payload);
+
+				copyContentSpy.mockRestore();
 			});
 		});
 	});
