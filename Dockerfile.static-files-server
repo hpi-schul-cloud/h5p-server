@@ -3,7 +3,7 @@ FROM docker.io/debian:bullseye AS builder
 
 # Install git
 RUN apt-get update && \
-    apt-get install -y git && \
+    apt-get --no-install-recommends install -y git && \
     rm -rf /var/lib/apt/lists/*
 
 # the last used version from Lumi
