@@ -44,7 +44,7 @@ spec:
         name: linux
       containers:
       - name: h5p-staticfiles-server
-        image: {{ H5P_STATICFILES_SERVER_IMAGE }}:{{ H5P_SERVER_IMAGE_TAG }}
+        image: {{ H5P_SERVER_IMAGE }}:static-files-{{ H5P_SERVER_IMAGE_TAG }}
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: {{ H5P_PORT }}
