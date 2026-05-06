@@ -11,8 +11,8 @@ ENV LAST_USED_H5P_LIBRARY=b5f527e140c17da2792283d369f621e9b3f969ff
 ENV LAST_USED_H5P_EDITOR_LIBRARY=f3a60ec2bdbe410cb2b11e8f8cb4cf206c41364b
 
 # Test connectivity and clone H5P repositories with better error handling
-RUN curl -fsSL https://api.github.com/repos/h5p/h5p-php-library > /dev/null && \
-    curl -fsSL https://api.github.com/repos/h5p/h5p-editor-php-library > /dev/null && \
+RUN curl --proto "=https" --tlsv1.2 -sSf -L https://api.github.com/repos/h5p/h5p-php-library > /dev/null && \
+    curl --proto "=https" --tlsv1.2 -sSf -L https://api.github.com/repos/h5p/h5p-editor-php-library > /dev/null && \
     echo "GitHub connectivity verified"
 
 # Clone H5P repositories with explicit error handling
@@ -46,8 +46,8 @@ COPY nginx.conf /etc/nginx/nginx.conf
 
 # Copy H5P files to webroot
 RUN rm -r /usr/share/nginx/html/*
-COPY --from=builder --chown=nginx:nginx /h5p-php-library /usr/share/nginx/html/core
-COPY --from=builder --chown=nginx:nginx /h5p-editor-php-library /usr/share/nginx/html/editor
+COPY --from=builder --chown=nginx:nginx --chmod=755 /h5p-php-library /usr/share/nginx/html/core
+COPY --from=builder --chown=nginx:nginx --chmod=755 /h5p-editor-php-library /usr/share/nginx/html/editor
 
 # Set up permissions and create required files
 RUN chown -R nginx:nginx /var/cache/nginx /etc/nginx && \
