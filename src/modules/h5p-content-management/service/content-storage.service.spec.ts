@@ -94,6 +94,18 @@ const helpers = {
 
 		return Promise.resolve();
 	},
+
+	readStream(stream: Readable): Promise<string> {
+		return new Promise((resolve, reject) => {
+			const chunks: Buffer[] = [];
+
+			stream.on('data', (chunk: Buffer | string) => {
+				chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
+			});
+			stream.on('end', () => resolve(Buffer.concat(chunks).toString('utf-8')));
+			stream.on('error', reject);
+		});
+	},
 };
 
 describe('ContentStorage', () => {
@@ -640,12 +652,15 @@ describe('ContentStorage', () => {
 
 		describe('WHEN file exists', () => {
 			it('should S3ClientAdapter.get with range', async () => {
-				const { testRanges, contentID, filename, user, fileResponse } = setup();
+				const { testRanges } = setup();
 
 				for (const range of testRanges) {
+					const { contentID, filename, user } = setup();
+					const fileResponse = createMock<GetH5PFileResponse>({ data: Readable.from('content') });
 					s3ClientAdapter.get.mockResolvedValueOnce(fileResponse);
 
-					await service.getFileStream(contentID, filename, user, range[0], range[1]);
+					const stream = await service.getFileStream(contentID, filename, user, range[0], range[1]);
+					await helpers.readStream(stream);
 
 					expect(s3ClientAdapter.get).toHaveBeenCalledWith(expect.stringContaining(filename), range[2]);
 				}
@@ -656,8 +671,11 @@ describe('ContentStorage', () => {
 				s3ClientAdapter.get.mockResolvedValueOnce(fileResponse);
 
 				const stream = await service.getFileStream(contentID, filename, user);
+				expect(s3ClientAdapter.get).not.toHaveBeenCalled();
 
-				expect(stream).toBe(fileStream);
+				await expect(helpers.readStream(stream)).resolves.toBe('content');
+				expect(stream).not.toBe(fileStream);
+				expect(s3ClientAdapter.get).toHaveBeenCalledWith(expect.stringContaining(filename), undefined);
 			});
 		});
 
@@ -666,9 +684,9 @@ describe('ContentStorage', () => {
 				const { contentID, filename, user, getError } = setup();
 				s3ClientAdapter.get.mockRejectedValueOnce(getError);
 
-				const streamPromise = service.getFileStream(contentID, filename, user);
+				const stream = await service.getFileStream(contentID, filename, user);
 
-				await expect(streamPromise).rejects.toBe(getError);
+				await expect(helpers.readStream(stream)).rejects.toBe(getError);
 			});
 		});
 	});
