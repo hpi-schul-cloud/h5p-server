@@ -7,16 +7,15 @@ import { H5PEditorTestModule } from '@modules/h5p-content-management/h5p-editor-
 import { HttpStatus, INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { cleanupCollections } from '@testing/database';
-import { UserAndAccountTestFactory } from '@testing/factory/user-and-account.test.factory';
 import { TestApiClient } from '@testing/test-api-client';
 import { PassThrough } from 'node:stream';
+import { currentUserFactory } from '../../../../testing/factory/currentuser.factory';
 import { H5P_CONTENT_S3_CLIENT_INJECTION_TOKEN, H5P_LIBRARIES_S3_CLIENT_INJECTION_TOKEN } from '../../h5p-editor.const';
 import { h5pContentFactory } from '../../testing';
 
 describe('H5PEditor Controller - Download (api)', () => {
 	let app: INestApplication;
 	let em: EntityManager;
-	let testApiClient: TestApiClient;
 	let ajaxEndpoint: DeepMocked<H5PAjaxEndpoint>;
 
 	beforeAll(async () => {
@@ -37,7 +36,6 @@ describe('H5PEditor Controller - Download (api)', () => {
 		await app.init();
 		em = app.get(EntityManager);
 		ajaxEndpoint = app.get(H5PAjaxEndpoint);
-		testApiClient = new TestApiClient(app, 'h5p-editor');
 	});
 
 	afterEach(async () => {
@@ -54,7 +52,7 @@ describe('H5PEditor Controller - Download (api)', () => {
 			it('should return 401', async () => {
 				const someId = new ObjectId().toHexString();
 
-				const response = await testApiClient.get(`download/${someId}`);
+				const response = await TestApiClient.createUnauthenticated(app, 'h5p-editor').get(`download/${someId}`);
 
 				expect(response.status).toEqual(HttpStatus.UNAUTHORIZED);
 			});
@@ -63,9 +61,8 @@ describe('H5PEditor Controller - Download (api)', () => {
 		describe('when user is logged in', () => {
 			describe('when id in params is not a mongo id', () => {
 				it('should return 400', async () => {
-					const { studentUser, studentAccount } = UserAndAccountTestFactory.buildStudent();
-
-					const loggedInClient = testApiClient.loginByUser(studentAccount, studentUser);
+					const studentUser = currentUserFactory.withRoleStudent().build();
+					const loggedInClient = TestApiClient.createWithJwt(app, 'h5p-editor', studentUser);
 
 					const response = await loggedInClient.get('download/123');
 
@@ -80,9 +77,9 @@ describe('H5PEditor Controller - Download (api)', () => {
 
 			describe('when requested content is not found', () => {
 				it('should return 404', async () => {
-					const { studentUser, studentAccount } = UserAndAccountTestFactory.buildStudent();
+					const studentUser = currentUserFactory.withRoleStudent().build();
 
-					const loggedInClient = testApiClient.loginByUser(studentAccount, studentUser);
+					const loggedInClient = TestApiClient.createWithJwt(app, 'h5p-editor', studentUser);
 					const someId = new ObjectId().toHexString();
 
 					const response = await loggedInClient.get(`download/${someId}`);
@@ -93,9 +90,9 @@ describe('H5PEditor Controller - Download (api)', () => {
 
 			describe('when content is found', () => {
 				const setup = async () => {
-					const { teacherAccount, teacherUser } = UserAndAccountTestFactory.buildTeacher();
+					const teacherUser = currentUserFactory.withRoleTeacher().build();
 
-					const loggedInClient = testApiClient.loginByUser(teacherAccount, teacherUser);
+					const loggedInClient = TestApiClient.createWithJwt(app, 'h5p-editor', teacherUser);
 
 					const parentId = new ObjectId().toHexString();
 					const h5pContent = h5pContentFactory.build({ parentId });
@@ -156,9 +153,9 @@ describe('H5PEditor Controller - Download (api)', () => {
 
 			describe('when content title contains special characters', () => {
 				const setup = async () => {
-					const { teacherAccount, teacherUser } = UserAndAccountTestFactory.buildTeacher();
+					const teacherUser = currentUserFactory.withRoleTeacher().build();
 
-					const loggedInClient = testApiClient.loginByUser(teacherAccount, teacherUser);
+					const loggedInClient = TestApiClient.createWithJwt(app, 'h5p-editor', teacherUser);
 
 					const parentId = new ObjectId().toHexString();
 					const h5pContent = h5pContentFactory.build({ parentId });
