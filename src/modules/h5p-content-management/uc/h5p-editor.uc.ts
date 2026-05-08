@@ -34,12 +34,12 @@ import {
 } from '@nestjs/common';
 import { EntityId } from '@shared/domain/types';
 import { Request } from 'express';
-import { mkdtempSync, rmSync, unlinkSync } from 'fs';
-import { writeFile } from 'fs/promises';
 import { randomUUID } from 'node:crypto';
-import { tmpdir } from 'os';
-import { dirname, join } from 'path';
-import { PassThrough, Readable } from 'stream';
+import { mkdtempSync, rmSync, unlinkSync } from 'node:fs';
+import { writeFile } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { dirname, join } from 'node:path';
+import { PassThrough, Readable } from 'node:stream';
 import { AjaxGetQueryParams, AjaxPostBodyParams, AjaxPostQueryParams, H5PContentResponse } from '../controller/dto';
 import { H5P_EDITOR_CONFIG_TOKEN, H5PEditorConfig } from '../h5p-editor.config';
 import { H5PUcErrorLoggable, H5PUcLoggable } from '../loggable';
