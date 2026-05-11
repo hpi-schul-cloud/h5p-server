@@ -221,6 +221,9 @@ export class H5PEditorUc {
 		const passThrough = new PassThrough();
 
 		this.h5pAjaxEndpoint.getDownload(contentId, user, passThrough).catch((error: unknown) => {
+			this.logger.warning(
+				new H5PUcErrorLoggable(error, { contentId, userId: currentUser.userId }, 'Error downloading H5P content')
+			);
 			passThrough.destroy(error instanceof Error ? error : new Error(String(error)));
 		});
 

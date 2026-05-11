@@ -8,6 +8,10 @@ import { h5pConfig, h5pUrlGenerator } from '../service/config/h5p-service-config
 import EditorPermissionSystem from './editor-permission-system';
 import { H5P_CACHE_PROVIDER_TOKEN } from './h5p-cache.provider';
 
+function filterLibraryFiles(files: string[]): string[] {
+	return files.filter((file) => file.length > 0 && !file.endsWith('/'));
+}
+
 export const H5PEditorProvider = {
 	provide: H5PEditor,
 	inject: [ContentStorage, LibraryStorage, TemporaryFileStorage, H5P_CACHE_PROVIDER_TOKEN, H5P_EDITOR_CONFIG_TOKEN],
@@ -20,6 +24,8 @@ export const H5PEditorProvider = {
 	): Promise<H5PEditor> {
 		const cache = new cacheImplementations.CachedKeyValueStorage('kvcache', cacheAdapter);
 		const cachedLibraryStorage = new cacheImplementations.CachedLibraryStorage(libraryStorage, cacheAdapter);
+		const originalListFiles = cachedLibraryStorage.listFiles.bind(cachedLibraryStorage);
+		cachedLibraryStorage.listFiles = async (library) => filterLibraryFiles(await originalListFiles(library));
 
 		const { availableLanguages, maxFileSize, maxTotalSize } = h5pEditorConfig;
 

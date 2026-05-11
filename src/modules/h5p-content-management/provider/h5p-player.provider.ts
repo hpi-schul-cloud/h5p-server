@@ -7,6 +7,10 @@ import { Translator } from '../service/h5p-translator.service';
 import { LibraryStorage } from '../service/library-storage.service';
 import { H5P_CACHE_PROVIDER_TOKEN } from './h5p-cache.provider';
 
+function filterLibraryFiles(files: string[]): string[] {
+	return files.filter((file) => file.length > 0 && !file.endsWith('/'));
+}
+
 export const H5PPlayerProvider = {
 	provide: H5PPlayer,
 	inject: [ContentStorage, LibraryStorage, H5P_CACHE_PROVIDER_TOKEN, H5P_EDITOR_CONFIG_TOKEN],
@@ -17,6 +21,8 @@ export const H5PPlayerProvider = {
 		h5pEditorConfig: H5PEditorConfig
 	): Promise<H5PPlayer> => {
 		const libraryCache = new cacheImplementations.CachedLibraryStorage(libraryStorage, cacheAdapter);
+		const originalListFiles = libraryCache.listFiles.bind(libraryCache);
+		libraryCache.listFiles = async (library) => filterLibraryFiles(await originalListFiles(library));
 		const { availableLanguages, maxFileSize, maxTotalSize } = h5pEditorConfig;
 
 		h5pConfig.maxFileSize = maxFileSize;
