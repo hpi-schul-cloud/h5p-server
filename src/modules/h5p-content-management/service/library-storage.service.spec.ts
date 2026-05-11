@@ -487,6 +487,18 @@ describe('LibraryStorage', () => {
 				expect(result.mimetype).toBeDefined();
 				expect(result.mimetype).toEqual('application/json');
 			});
+
+			it('should fail if filename is empty', async () => {
+				const { ubername } = await setup();
+
+				await expect(storage.getLibraryFile(ubername, '')).rejects.toThrow('illegal-filename');
+			});
+
+			it('should fail if filename targets a directory', async () => {
+				const { ubername } = await setup();
+
+				await expect(storage.getLibraryFile(ubername, 'language/')).rejects.toThrow('illegal-filename');
+			});
 		});
 	});
 

@@ -44,10 +44,12 @@ export class LibraryStorage implements ILibraryStorage {
 	 * @param filename the requested file
 	 */
 	private checkFilename(filename: string): void {
+		const isEmptyPath = filename.length === 0;
 		const hasPathTraversal = filename.includes('../');
 		const isAbsolutePath = filename.startsWith('/');
+		const isDirectoryPath = filename.endsWith('/');
 
-		if (hasPathTraversal || isAbsolutePath) {
+		if (isEmptyPath || hasPathTraversal || isAbsolutePath || isDirectoryPath) {
 			throw new H5pError('illegal-filename', { filename }, 400);
 		}
 	}
