@@ -241,8 +241,9 @@ export class ContentStorage implements IContentStorage {
 
 		const path = this.getContentPath(contentId);
 		const { files } = await this.storageClient.list({ path });
+		const filteredFiles = files.filter((file) => file.length > 0 && !file.endsWith('/'));
 
-		return files;
+		return filteredFiles;
 	}
 
 	public async copyAllFiles(sourceContentId: string, targetContentId: string): Promise<void> {

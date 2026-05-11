@@ -465,12 +465,13 @@ export class LibraryStorage implements ILibraryStorage {
 		const s3Path = this.getS3Key(libraryName, '');
 
 		const { files } = await this.s3Client.list({ path: s3Path });
+		const filteredFiles = files.filter((file) => file.length > 0 && !file.endsWith('/'));
 
 		if (withMetadata) {
-			return files.concat('library.json');
+			return filteredFiles.concat('library.json');
 		}
 
-		return files;
+		return filteredFiles;
 	}
 
 	/**

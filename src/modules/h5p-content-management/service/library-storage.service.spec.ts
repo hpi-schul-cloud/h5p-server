@@ -773,6 +773,16 @@ describe('LibraryStorage', () => {
 			expect(files).toEqual([testFile.name, 'library.json']);
 		});
 
+		it('should filter out directory marker entries', async () => {
+			const { testingLib, testFile } = await setup();
+
+			// @ts-expect-error test
+			s3ClientAdapter.list.mockResolvedValueOnce({ files: [testFile.name, 'nested/', ''] });
+
+			const files = await storage.listFiles(testingLib);
+			expect(files).toEqual([testFile.name, 'library.json']);
+		});
+
 		it('should list all files (excluding library.json)', async () => {
 			const { testingLib, testFile } = await setup();
 

@@ -877,6 +877,17 @@ describe('ContentStorage', () => {
 
 				expect(files).toEqual(filenames);
 			});
+
+			it('should filter out directory marker entries', async () => {
+				const { content } = setup();
+				contentRepo.existsOne.mockResolvedValueOnce(true);
+				// @ts-expect-error test case
+				s3ClientAdapter.list.mockResolvedValueOnce({ files: ['1.txt', 'nested/', '', '2.txt'] });
+
+				const files = await service.listFiles(content.id);
+
+				expect(files).toEqual(['1.txt', '2.txt']);
+			});
 		});
 
 		describe('WHEN content does not exist', () => {
