@@ -51,6 +51,31 @@ jobs:
           tags: ${{ steps.docker_meta_img_hub.outputs.tags }}
           labels: ${{ steps.docker_meta_img_hub.outputs.labels }}
 
+      - name: Docker meta Service Name for docker hub (static files server)
+        id: docker_meta_img_hub_static_files
+        uses: docker/metadata-action@030e881283bb7a6894de51c315a6bfe6a94e05cf # v6.0.0
+        with:
+          images: quay.io/schulcloudverbund/h5p-server-static-files
+          tags: |
+            type=semver,pattern={{version}},prefix=static-files-,onlatest=false
+            type=semver,pattern={{major}}.{{minor}},prefix=static-files-,onlatest=false
+          labels: |
+            org.opencontainers.image.title=h5p-server-static-files
+      - name: Build and push ${{ github.repository }} (static files server)
+        uses: docker/build-push-action@d08e5c354a6adb9ed34480a06d141179aa583294 # v7.0.0
+        env:
+          DOCKER_BUILD_RECORD_UPLOAD: false
+        with:
+          build-args: |
+            BASE_IMAGE=quay.io/schulcloudverbund/h5p-server-static-files:${{ github.ref_name }}
+          context: .
+          file: ./Dockerfile.static-files-server
+          platforms: linux/amd64
+          push: true
+          pull: true
+          tags: ${{ steps.docker_meta_img_hub_static_files.outputs.tags }}
+          labels: ${{ steps.docker_meta_img_hub_static_files.outputs.labels }}
+
   create_release:
     runs-on: ubuntu-latest
     permissions:
