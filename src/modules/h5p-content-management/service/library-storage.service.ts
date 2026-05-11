@@ -386,11 +386,47 @@ export class LibraryStorage implements ILibraryStorage {
 	 * @param file
 	 */
 	public async getFileStream(library: ILibraryName, file: string, readLibraryJsonFromS3 = false): Promise<Readable> {
-		const ubername = LibraryName.toUberName(library);
+		if (file === 'library.json' && !readLibraryJsonFromS3) {
+			const ubername = LibraryName.toUberName(library);
+			const response = await this.getLibraryFile(ubername, file, readLibraryJsonFromS3);
 
-		const response = await this.getLibraryFile(ubername, file, readLibraryJsonFromS3);
+			return response.stream;
+		}
 
-		return response.stream;
+		this.checkFilename(file);
+		const s3Path = this.getS3Key(library, file);
+		let s3Stream: Readable | null = null;
+		let initializing = false;
+		const s3Client = this.s3Client;
+		const lazyReadable = new Readable({
+			async read(): Promise<void> {
+				if (s3Stream) {
+					s3Stream.resume();
+
+					return;
+				}
+				if (initializing) {
+					return;
+				}
+
+				initializing = true;
+				try {
+					const { data } = await s3Client.get(s3Path);
+					s3Stream = data;
+					data.on('data', (chunk: Buffer) => {
+						if (!lazyReadable.push(chunk)) {
+							data.pause();
+						}
+					});
+					data.on('end', () => lazyReadable.push(null));
+					data.on('error', (err: Error) => lazyReadable.destroy(err));
+				} catch (err) {
+					lazyReadable.destroy(err instanceof Error ? err : new Error(String(err)));
+				}
+			},
+		});
+
+		return lazyReadable;
 	}
 
 	/**
