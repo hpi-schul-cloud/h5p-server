@@ -1,0 +1,28 @@
+  - name: Service
+    kubernetes.core.k8s:
+      kubeconfig: ~/.kube/config 
+      namespace: "{{ NAMESPACE }}"
+      template: svc.yml.j2
+    when: WITH_H5P_SERVER is defined and WITH_H5P_SERVER|bool
+    tags:
+      - service
+
+  - name: Configmap
+    kubernetes.core.k8s:
+      kubeconfig: ~/.kube/config 
+      namespace: "{{ NAMESPACE }}"
+      template: configmap.yml.j2
+      apply: yes
+    when: WITH_H5P_SERVER is defined and WITH_H5P_SERVER|bool
+    tags:
+      - configmap
+
+  - name: Deployment
+    kubernetes.core.k8s:
+      kubeconfig: ~/.kube/config 
+      namespace: "{{ NAMESPACE }}"
+      template: deployment.yml.j2
+      apply: yes
+      state: "{{ 'present' if WITH_H5P_SERVER is defined and WITH_H5P_SERVER|bool else 'absent'}}"
+    tags:
+      - deployment
