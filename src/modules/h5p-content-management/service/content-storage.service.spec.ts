@@ -674,6 +674,14 @@ describe('ContentStorage', () => {
 				expect(s3ClientAdapter.get).toHaveBeenCalledWith(expect.stringContaining(filename), undefined);
 			});
 		});
+
+		describe('WHEN filename is invalid', () => {
+			it('should throw error', () => {
+				const { contentID, user } = setup();
+
+				expect(() => service.getFileStream(contentID, 'ex#ample.txt', user)).toThrow(HttpException);
+			});
+		});
 	});
 
 	describe('getMetadata', () => {

@@ -155,6 +155,7 @@ export class ContentStorage implements IContentStorage {
 		rangeStart = 0,
 		rangeEnd?: number
 	): Promise<Readable> {
+		this.checkFilename(file);
 		const filePath = this.getFilePath(contentId, file);
 
 		let range: string | undefined;
