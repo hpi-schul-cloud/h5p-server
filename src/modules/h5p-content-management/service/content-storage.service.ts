@@ -23,6 +23,7 @@ import { H5pFileDto } from '../controller/dto/h5p-file.dto';
 import { H5P_CONTENT_S3_CLIENT_INJECTION_TOKEN } from '../h5p-editor.const';
 import { H5PContent, H5PContentRepo } from '../repo';
 import { H5PCountUsageResult, LumiUserWithContentData } from '../types';
+import { createLazyS3Readable } from './create-lazy-s3-readable.helper';
 
 @Injectable()
 export class ContentStorage implements IContentStorage {
@@ -162,43 +163,8 @@ export class ContentStorage implements IContentStorage {
 			range = `bytes=${rangeStart}-${rangeEnd}`;
 		}
 
-		// Return a lazy Readable that only opens the S3 connection when first read.
-		// This prevents S3 streams from being opened while yazl is still consuming
-		// a previous large file, which would cause the streams to sit idle and hit
-		// the S3 client's inactivity timeout before yazl ever reads them.
-		let s3Stream: Readable | null = null;
-		let initializing = false;
 		const storageClient = this.storageClient;
-		const lazyReadable = new Readable({
-			async read(): Promise<void> {
-				if (s3Stream) {
-					// _read() is called when the consumer wants more data.
-					// If the S3 stream was paused due to backpressure, resume it now.
-					s3Stream.resume();
-
-					return;
-				}
-				if (initializing) {
-					// Already waiting for the S3 connection; the data handler will push
-					// chunks once the connection is established.
-					return;
-				}
-				initializing = true;
-				try {
-					const { data } = await storageClient.get(filePath, range);
-					s3Stream = data;
-					data.on('data', (chunk: Buffer) => {
-						if (!lazyReadable.push(chunk)) {
-							data.pause();
-						}
-					});
-					data.on('end', () => lazyReadable.push(null));
-					data.on('error', (err: Error) => lazyReadable.destroy(err));
-				} catch (err) {
-					lazyReadable.destroy(err instanceof Error ? err : new Error(String(err)));
-				}
-			},
-		});
+		const lazyReadable = createLazyS3Readable(() => storageClient.get(filePath, range));
 
 		return Promise.resolve(lazyReadable);
 	}

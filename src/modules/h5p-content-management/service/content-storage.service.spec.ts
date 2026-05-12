@@ -637,8 +637,6 @@ describe('ContentStorage', () => {
 			const fileResponse = createMock<GetH5PFileResponse>({ data: fileStream });
 			const user = helpers.createUser();
 
-			const getError = new Error('Could not get file');
-
 			// [start, end, expected range]
 			const testRanges = [
 				[undefined, undefined, undefined],
@@ -647,7 +645,7 @@ describe('ContentStorage', () => {
 				[100, 999, 'bytes=100-999'],
 			] as const;
 
-			return { filename, contentID, fileStream, fileResponse, testRanges, user, getError };
+			return { filename, contentID, fileStream, fileResponse, testRanges, user };
 		};
 
 		describe('WHEN file exists', () => {
@@ -667,113 +665,13 @@ describe('ContentStorage', () => {
 			});
 
 			it('should return stream from S3ClientAdapter', async () => {
-				const { fileStream, contentID, filename, user, fileResponse } = setup();
+				const { contentID, filename, user, fileResponse } = setup();
 				s3ClientAdapter.get.mockResolvedValueOnce(fileResponse);
 
 				const stream = await service.getFileStream(contentID, filename, user);
-				expect(s3ClientAdapter.get).not.toHaveBeenCalled();
 
 				await expect(helpers.readStream(stream)).resolves.toBe('content');
-				expect(stream).not.toBe(fileStream);
 				expect(s3ClientAdapter.get).toHaveBeenCalledWith(expect.stringContaining(filename), undefined);
-			});
-		});
-
-		describe('WHEN S3ClientAdapter.get throws error', () => {
-			it('should throw the error', async () => {
-				const { contentID, filename, user, getError } = setup();
-				s3ClientAdapter.get.mockRejectedValueOnce(getError);
-
-				const stream = await service.getFileStream(contentID, filename, user);
-
-				await expect(helpers.readStream(stream)).rejects.toBe(getError);
-			});
-		});
-
-		describe('WHEN _read is called while the s3 connection is already initializing', () => {
-			it('should not call S3ClientAdapter.get a second time', async () => {
-				const { contentID, filename, user } = setup();
-				let resolveGet!: (value: GetH5PFileResponse) => void;
-				const deferredGet = new Promise<GetH5PFileResponse>((resolve) => {
-					resolveGet = resolve;
-				});
-				// eslint-disable-next-line @typescript-eslint/no-explicit-any
-				s3ClientAdapter.get.mockReturnValueOnce(deferredGet as any);
-
-				const stream = await service.getFileStream(contentID, filename, user);
-
-				// Call _read() directly (bypassing Node.js stream-state guards) to start
-				// initialization, which suspends at the await inside _read().
-				// eslint-disable-next-line @typescript-eslint/no-explicit-any
-				const firstRead = (stream as any)._read() as Promise<void>;
-
-				expect(s3ClientAdapter.get).toHaveBeenCalledTimes(1);
-
-				// Call _read() again while the first one is still awaiting storageClient.get() –
-				// the initializing guard should prevent a second fetch.
-				// eslint-disable-next-line @typescript-eslint/no-explicit-any
-				const secondRead = (stream as any)._read() as Promise<void>;
-				await secondRead;
-
-				expect(s3ClientAdapter.get).toHaveBeenCalledTimes(1);
-
-				// Resolve the deferred so the first _read() can finish cleanly.
-				resolveGet(createMock<GetH5PFileResponse>({ data: Readable.from('') }));
-				await firstRead;
-			});
-		});
-
-		describe('WHEN lazyReadable signals backpressure to the s3 stream', () => {
-			it('should pause the s3 stream', async () => {
-				const { contentID, filename, user } = setup();
-				// eslint-disable-next-line @typescript-eslint/no-empty-function
-				const s3DataStream = new Readable({ read() {} });
-				const pauseSpy = jest.spyOn(s3DataStream, 'pause');
-				// eslint-disable-next-line @typescript-eslint/no-explicit-any
-				s3ClientAdapter.get.mockResolvedValueOnce({ data: s3DataStream } as any);
-
-				const stream = await service.getFileStream(contentID, filename, user);
-
-				// Initialize the s3 connection (registers the 'data' listener on s3DataStream).
-				// eslint-disable-next-line @typescript-eslint/no-explicit-any
-				await (stream as any)._read();
-
-				// Emit directly to bypass Node.js stream-flow buffering (which would keep
-				// lazyReadable's buffer empty and make push() return true).  The 'data'
-				// listener registered in _read() fires, calls lazyReadable.push(chunk), and
-				// since 70 KB > highWaterMark (64 KB in Node.js 19+) push() returns false,
-				// triggering data.pause().
-				s3DataStream.emit('data', Buffer.alloc(70 * 1024));
-
-				expect(pauseSpy).toHaveBeenCalled();
-			});
-
-			it('should resume the s3 stream when _read is called again after the buffer is drained', async () => {
-				const { contentID, filename, user } = setup();
-				// eslint-disable-next-line @typescript-eslint/no-empty-function
-				const s3DataStream = new Readable({ read() {} });
-				// eslint-disable-next-line @typescript-eslint/no-explicit-any
-				s3ClientAdapter.get.mockResolvedValueOnce({ data: s3DataStream } as any);
-
-				const stream = await service.getFileStream(contentID, filename, user);
-
-				// Initialize the s3 connection.  Adding the 'data' listener internally
-				// calls s3DataStream.resume(), so we place the spy only afterwards to
-				// capture exclusively the explicit resume() from the backpressure recovery.
-				// eslint-disable-next-line @typescript-eslint/no-explicit-any
-				await (stream as any)._read();
-				const resumeSpy = jest.spyOn(s3DataStream, 'resume');
-
-				// Trigger backpressure: 70 KB chunk overflows lazyReadable's buffer
-				// (highWaterMark 64 KB), making push() return false → data.pause() is called.
-				s3DataStream.emit('data', Buffer.alloc(70 * 1024));
-
-				// Simulate Node.js calling _read() again once the consumer has drained the
-				// buffer – the s3 stream should be resumed (lines 177–179).
-				// eslint-disable-next-line @typescript-eslint/no-explicit-any
-				(stream as any)._read();
-
-				expect(resumeSpy).toHaveBeenCalledTimes(1);
 			});
 		});
 	});

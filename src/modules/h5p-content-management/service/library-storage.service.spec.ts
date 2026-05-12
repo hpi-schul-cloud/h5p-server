@@ -870,26 +870,6 @@ describe('LibraryStorage', () => {
 
 				expect(streamContents).toEqual(testFile.content);
 			});
-
-			it('should lazily open the S3 stream when consumed', async () => {
-				const { testingLib, testFile } = await setup();
-				s3ClientAdapter.get.mockClear();
-				const stream = Readable.from(Buffer.from(testFile.content));
-				s3ClientAdapter.get.mockResolvedValueOnce({
-					data: stream,
-					contentLength: testFile.content.length,
-					contentType: 'application/json',
-				});
-
-				const fileStream = await storage.getFileStream(testingLib, testFile.name);
-
-				expect(s3ClientAdapter.get).not.toHaveBeenCalled();
-
-				const streamContents = await readStream(fileStream);
-
-				expect(streamContents).toEqual(testFile.content);
-				expect(s3ClientAdapter.get).toHaveBeenCalledTimes(1);
-			});
 		});
 		describe('when getting file stats', () => {
 			it('should return file stats', async () => {
