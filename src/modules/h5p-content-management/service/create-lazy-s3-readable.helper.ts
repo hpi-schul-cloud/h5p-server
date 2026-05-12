@@ -10,6 +10,32 @@ import { Readable } from 'node:stream';
 export function createLazyS3Readable(getStream: () => Promise<{ data: Readable }>): Readable {
 	let s3Stream: Readable | null = null;
 	let initializing = false;
+	let onData: ((chunk: Buffer) => void) | null = null;
+	let onEnd: (() => void) | null = null;
+	let onError: ((err: Error) => void) | null = null;
+
+	const cleanup = (): void => {
+		if (!s3Stream) {
+			return;
+		}
+
+		const stream = s3Stream;
+		s3Stream = null;
+
+		if (onData) {
+			stream.removeListener('data', onData);
+		}
+		if (onEnd) {
+			stream.removeListener('end', onEnd);
+		}
+		if (onError) {
+			stream.removeListener('error', onError);
+		}
+
+		if (!stream.destroyed) {
+			stream.destroy();
+		}
+	};
 
 	const lazyReadable = new Readable({
 		async read(): Promise<void> {
@@ -29,19 +55,31 @@ export function createLazyS3Readable(getStream: () => Promise<{ data: Readable }
 			initializing = true;
 			try {
 				const { data } = await getStream();
+				if (lazyReadable.destroyed) {
+					data.destroy();
+
+					return;
+				}
+
 				s3Stream = data;
-				data.on('data', (chunk: Buffer) => {
+				onData = (chunk: Buffer) => {
 					if (!lazyReadable.push(chunk)) {
 						data.pause();
 					}
-				});
-				data.on('end', () => lazyReadable.push(null));
-				data.on('error', (err: Error) => lazyReadable.destroy(err));
+				};
+				onEnd = () => lazyReadable.push(null);
+				onError = (err: Error) => lazyReadable.destroy(err);
+
+				data.on('data', onData);
+				data.on('end', onEnd);
+				data.on('error', onError);
 			} catch (err) {
 				lazyReadable.destroy(err instanceof Error ? err : new Error(String(err)));
 			}
 		},
 	});
+
+	lazyReadable.once('close', cleanup);
 
 	return lazyReadable;
 }
