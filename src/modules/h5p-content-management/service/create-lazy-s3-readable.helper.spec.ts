@@ -86,6 +86,46 @@ describe('createLazyS3Readable', () => {
 		});
 	});
 
+	describe('WHEN the lazy readable is closed after the S3 stream is initialized', () => {
+		it('should destroy the S3 stream if it is not already destroyed', async () => {
+			const s3Stream = new PassThrough();
+			const destroySpy = jest.spyOn(s3Stream, 'destroy');
+			const getStream = jest.fn().mockResolvedValue({ data: s3Stream });
+
+			const readable = createLazyS3Readable(getStream);
+
+			// Start reading so the S3 stream is fully initialized
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			await (readable as any)._read();
+
+			// Destroy the lazy readable while the S3 stream is still alive
+			readable.destroy();
+
+			// Wait for the 'close' event to propagate and cleanup to run
+			await new Promise((resolve) => setImmediate(resolve));
+
+			expect(destroySpy).toHaveBeenCalledTimes(1);
+		});
+
+		it('should not destroy the S3 stream if it is already destroyed', async () => {
+			const s3Stream = new PassThrough();
+			const getStream = jest.fn().mockResolvedValue({ data: s3Stream });
+
+			const readable = createLazyS3Readable(getStream);
+
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			await (readable as any)._read();
+
+			s3Stream.destroy();
+			const destroySpy = jest.spyOn(s3Stream, 'destroy');
+
+			readable.destroy();
+			await new Promise((resolve) => setImmediate(resolve));
+
+			expect(destroySpy).not.toHaveBeenCalled();
+		});
+	});
+
 	describe('WHEN the S3 stream emits an error', () => {
 		it('should destroy the readable with the error', async () => {
 			const s3Stream = new PassThrough();
