@@ -62,13 +62,17 @@ export function createLazyS3Readable(getStream: () => Promise<{ data: Readable }
 				}
 
 				s3Stream = data;
-				onData = (chunk: Buffer) => {
+				onData = (chunk: Buffer): void => {
 					if (!lazyReadable.push(chunk)) {
 						data.pause();
 					}
 				};
-				onEnd = () => lazyReadable.push(null);
-				onError = (err: Error) => lazyReadable.destroy(err);
+				onEnd = (): void => {
+					lazyReadable.push(null);
+				};
+				onError = (err: Error): void => {
+					lazyReadable.destroy(err);
+				};
 
 				data.on('data', onData);
 				data.on('end', onEnd);
