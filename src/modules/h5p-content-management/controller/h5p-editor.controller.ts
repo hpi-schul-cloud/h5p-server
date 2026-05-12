@@ -290,9 +290,10 @@ export class H5PEditorController {
 		const { filename, passThrough } = await this.h5pEditorUc.downloadH5pContent(currentUser, params.contentId);
 		req.on('close', () => passThrough.destroy());
 
+		const asciiFallbackFilename = filename.replace(/[^\x00-\xFF]/g, '_');
 		res.set({
 			'Content-Type': 'application/zip',
-			'Content-Disposition': `attachment; filename="${filename}"; filename*=UTF-8''${encodeURIComponent(filename)}`,
+			'Content-Disposition': `attachment; filename="${asciiFallbackFilename}"; filename*=UTF-8''${encodeURIComponent(filename)}`,
 		});
 
 		const streamableFile = new StreamableFile(passThrough);

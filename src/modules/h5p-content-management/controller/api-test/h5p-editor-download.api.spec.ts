@@ -183,6 +183,40 @@ describe('H5PEditor Controller - Download (api)', () => {
 					expect(response.headers['content-disposition']).toContain('Test_Title_With_Special.h5p');
 				});
 			});
+
+			describe('when content title contains non-latin1 characters', () => {
+				const setup = async () => {
+					const teacherUser = currentUserFactory.withRoleTeacher().build();
+
+					const loggedInClient = TestApiClient.createWithJwt(app, 'h5p-editor', teacherUser);
+
+					const parentId = new ObjectId().toHexString();
+					const h5pContent = h5pContentFactory.build({ parentId });
+					h5pContent.metadata.title = 'Test你好';
+
+					await em.persist([h5pContent]).flush();
+					em.clear();
+
+					ajaxEndpoint.getDownload.mockImplementation((_contentId, _user, stream) => {
+						const passThrough = stream as PassThrough;
+						passThrough.write('PK');
+						passThrough.end();
+
+						return Promise.resolve();
+					});
+
+					return { contentId: h5pContent.id, loggedInClient };
+				};
+
+				it('should set an encoded UTF-8 filename and latin1 fallback in Content-Disposition header', async () => {
+					const { contentId, loggedInClient } = await setup();
+
+					const response = await loggedInClient.get(`download/${contentId}`);
+
+					expect(response.headers['content-disposition']).toContain('filename="Test__.h5p"');
+					expect(response.headers['content-disposition']).toContain("filename*=UTF-8''Test%E4%BD%A0%E5%A5%BD.h5p");
+				});
+			});
 		});
 	});
 });
