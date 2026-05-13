@@ -52,7 +52,7 @@ Configuration is managed via environment files (e.g., `.env.development`). Key v
    ```
 2. Install dependencies:
    ```sh
-   npm ci
+   npm ci --ignore-scripts
    ```
 3. Configure environment:
    - Copy `.env.development` and adjust values as needed.
