@@ -149,5 +149,5 @@ scripts/h5p/**/*.js.map
 .vscode/launch.json
 !.vscode/extensions.json
 
-.idea
-*swp
+*.idea
+.swp
