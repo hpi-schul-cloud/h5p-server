@@ -1,10 +1,7 @@
 /* istanbul ignore file */
-
-import { H5PEditorAMQPModule } from '@modules/h5p-content-management';
-import { NestFactory } from '@nestjs/core';
-
-// register source-map-support for debugging
 import { Logger } from '@infra/logger';
+import { H5PEditorAMQPModule } from '@modules/h5p-amqp-app';
+import { NestFactory } from '@nestjs/core';
 import { install as sourceMapInstall } from 'source-map-support';
 import { AppStartLoggable } from './helpers';
 

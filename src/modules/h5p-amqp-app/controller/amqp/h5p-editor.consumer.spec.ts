@@ -1,28 +1,24 @@
 import { AmqpConnection } from '@golevelup/nestjs-rabbitmq';
 import { createMock, DeepMocked } from '@golevelup/ts-jest';
 import { Logger } from '@infra/logger';
+import * as AmqpSubscriberHelper from '@infra/rabbitmq';
 import { H5PEditor } from '@lumieducation/h5p-server';
 import { MikroORM } from '@mikro-orm/core';
 import { ObjectId } from '@mikro-orm/mongodb';
-import { H5P_EXCHANGE_CONFIG_TOKEN } from '@modules/h5p-content-management/h5p-exchange.config';
-import {
-	CopyContentParams,
-	CopyContentParentType,
-	DeleteContentParams,
-	H5pEditorEvents,
-} from '@modules/h5p-content-management/interface';
+import { ENTITIES } from '@modules/h5p-content-management/h5p-editor.entity.exports';
+import { H5pEditorContentService } from '@modules/h5p-content-management/service';
+import { h5pCopyContentParamsFactory } from '@modules/h5p-content-management/testing';
+import { H5PContentParentType } from '@modules/h5p-content-management/types';
 import { Test, TestingModule } from '@nestjs/testing';
 import { setupEntities } from '@testing/database';
-import { ENTITIES } from '../../h5p-editor.entity.exports';
+import { CopyContentParams, CopyContentParentType, DeleteContentParams, H5pEditorEvents } from '../../domain/interface';
 import {
 	H5pEditorContentCopySuccessfulLoggable,
 	H5pEditorContentDeletionSuccessfulLoggable,
 	H5pEditorExchangeInvalidParamsLoggableException,
-} from '../../loggable';
-import { H5pEditorContentService } from '../../service';
-import { h5pCopyContentParamsFactory, h5pEditorExchangeCopyContentParamsFactory } from '../../testing';
-import { H5PContentParentType } from '../../types';
-import * as AmqpSubscriberHelper from './amqp-subscriber.helper';
+} from '../../domain/loggable';
+import { H5P_EXCHANGE_CONFIG_TOKEN } from '../../h5p-exchange.config';
+import { h5pEditorExchangeCopyContentParamsFactory } from '../../testing';
 import { H5pEditorConsumer } from './h5p-editor.consumer';
 
 describe(H5pEditorConsumer.name, () => {

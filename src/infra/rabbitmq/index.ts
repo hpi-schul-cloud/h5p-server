@@ -1,3 +1,4 @@
+export { registerAmqpSubscriber } from './amqp-subscriber.helper';
 export { ErrorMapper } from './error.mapper';
 export {
 	InternalRabbitMQConfig,

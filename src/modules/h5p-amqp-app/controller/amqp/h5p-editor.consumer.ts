@@ -1,19 +1,18 @@
 import { AmqpConnection } from '@golevelup/nestjs-rabbitmq';
-
 import { Logger } from '@infra/logger';
+import { registerAmqpSubscriber } from '@infra/rabbitmq';
 import { H5PEditor, IUser as LumiIUser } from '@lumieducation/h5p-server';
 import { MikroORM, RequestContext } from '@mikro-orm/core';
+import { H5pEditorContentService } from '@modules/h5p-content-management/service';
+import { H5PContentParentType } from '@modules/h5p-content-management/types';
 import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
-import { H5P_EXCHANGE_CONFIG_TOKEN, H5pExchangeConfig } from '../../h5p-exchange.config';
-import { CopyContentParams, DeleteContentParams, H5pEditorEvents } from '../../interface';
+import { CopyContentParams, DeleteContentParams, H5pEditorEvents } from '../../domain/interface';
 import {
 	H5pEditorContentCopySuccessfulLoggable,
 	H5pEditorContentDeletionSuccessfulLoggable,
 	H5pEditorExchangeInvalidParamsLoggableException,
-} from '../../loggable';
-import { H5pEditorContentService } from '../../service';
-import { H5PContentParentType } from '../../types';
-import { registerAmqpSubscriber } from './amqp-subscriber.helper';
+} from '../../domain/loggable';
+import { H5P_EXCHANGE_CONFIG_TOKEN, H5pExchangeConfig } from '../../h5p-exchange.config';
 
 @Injectable()
 export class H5pEditorConsumer implements OnModuleInit {

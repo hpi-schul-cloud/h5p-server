@@ -1,6 +1,6 @@
 import { AmqpConnection, defaultNackErrorHandler } from '@golevelup/nestjs-rabbitmq';
 import { createMock, DeepMocked } from '@golevelup/ts-jest';
-import { Logger } from '@infra/logger/logger';
+import { Logger } from '@infra/logger';
 import { Channel, ConsumeMessage } from 'amqplib';
 import { registerAmqpSubscriber } from './amqp-subscriber.helper';
 

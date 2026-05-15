@@ -1,6 +1,6 @@
 import { ErrorLogMessage, Loggable } from '@infra/logger';
 import { UnprocessableEntityException } from '@nestjs/common';
-import { CopyContentParams, H5pEditorEvents } from '../interface';
+import { H5pEditorEvents, CopyContentParams } from '../interface';
 
 export class H5pEditorExchangeInvalidParamsLoggableException extends UnprocessableEntityException implements Loggable {
 	constructor(
