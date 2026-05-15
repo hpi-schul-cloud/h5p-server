@@ -17,6 +17,7 @@ describe('H5PEditor Controller - Download (api)', () => {
 	let app: INestApplication;
 	let em: EntityManager;
 	let ajaxEndpoint: DeepMocked<H5PAjaxEndpoint>;
+	const baseRoute = '/h5p-editor';
 
 	beforeAll(async () => {
 		const module = await Test.createTestingModule({
@@ -52,7 +53,7 @@ describe('H5PEditor Controller - Download (api)', () => {
 			it('should return 401', async () => {
 				const someId = new ObjectId().toHexString();
 
-				const response = await TestApiClient.createUnauthenticated(app, 'h5p-editor').get(`download/${someId}`);
+				const response = await TestApiClient.createUnauthenticated(app, baseRoute).get(`download/${someId}`);
 
 				expect(response.status).toEqual(HttpStatus.UNAUTHORIZED);
 			});
@@ -62,7 +63,7 @@ describe('H5PEditor Controller - Download (api)', () => {
 			describe('when id in params is not a mongo id', () => {
 				it('should return 400', async () => {
 					const studentUser = currentUserFactory.withRoleStudent().build();
-					const loggedInClient = TestApiClient.createWithJwt(app, 'h5p-editor', studentUser);
+					const loggedInClient = TestApiClient.createWithJwt(app, baseRoute, studentUser);
 
 					const response = await loggedInClient.get('download/123');
 
@@ -79,7 +80,7 @@ describe('H5PEditor Controller - Download (api)', () => {
 				it('should return 404', async () => {
 					const studentUser = currentUserFactory.withRoleStudent().build();
 
-					const loggedInClient = TestApiClient.createWithJwt(app, 'h5p-editor', studentUser);
+					const loggedInClient = TestApiClient.createWithJwt(app, baseRoute, studentUser);
 					const someId = new ObjectId().toHexString();
 
 					const response = await loggedInClient.get(`download/${someId}`);
@@ -92,7 +93,7 @@ describe('H5PEditor Controller - Download (api)', () => {
 				const setup = async () => {
 					const teacherUser = currentUserFactory.withRoleTeacher().build();
 
-					const loggedInClient = TestApiClient.createWithJwt(app, 'h5p-editor', teacherUser);
+					const loggedInClient = TestApiClient.createWithJwt(app, baseRoute, teacherUser);
 
 					const parentId = new ObjectId().toHexString();
 					const h5pContent = h5pContentFactory.build({ parentId });
@@ -155,7 +156,7 @@ describe('H5PEditor Controller - Download (api)', () => {
 				const setup = async () => {
 					const teacherUser = currentUserFactory.withRoleTeacher().build();
 
-					const loggedInClient = TestApiClient.createWithJwt(app, 'h5p-editor', teacherUser);
+					const loggedInClient = TestApiClient.createWithJwt(app, baseRoute, teacherUser);
 
 					const parentId = new ObjectId().toHexString();
 					const h5pContent = h5pContentFactory.build({ parentId });
@@ -188,7 +189,7 @@ describe('H5PEditor Controller - Download (api)', () => {
 				const setup = async () => {
 					const teacherUser = currentUserFactory.withRoleTeacher().build();
 
-					const loggedInClient = TestApiClient.createWithJwt(app, 'h5p-editor', teacherUser);
+					const loggedInClient = TestApiClient.createWithJwt(app, baseRoute, teacherUser);
 
 					const parentId = new ObjectId().toHexString();
 					const h5pContent = h5pContentFactory.build({ parentId });
@@ -222,7 +223,7 @@ describe('H5PEditor Controller - Download (api)', () => {
 				const setup = async () => {
 					const teacherUser = currentUserFactory.withRoleTeacher().build();
 
-					const loggedInClient = TestApiClient.createWithJwt(app, 'h5p-editor', teacherUser);
+					const loggedInClient = TestApiClient.createWithJwt(app, baseRoute, teacherUser);
 
 					const parentId = new ObjectId().toHexString();
 					const h5pContent = h5pContentFactory.build({ parentId });
@@ -256,7 +257,7 @@ describe('H5PEditor Controller - Download (api)', () => {
 				const setup = async () => {
 					const teacherUser = currentUserFactory.withRoleTeacher().build();
 
-					const loggedInClient = TestApiClient.createWithJwt(app, 'h5p-editor', teacherUser);
+					const loggedInClient = TestApiClient.createWithJwt(app, baseRoute, teacherUser);
 
 					const parentId = new ObjectId().toHexString();
 					const h5pContent = h5pContentFactory.build({ parentId });
@@ -297,7 +298,7 @@ describe('H5PEditor Controller - Download (api)', () => {
 				const setup = async () => {
 					const teacherUser = currentUserFactory.withRoleTeacher().build();
 
-					const loggedInClient = TestApiClient.createWithJwt(app, 'h5p-editor', teacherUser);
+					const loggedInClient = TestApiClient.createWithJwt(app, baseRoute, teacherUser);
 
 					const parentId = new ObjectId().toHexString();
 					const h5pContent = h5pContentFactory.build({ parentId });
