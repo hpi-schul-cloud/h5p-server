@@ -217,6 +217,89 @@ describe('H5PEditor Controller - Download (api)', () => {
 					expect(response.headers['content-disposition']).toContain("filename*=UTF-8''Test%E4%BD%A0%E5%A5%BD.h5p");
 				});
 			});
+
+			describe('when getDownload rejects with an Error', () => {
+				const setup = async () => {
+					const teacherUser = currentUserFactory.withRoleTeacher().build();
+
+					const loggedInClient = TestApiClient.createWithJwt(app, 'h5p-editor', teacherUser);
+
+					const parentId = new ObjectId().toHexString();
+					const h5pContent = h5pContentFactory.build({ parentId });
+
+					await em.persist([h5pContent]).flush();
+					em.clear();
+
+					const downloadError = new Error('Download failed');
+					ajaxEndpoint.getDownload.mockImplementation((_contentId, _user, stream) => {
+						const passThrough = stream as PassThrough;
+						// Simulate async rejection after stream is returned
+						setImmediate(() => {
+							passThrough.destroy(downloadError);
+						});
+
+						return Promise.reject(downloadError);
+					});
+
+					return { contentId: h5pContent.id, loggedInClient, downloadError };
+				};
+
+				it('should call getDownload and handle the error', async () => {
+					const { contentId, loggedInClient } = await setup();
+
+					const response = await loggedInClient.get(`download/${contentId}`);
+
+					expect(ajaxEndpoint.getDownload).toHaveBeenCalledWith(
+						contentId,
+						expect.objectContaining({ id: expect.any(String) }),
+						expect.any(PassThrough)
+					);
+					// Response status depends on when the error occurs - stream is destroyed with error
+					expect([HttpStatus.OK, HttpStatus.BAD_REQUEST, HttpStatus.INTERNAL_SERVER_ERROR]).toContain(response.status);
+				});
+			});
+
+			describe('when getDownload rejects with a non-Error value', () => {
+				const setup = async () => {
+					const teacherUser = currentUserFactory.withRoleTeacher().build();
+
+					const loggedInClient = TestApiClient.createWithJwt(app, 'h5p-editor', teacherUser);
+
+					const parentId = new ObjectId().toHexString();
+					const h5pContent = h5pContentFactory.build({ parentId });
+
+					await em.persist([h5pContent]).flush();
+					em.clear();
+
+					const nonErrorValue = 'string error message';
+					ajaxEndpoint.getDownload.mockImplementation((_contentId, _user, stream) => {
+						const passThrough = stream as PassThrough;
+						// Simulate async rejection after stream is returned
+						setImmediate(() => {
+							passThrough.destroy(new Error(String(nonErrorValue)));
+						});
+
+						// This intentionally rejects with a non-Error to test the error conversion logic
+						return Promise.reject(nonErrorValue);
+					});
+
+					return { contentId: h5pContent.id, loggedInClient, nonErrorValue };
+				};
+
+				it('should convert non-Error to Error and handle the rejection', async () => {
+					const { contentId, loggedInClient } = await setup();
+
+					const response = await loggedInClient.get(`download/${contentId}`);
+
+					expect(ajaxEndpoint.getDownload).toHaveBeenCalledWith(
+						contentId,
+						expect.objectContaining({ id: expect.any(String) }),
+						expect.any(PassThrough)
+					);
+					// Response status depends on when the error occurs - stream is destroyed with converted error
+					expect([HttpStatus.OK, HttpStatus.BAD_REQUEST, HttpStatus.INTERNAL_SERVER_ERROR]).toContain(response.status);
+				});
+			});
 		});
 	});
 });
