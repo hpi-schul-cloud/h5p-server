@@ -184,6 +184,40 @@ describe('H5PEditor Controller - Download (api)', () => {
 				});
 			});
 
+			describe('when content title ends with trailing dots', () => {
+				const setup = async () => {
+					const teacherUser = currentUserFactory.withRoleTeacher().build();
+
+					const loggedInClient = TestApiClient.createWithJwt(app, 'h5p-editor', teacherUser);
+
+					const parentId = new ObjectId().toHexString();
+					const h5pContent = h5pContentFactory.build({ parentId });
+					h5pContent.metadata.title = 'TestTitle...';
+
+					await em.persist([h5pContent]).flush();
+					em.clear();
+
+					ajaxEndpoint.getDownload.mockImplementation((_contentId, _user, stream) => {
+						const passThrough = stream as PassThrough;
+						passThrough.write('PK');
+						passThrough.end();
+
+						return Promise.resolve();
+					});
+
+					return { contentId: h5pContent.id, loggedInClient };
+				};
+
+				it('should remove trailing dots from filename in Content-Disposition header', async () => {
+					const { contentId, loggedInClient } = await setup();
+
+					const response = await loggedInClient.get(`download/${contentId}`);
+
+					expect(response.headers['content-disposition']).toContain('filename="TestTitle.h5p"');
+					expect(response.headers['content-disposition']).not.toContain('filename="TestTitle...');
+				});
+			});
+
 			describe('when content title contains non-latin1 characters', () => {
 				const setup = async () => {
 					const teacherUser = currentUserFactory.withRoleTeacher().build();
