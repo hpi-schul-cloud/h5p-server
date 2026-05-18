@@ -1,4 +1,5 @@
 import { ConfigurationModule } from '@infra/configuration';
+import { ErrorModule } from '@infra/error';
 import { LoggerModule } from '@infra/logger';
 import { S3ClientModule } from '@infra/s3-client';
 import { H5PAjaxEndpoint, H5PEditor, H5PPlayer } from '@lumieducation/h5p-server';
@@ -11,7 +12,6 @@ import { H5P_LIBRARIES_S3_CLIENT_CONFIG_TOKEN, H5PLibrariesS3ClientConfig } from
 import { H5PAjaxEndpointProvider, H5PCacheProvider, H5PEditorProvider, H5PPlayerProvider } from './provider';
 import { H5PContentRepo, LibraryRepo } from './repo';
 import { ContentStorage, H5pEditorContentService, LibraryStorage, TemporaryFileStorage } from './service';
-import { ErrorModule } from '@infra/error';
 
 @Module({
 	imports: [
@@ -45,6 +45,7 @@ import { ErrorModule } from '@infra/error';
 	exports: [
 		ContentStorage,
 		LibraryStorage,
+		H5PCacheProvider,
 		H5PEditor,
 		H5PPlayer,
 		H5PAjaxEndpoint,

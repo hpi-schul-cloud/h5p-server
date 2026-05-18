@@ -1,7 +1,7 @@
 /* istanbul ignore file */
 
 import { Logger } from '@infra/logger/logger';
-import { H5PLibraryManagementJobModule, H5PLibraryManagementService } from '@modules/h5p-content-management';
+import { H5PLibraryManagementJobModule, H5PLibraryManagementService } from '@modules/h5p-library-managment';
 import { NestFactory } from '@nestjs/core';
 import { install as sourceMapInstall } from 'source-map-support';
 import { AppStartLoggable } from './helpers';

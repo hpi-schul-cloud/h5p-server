@@ -7,14 +7,17 @@ import {
 	ILibraryName,
 } from '@lumieducation/h5p-server/build/src/types';
 import { ObjectId } from '@mikro-orm/mongodb';
+import { H5P_CACHE_PROVIDER_TOKEN } from '@modules/h5p-content-management/provider';
+import { ContentStorage } from '@modules/h5p-content-management/service/content-storage.service';
+import { LibraryStorage } from '@modules/h5p-content-management/service/library-storage.service';
 import { Test, TestingModule } from '@nestjs/testing';
-import { H5P_EDITOR_CONFIG_TOKEN } from '../h5p-editor.config';
+import {
+	ILibraryAdministrationOverviewItemTestFactory,
+	ILibraryInstallResultTestFactory,
+} from '../../../h5p-content-management/testing';
+import { H5P_LIBRARY_MANAGEMENT_CONFIG_TOKEN } from '../../h5p-library-managment.config';
 import { H5pConsistencyError, H5pTimeoutError } from '../interface';
-import { H5P_CACHE_PROVIDER_TOKEN } from '../provider';
-import { ILibraryAdministrationOverviewItemTestFactory, ILibraryInstallResultTestFactory } from '../testing';
-import { ContentStorage } from './content-storage.service';
 import { H5PLibraryManagementService } from './h5p-library-management.service';
-import { LibraryStorage } from './library-storage.service';
 
 describe('H5PLibraryManagementService', () => {
 	let module: TestingModule;
@@ -49,7 +52,7 @@ describe('H5PLibraryManagementService', () => {
 					useValue: createMock<ContentStorage>(),
 				},
 				{
-					provide: H5P_EDITOR_CONFIG_TOKEN,
+					provide: H5P_LIBRARY_MANAGEMENT_CONFIG_TOKEN,
 					useValue: {
 						installLibraryLockMaxOccupationTime: 5000,
 						libraryList: libraryWishList,

@@ -18,12 +18,14 @@ import {
 	ILibraryMetadata,
 	ILibraryName,
 } from '@lumieducation/h5p-server/build/src/types';
+import { H5pDefaultUserFactory } from '@modules/h5p-content-management/factory';
+import { H5P_CACHE_PROVIDER_TOKEN } from '@modules/h5p-content-management/provider';
+import { ContentStorage, LibraryStorage } from '@modules/h5p-content-management/service';
 import { Inject, Injectable } from '@nestjs/common';
 import { TypeGuard } from '@shared/guard';
 import { Cache } from 'cache-manager';
 import { Readable } from 'node:stream';
-import { H5pDefaultUserFactory } from '../factory';
-import { H5P_EDITOR_CONFIG_TOKEN, H5PEditorConfig } from '../h5p-editor.config';
+import { H5P_LIBRARY_MANAGEMENT_CONFIG_TOKEN, H5PLibraryManagementConfig } from '../../h5p-library-managment.config';
 import { H5pConsistencyError, H5pTimeoutError } from '../interface';
 import {
 	H5PLibraryManagementErrorLoggable,
@@ -31,10 +33,7 @@ import {
 	H5PLibraryManagementLoggable,
 	H5PLibraryManagementMetricsLoggable,
 } from '../loggable';
-import { H5P_CACHE_PROVIDER_TOKEN } from '../provider/h5p-cache.provider';
-import { ContentStorage } from './content-storage.service';
 import LibraryManagementPermissionSystem from './library-management-permission-system';
-import { LibraryStorage } from './library-storage.service';
 
 @Injectable()
 export class H5PLibraryManagementService {
@@ -47,7 +46,7 @@ export class H5PLibraryManagementService {
 	constructor(
 		private readonly libraryStorage: LibraryStorage,
 		private readonly contentStorage: ContentStorage,
-		@Inject(H5P_EDITOR_CONFIG_TOKEN) private readonly config: H5PEditorConfig,
+		@Inject(H5P_LIBRARY_MANAGEMENT_CONFIG_TOKEN) private readonly config: H5PLibraryManagementConfig,
 		@Inject(H5P_CACHE_PROVIDER_TOKEN) private readonly cacheAdapter: Cache,
 		private readonly logger: Logger
 	) {
