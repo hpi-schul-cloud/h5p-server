@@ -12,8 +12,8 @@ import {
 	H5PContentParentType,
 	LibraryStorage,
 } from '@modules/h5p-core';
+import { TemporaryFileStorage } from '@modules/h5p-core/domain';
 import { H5PContent, H5PContentProperties } from '@modules/h5p-core/repo';
-import { TemporaryFileStorage } from '@modules/h5p-core/service';
 import { h5pContentFactory } from '@modules/h5p-core/testing';
 import { HttpStatus, INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';

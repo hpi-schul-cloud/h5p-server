@@ -1,9 +1,9 @@
 import { createMock, DeepMocked } from '@golevelup/ts-jest';
 import { InternalServerErrorException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
+import { H5PContentRepo } from '../../repo';
+import { h5pContentFactory, h5pCopyContentParamsFactory } from '../../testing';
 import { H5pEditorContentInvalidIdLoggableException } from '../loggable';
-import { H5PContentRepo } from '../repo';
-import { h5pContentFactory, h5pCopyContentParamsFactory } from '../testing';
 import { ContentStorage } from './content-storage.service';
 import { H5pEditorContentService } from './h5p-editor-content.service';
 

@@ -1,7 +1,7 @@
 import { ObjectId } from '@mikro-orm/mongodb';
 import { BaseFactory } from '@testing/factory/base.factory';
+import { H5PContentParentType } from '../domain';
 import { ContentMetadata, H5PContent, H5PContentProperties, InstalledLibrary } from '../repo';
-import { H5PContentParentType } from '../types';
 
 class H5PContentFactory extends BaseFactory<H5PContent, H5PContentProperties> {
 	public withMainLibrary(library: InstalledLibrary): this {

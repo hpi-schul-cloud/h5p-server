@@ -3,7 +3,7 @@ import { EntityName } from '@mikro-orm/core';
 import { Injectable } from '@nestjs/common';
 import { EntityId } from '@shared/domain/types';
 import { BaseRepo } from '@shared/repo/base.repo';
-import { H5PCountUsageResult } from '../types';
+import { H5PCountUsageResult } from '../domain';
 import { H5PContent } from './entity';
 
 @Injectable()

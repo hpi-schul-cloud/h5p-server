@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { EntityId } from '@shared/domain/types';
 import { isMongoId } from 'class-validator';
+import { H5PContent, H5PContentRepo } from '../../repo';
 import { H5pEditorContentInvalidIdLoggableException } from '../loggable';
-import { H5PContent, H5PContentRepo } from '../repo';
 import { H5PContentParentType } from '../types';
 import { ContentStorage } from './content-storage.service';
 

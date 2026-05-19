@@ -1,7 +1,6 @@
 import { ObjectId } from '@mikro-orm/mongodb';
 import { Factory } from 'fishery';
-import { H5pCopyContentParams } from '../service';
-import { H5PContentParentType } from '../types';
+import { H5pCopyContentParams, H5PContentParentType } from '../domain';
 
 export const h5pCopyContentParamsFactory = Factory.define<H5pCopyContentParams>(() => {
 	const params: H5pCopyContentParams = {

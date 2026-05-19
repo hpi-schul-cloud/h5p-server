@@ -13,9 +13,9 @@ import {
 import { Test, TestingModule } from '@nestjs/testing';
 import { BaseEntity } from '@shared/domain/entity';
 import { Readable } from 'stream';
-import { H5P_CONTENT_S3_CLIENT_INJECTION_TOKEN } from '../h5p-editor.const';
-import { H5PContent, H5PContentProperties, H5PContentRepo } from '../repo';
-import { h5pContentFactory } from '../testing';
+import { H5P_CONTENT_S3_CLIENT_INJECTION_TOKEN } from '../../h5p-editor.const';
+import { H5PContent, H5PContentProperties, H5PContentRepo } from '../../repo';
+import { h5pContentFactory } from '../../testing';
 import { H5PContentParentParams, H5PContentParentType, LumiUserWithContentData } from '../types';
 import { ContentStorage } from './content-storage.service';
 

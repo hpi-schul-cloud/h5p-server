@@ -6,8 +6,8 @@ import { NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import pLimit from 'p-limit';
 import { Readable } from 'stream';
-import { H5P_LIBRARIES_S3_CLIENT_INJECTION_TOKEN } from '../h5p-editor.const';
-import { FileMetadata, InstalledLibrary, LibraryRepo } from '../repo';
+import { H5P_LIBRARIES_S3_CLIENT_INJECTION_TOKEN } from '../../h5p-editor.const';
+import { FileMetadata, InstalledLibrary, LibraryRepo } from '../../repo';
 import { LibraryStorage } from './library-storage.service';
 
 function readStream(stream: Readable): Promise<string> {

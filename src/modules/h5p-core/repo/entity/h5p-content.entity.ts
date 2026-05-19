@@ -4,7 +4,7 @@ import { Embeddable, Embedded, Entity, Enum, Index, JsonType, Property } from '@
 import { ObjectId } from '@mikro-orm/mongodb';
 import { BaseEntityWithTimestamps } from '@shared/domain/entity';
 import { EntityId } from '@shared/domain/types';
-import { H5PContentParentType } from '../../types';
+import { H5PContentParentType } from '../../domain';
 
 @Embeddable()
 export class ContentMetadata implements IContentMetadata {

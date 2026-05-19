@@ -1,5 +1,5 @@
 import { ObjectId } from '@mikro-orm/mongodb';
-import { H5PContentParentType } from '../../types';
+import { H5PContentParentType } from '../../domain';
 import { ContentMetadata, H5PContent, H5PContentProperties } from './h5p-content.entity';
 
 describe(H5PContent.name, () => {

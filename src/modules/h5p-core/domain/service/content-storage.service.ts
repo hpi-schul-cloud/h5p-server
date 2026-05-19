@@ -19,8 +19,8 @@ import {
 	UnprocessableEntityException,
 } from '@nestjs/common';
 import { Readable } from 'node:stream';
-import { H5P_CONTENT_S3_CLIENT_INJECTION_TOKEN } from '../h5p-editor.const';
-import { H5PContent, H5PContentRepo } from '../repo';
+import { H5P_CONTENT_S3_CLIENT_INJECTION_TOKEN } from '../../h5p-editor.const';
+import { H5PContent, H5PContentRepo } from '../../repo';
 import { H5PCountUsageResult, LumiUserWithContentData } from '../types';
 import { H5pFileVo } from '../vo';
 

@@ -15,8 +15,8 @@ import mime from 'mime';
 import path from 'node:path/posix';
 import { Readable } from 'node:stream';
 import pLimit from 'p-limit';
-import { H5P_LIBRARIES_S3_CLIENT_INJECTION_TOKEN } from '../h5p-editor.const';
-import { InstalledLibrary, LibraryRepo } from '../repo';
+import { H5P_LIBRARIES_S3_CLIENT_INJECTION_TOKEN } from '../../h5p-editor.const';
+import { InstalledLibrary, LibraryRepo } from '../../repo';
 import { H5pFileVo } from '../vo';
 
 enum LibraryDependencyType {
