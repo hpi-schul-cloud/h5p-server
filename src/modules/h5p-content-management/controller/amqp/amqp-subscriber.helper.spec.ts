@@ -73,13 +73,13 @@ describe('registerAmqpSubscriber', () => {
 
 			let subscriberCallback: (payload: TestPayload) => Promise<void>;
 
-			/* eslint-disable @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-return, @typescript-eslint/no-explicit-any */
+			/* eslint-disable @typescript-eslint/no-explicit-any */
 			amqpConnection.createSubscriber.mockImplementation(((callback: any) => {
 				subscriberCallback = callback;
 
 				return Promise.resolve({});
 			}) as any);
-			/* eslint-enable @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-return, @typescript-eslint/no-explicit-any */
+			/* eslint-enable @typescript-eslint/no-explicit-any */
 
 			return {
 				exchangeName,
@@ -118,13 +118,13 @@ describe('registerAmqpSubscriber', () => {
 
 			let errorHandler: (channel: Channel, msg: ConsumeMessage, error: unknown) => Promise<void>;
 
-			/* eslint-disable @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-explicit-any */
+			/* eslint-disable @typescript-eslint/no-explicit-any */
 			amqpConnection.createSubscriber.mockImplementation(((_callback: any, options: any) => {
 				errorHandler = options.errorHandler;
 
 				return Promise.resolve({});
 			}) as any);
-			/* eslint-enable @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-explicit-any */
+			/* eslint-enable @typescript-eslint/no-explicit-any */
 
 			return {
 				exchangeName,
@@ -173,13 +173,13 @@ describe('registerAmqpSubscriber', () => {
 
 			let subscriberCallback: (payload: TestPayload) => Promise<void>;
 
-			/* eslint-disable @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-return, @typescript-eslint/no-explicit-any */
+			/* eslint-disable @typescript-eslint/no-explicit-any */
 			amqpConnection.createSubscriber.mockImplementation(((callback: any) => {
 				subscriberCallback = callback;
 
 				return Promise.resolve({});
 			}) as any);
-			/* eslint-enable @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-return, @typescript-eslint/no-explicit-any */
+			/* eslint-enable @typescript-eslint/no-explicit-any */
 
 			return {
 				exchangeName,
@@ -214,13 +214,13 @@ describe('registerAmqpSubscriber', () => {
 
 			let subscriberCallback: (payload: TestPayload | null | undefined) => Promise<void>;
 
-			/* eslint-disable @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-return, @typescript-eslint/no-explicit-any */
+			/* eslint-disable @typescript-eslint/no-explicit-any */
 			amqpConnection.createSubscriber.mockImplementation(((callback: any) => {
 				subscriberCallback = callback;
 
 				return Promise.resolve({});
 			}) as any);
-			/* eslint-enable @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-return, @typescript-eslint/no-explicit-any */
+			/* eslint-enable @typescript-eslint/no-explicit-any */
 
 			return {
 				exchangeName,

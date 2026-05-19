@@ -487,6 +487,18 @@ describe('LibraryStorage', () => {
 				expect(result.mimetype).toBeDefined();
 				expect(result.mimetype).toEqual('application/json');
 			});
+
+			it('should fail if filename is empty', async () => {
+				const { ubername } = await setup();
+
+				await expect(storage.getLibraryFile(ubername, '')).rejects.toThrow('illegal-filename');
+			});
+
+			it('should fail if filename targets a directory', async () => {
+				const { ubername } = await setup();
+
+				await expect(storage.getLibraryFile(ubername, 'language/')).rejects.toThrow('illegal-filename');
+			});
 		});
 	});
 
@@ -768,6 +780,16 @@ describe('LibraryStorage', () => {
 
 			// @ts-expect-error test
 			s3ClientAdapter.list.mockResolvedValueOnce({ files: [testFile.name] });
+
+			const files = await storage.listFiles(testingLib);
+			expect(files).toEqual([testFile.name, 'library.json']);
+		});
+
+		it('should filter out directory marker entries', async () => {
+			const { testingLib, testFile } = await setup();
+
+			// @ts-expect-error test
+			s3ClientAdapter.list.mockResolvedValueOnce({ files: [testFile.name, 'nested/', ''] });
 
 			const files = await storage.listFiles(testingLib);
 			expect(files).toEqual([testFile.name, 'library.json']);

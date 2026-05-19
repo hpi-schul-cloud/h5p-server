@@ -15,12 +15,12 @@ export class H5PEditorConfig {
 	@ConfigProperty('H5P_EDITOR__MAX_FILE_SIZE_IN_BYTES')
 	@IsNumber()
 	@StringToNumber()
-	maxFileSize = 1024 * 1024 * 1024; // 1 GB
+	maxFileSize = 2.5 * 1024 * 1024 * 1024; // 2.5 GB
 
 	@ConfigProperty('H5P_EDITOR__MAX_TOTAL_SIZE_IN_BYTES')
 	@IsNumber()
 	@StringToNumber()
-	maxTotalSize = 1024 * 1024 * 1024; // 1 GB
+	maxTotalSize = 2.5 * 1024 * 1024 * 1024; // 2.5 GB
 
 	@ConfigProperty('H5P_EDITOR__INSTALL_LIBRARY_LOCK_MAX_OCCUPATION_TIME')
 	@StringToNumber()
