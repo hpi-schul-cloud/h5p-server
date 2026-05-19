@@ -7,14 +7,13 @@ import {
 	ILibraryName,
 } from '@lumieducation/h5p-server/build/src/types';
 import { ObjectId } from '@mikro-orm/mongodb';
-import { H5P_CACHE_PROVIDER_TOKEN } from '@modules/h5p-content-management/provider';
-import { ContentStorage } from '@modules/h5p-content-management/service/content-storage.service';
-import { LibraryStorage } from '@modules/h5p-content-management/service/library-storage.service';
+import { ContentStorage, LibraryStorage } from '@modules/h5p-core';
+import { H5P_CACHE_PROVIDER_TOKEN } from '@modules/h5p-core/provider';
 import { Test, TestingModule } from '@nestjs/testing';
 import {
 	ILibraryAdministrationOverviewItemTestFactory,
 	ILibraryInstallResultTestFactory,
-} from '../../../h5p-content-management/testing';
+} from '../../../h5p-core/testing';
 import { H5P_LIBRARY_MANAGEMENT_CONFIG_TOKEN } from '../../h5p-library-managment.config';
 import { H5pConsistencyError, H5pTimeoutError } from '../interface';
 import { H5PLibraryManagementService } from './h5p-library-management.service';

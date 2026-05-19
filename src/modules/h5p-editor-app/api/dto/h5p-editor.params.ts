@@ -1,6 +1,6 @@
 /* eslint-disable max-classes-per-file */
 import { IContentMetadata } from '@lumieducation/h5p-server';
-import { H5PContentParentType, LanguageType } from '@modules/h5p-content-management';
+import { H5PContentParentType, LanguageType } from '@modules/h5p-core';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { EntityId } from '@shared/domain/types';
 import { IsEnum, IsMongoId, IsNotEmpty, IsObject, IsOptional, IsString } from 'class-validator';

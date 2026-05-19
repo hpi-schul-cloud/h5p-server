@@ -4,6 +4,7 @@ import { MeResponse } from '@infra/authorization-client/authorization-api-client
 import { S3ClientAdapter } from '@infra/s3-client';
 import { AjaxErrorResponse, H5PAjaxEndpoint, H5pError } from '@lumieducation/h5p-server';
 import { EntityManager } from '@mikro-orm/mongodb';
+import { H5P_CONTENT_S3_CLIENT_INJECTION_TOKEN, H5P_LIBRARIES_S3_CLIENT_INJECTION_TOKEN } from '@modules/h5p-core';
 import { HttpStatus, INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { cleanupCollections } from '@testing/database';
@@ -15,10 +16,6 @@ import {
 	RequestTimeoutConfig,
 } from '../../h5p-editor-app.config';
 import { H5PEditorTestModule } from '../../h5p-editor-test.module';
-import {
-	H5P_CONTENT_S3_CLIENT_INJECTION_TOKEN,
-	H5P_LIBRARIES_S3_CLIENT_INJECTION_TOKEN,
-} from '@modules/h5p-content-management';
 
 describe('H5PEditor Controller (api)', () => {
 	let app: INestApplication;

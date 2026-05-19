@@ -18,9 +18,9 @@ import {
 	ILibraryMetadata,
 	ILibraryName,
 } from '@lumieducation/h5p-server/build/src/types';
-import { H5pDefaultUserFactory } from '@modules/h5p-content-management/factory';
-import { H5P_CACHE_PROVIDER_TOKEN } from '@modules/h5p-content-management/provider';
-import { ContentStorage, LibraryStorage } from '@modules/h5p-content-management/service';
+import { ContentStorage, LibraryStorage } from '@modules/h5p-core';
+import { H5pDefaultUserFactory } from '@modules/h5p-core/factory';
+import { H5P_CACHE_PROVIDER_TOKEN } from '@modules/h5p-core/provider';
 import { Inject, Injectable } from '@nestjs/common';
 import { TypeGuard } from '@shared/guard';
 import { Cache } from 'cache-manager';

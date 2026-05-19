@@ -5,21 +5,21 @@ import { S3ClientAdapter } from '@infra/s3-client';
 import { IFileStats, ILibraryName } from '@lumieducation/h5p-server';
 import { ContentMetadata } from '@lumieducation/h5p-server/build/src/ContentMetadata';
 import { EntityManager, ObjectId } from '@mikro-orm/mongodb';
+import {
+	ContentStorage,
+	H5P_CONTENT_S3_CLIENT_INJECTION_TOKEN,
+	H5P_LIBRARIES_S3_CLIENT_INJECTION_TOKEN,
+	H5PContentParentType,
+	LibraryStorage,
+} from '@modules/h5p-core';
+import { H5PContent, H5PContentProperties } from '@modules/h5p-core/repo';
+import { TemporaryFileStorage } from '@modules/h5p-core/service';
+import { h5pContentFactory } from '@modules/h5p-core/testing';
 import { HttpStatus, INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { TestApiClient } from '@testing/test-api-client';
-import { Readable } from 'stream';
+import { Readable } from 'node:stream';
 import { H5PEditorTestModule } from '../../h5p-editor-test.module';
-import {
-	H5PContentParentType,
-	ContentStorage,
-	LibraryStorage,
-	H5P_CONTENT_S3_CLIENT_INJECTION_TOKEN,
-	H5P_LIBRARIES_S3_CLIENT_INJECTION_TOKEN,
-} from '@modules/h5p-content-management';
-import { H5PContentProperties, H5PContent } from '@modules/h5p-content-management/repo';
-import { TemporaryFileStorage } from '@modules/h5p-content-management/service';
-import { h5pContentFactory } from '@modules/h5p-content-management/testing';
 
 const helpers = {
 	buildMetadata(

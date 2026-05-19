@@ -9,8 +9,8 @@ import { CoreModule } from '@infra/core';
 import { DATABASE_CONFIG_TOKEN, DatabaseConfig, DatabaseModule } from '@infra/database';
 import { ErrorModule } from '@infra/error';
 import { LoggerModule } from '@infra/logger';
-import { H5PEditorModule } from '@modules/h5p-content-management';
-import { ENTITIES } from '@modules/h5p-content-management/h5p-editor.entity.exports';
+import { H5PEditorModule } from '@modules/h5p-core';
+import { ENTITIES } from '@modules/h5p-core/h5p-editor.entity.exports';
 import { Module } from '@nestjs/common';
 import { H5PEditorController, H5PEditorUc } from './api';
 import {

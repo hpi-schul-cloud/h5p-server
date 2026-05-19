@@ -1,5 +1,5 @@
 import { ConfigProperty, Configuration } from '@infra/configuration';
-import { H5P_AVAILABLE_LIBRARIES } from '@modules/h5p-content-management/h5p-editor.const';
+import { H5P_AVAILABLE_LIBRARIES } from '@modules/h5p-core';
 import { CommaSeparatedStringToArray, StringToNumber } from '@shared/transformer';
 import { IsNumber, IsString } from 'class-validator';
 

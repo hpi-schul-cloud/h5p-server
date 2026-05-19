@@ -30,7 +30,7 @@ import {
 	LanguageType,
 	LibraryStorage,
 	LumiUserWithContentData,
-} from '@modules/h5p-content-management';
+} from '@modules/h5p-core';
 import {
 	BadRequestException,
 	HttpException,

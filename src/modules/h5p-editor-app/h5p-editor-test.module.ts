@@ -1,4 +1,4 @@
-import { TEST_ENTITIES } from '@modules/h5p-content-management/h5p-editor.entity.exports';
+import { TEST_ENTITIES } from '@modules/h5p-core/h5p-editor.entity.exports';
 import { Module } from '@nestjs/common';
 import { MongoMemoryDatabaseModule } from '@testing/database';
 import { controllers, imports, providers } from './h5p-editor.app.module';

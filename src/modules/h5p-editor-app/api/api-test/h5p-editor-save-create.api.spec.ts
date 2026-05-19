@@ -7,7 +7,7 @@ import {
 	H5P_CONTENT_S3_CLIENT_INJECTION_TOKEN,
 	H5P_LIBRARIES_S3_CLIENT_INJECTION_TOKEN,
 	H5PContentParentType,
-} from '@modules/h5p-content-management';
+} from '@modules/h5p-core';
 import { HttpStatus, INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { cleanupCollections } from '@testing/database';

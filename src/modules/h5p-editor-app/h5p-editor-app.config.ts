@@ -1,6 +1,6 @@
 import { ConfigProperty, Configuration } from '@infra/configuration';
 import { TimeoutInterceptorConfig } from '@infra/core/interceptor';
-import { H5P_AVAILABLE_LIBRARIES, LanguageType } from '@modules/h5p-content-management';
+import { H5P_AVAILABLE_LIBRARIES, LanguageType } from '@modules/h5p-core';
 import { CommaSeparatedStringToArray, StringToNumber } from '@shared/transformer';
 import { IsEnum, IsNumber, IsString } from 'class-validator';
 

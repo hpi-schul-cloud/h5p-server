@@ -1,5 +1,5 @@
 import { AuthorizationBodyParamsReferenceType } from '@infra/authorization-client';
-import { H5PContentParentType } from '@modules/h5p-content-management';
+import { H5PContentParentType } from '@modules/h5p-core';
 import { NotImplementedException } from '@nestjs/common';
 
 export class H5PContentMapper {

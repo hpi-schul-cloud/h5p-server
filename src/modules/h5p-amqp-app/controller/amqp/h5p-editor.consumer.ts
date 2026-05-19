@@ -3,8 +3,7 @@ import { Logger } from '@infra/logger';
 import { registerAmqpSubscriber } from '@infra/rabbitmq';
 import { H5PEditor, IUser as LumiIUser } from '@lumieducation/h5p-server';
 import { MikroORM, RequestContext } from '@mikro-orm/core';
-import { H5pEditorContentService } from '@modules/h5p-content-management/service';
-import { H5PContentParentType } from '@modules/h5p-content-management/types';
+import { H5PContentParentType, H5pEditorContentService } from '@modules/h5p-core';
 import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
 import { CopyContentParams, DeleteContentParams, H5pEditorEvents } from '../../domain/interface';
 import {
