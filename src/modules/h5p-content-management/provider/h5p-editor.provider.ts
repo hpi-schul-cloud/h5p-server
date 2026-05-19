@@ -2,7 +2,7 @@ import { cacheImplementations, H5PEditor } from '@lumieducation/h5p-server';
 import { IH5PEditorOptions, ITranslationFunction } from '@lumieducation/h5p-server/build/src/types';
 import SvgSanitizer from '@lumieducation/h5p-svg-sanitizer';
 import { Cache } from 'cache-manager';
-import { H5P_EDITOR_CONFIG_TOKEN, H5PEditorConfig } from '../h5p-editor.config';
+import { H5P_CORE_CONFIG_TOKEN, H5PCoreConfig } from '../h5p-core.config';
 import { ContentStorage, LibraryStorage, TemporaryFileStorage, Translator } from '../service';
 import { h5pConfig, h5pUrlGenerator } from '../service/config/h5p-service-config';
 import EditorPermissionSystem from './editor-permission-system';
@@ -10,13 +10,13 @@ import { H5P_CACHE_PROVIDER_TOKEN } from './h5p-cache.provider';
 
 export const H5PEditorProvider = {
 	provide: H5PEditor,
-	inject: [ContentStorage, LibraryStorage, TemporaryFileStorage, H5P_CACHE_PROVIDER_TOKEN, H5P_EDITOR_CONFIG_TOKEN],
+	inject: [ContentStorage, LibraryStorage, TemporaryFileStorage, H5P_CACHE_PROVIDER_TOKEN, H5P_CORE_CONFIG_TOKEN],
 	async useFactory(
 		contentStorage: ContentStorage,
 		libraryStorage: LibraryStorage,
 		temporaryStorage: TemporaryFileStorage,
 		cacheAdapter: Cache,
-		h5pEditorConfig: H5PEditorConfig
+		h5pEditorConfig: H5PCoreConfig
 	): Promise<H5PEditor> {
 		const cache = new cacheImplementations.CachedKeyValueStorage('kvcache', cacheAdapter);
 		const cachedLibraryStorage = new cacheImplementations.CachedLibraryStorage(libraryStorage, cacheAdapter);

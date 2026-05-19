@@ -1,6 +1,6 @@
 import { cacheImplementations, H5PPlayer, ITranslationFunction } from '@lumieducation/h5p-server';
 import { Cache } from 'cache-manager';
-import { H5P_EDITOR_CONFIG_TOKEN, H5PEditorConfig } from '../h5p-editor.config';
+import { H5P_CORE_CONFIG_TOKEN, H5PCoreConfig } from '../h5p-core.config';
 import { h5pConfig, h5pUrlGenerator } from '../service/config/h5p-service-config';
 import { ContentStorage } from '../service/content-storage.service';
 import { Translator } from '../service/h5p-translator.service';
@@ -9,12 +9,12 @@ import { H5P_CACHE_PROVIDER_TOKEN } from './h5p-cache.provider';
 
 export const H5PPlayerProvider = {
 	provide: H5PPlayer,
-	inject: [ContentStorage, LibraryStorage, H5P_CACHE_PROVIDER_TOKEN, H5P_EDITOR_CONFIG_TOKEN],
+	inject: [ContentStorage, LibraryStorage, H5P_CACHE_PROVIDER_TOKEN, H5P_CORE_CONFIG_TOKEN],
 	useFactory: async (
 		contentStorage: ContentStorage,
 		libraryStorage: LibraryStorage,
 		cacheAdapter: Cache,
-		h5pEditorConfig: H5PEditorConfig
+		h5pEditorConfig: H5PCoreConfig
 	): Promise<H5PPlayer> => {
 		const libraryCache = new cacheImplementations.CachedLibraryStorage(libraryStorage, cacheAdapter);
 		const { availableLanguages, maxFileSize, maxTotalSize } = h5pEditorConfig;

@@ -129,4 +129,15 @@ describe(H5pEditorContentService.name, () => {
 			});
 		});
 	});
+
+	describe('getContentById', () => {
+		it('should return the content of the given id', async () => {
+			const content = h5pContentFactory.build();
+			h5PContentRepo.findById.mockResolvedValueOnce(content);
+
+			const result = await service.getContentById(content.id);
+
+			expect(result).toEqual(content);
+		});
+	});
 });

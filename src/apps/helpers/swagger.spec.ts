@@ -1,4 +1,4 @@
-import { H5PEditorTestModule } from '@modules/h5p-content-management/h5p-editor-test.module';
+import { H5PEditorTestModule } from '@modules/h5p-editor-app/h5p-editor-test.module';
 import { INestApplication } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import type { Server } from 'node:net';

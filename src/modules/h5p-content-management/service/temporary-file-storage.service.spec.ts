@@ -5,7 +5,6 @@ import { HttpException, InternalServerErrorException, NotAcceptableException, No
 import { Test, TestingModule } from '@nestjs/testing';
 import { ReadStream } from 'fs';
 import { Readable } from 'node:stream';
-import { GetH5PFileResponse } from '../controller/dto';
 import { H5P_CONTENT_S3_CLIENT_INJECTION_TOKEN } from '../h5p-editor.const';
 import { TemporaryFileStorage } from './temporary-file-storage.service';
 
@@ -258,7 +257,7 @@ describe('TemporaryFileStorage', () => {
 		const setup = () => {
 			const filename = 'testfile.txt';
 			const fileStream = Readable.from('content');
-			const fileResponse = createMock<GetH5PFileResponse>({ data: fileStream });
+			const fileResponse = createMock({ data: fileStream });
 			const user = helpers.createUser();
 			const userID = user.id;
 

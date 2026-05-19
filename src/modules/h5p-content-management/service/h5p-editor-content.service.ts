@@ -43,4 +43,10 @@ export class H5pEditorContentService {
 			throw error;
 		}
 	}
+
+	public async getContentById(contentId: EntityId): Promise<H5PContent> {
+		const content = await this.h5PContentRepo.findById(contentId);
+
+		return content;
+	}
 }

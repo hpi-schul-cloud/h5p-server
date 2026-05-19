@@ -11,8 +11,8 @@ import {
 } from '@nestjs/common';
 import { ReadStream } from 'node:fs';
 import { Readable } from 'node:stream';
-import { H5pFileDto } from '../controller/dto';
 import { H5P_CONTENT_S3_CLIENT_INJECTION_TOKEN } from '../h5p-editor.const';
+import { H5pFileVo } from '../vo';
 
 @Injectable()
 export class TemporaryFileStorage implements ITemporaryFileStorage {
@@ -122,7 +122,7 @@ export class TemporaryFileStorage implements ITemporaryFileStorage {
 
 		const path = this.getFilePath(user.id, filename);
 
-		const file: H5pFileDto = {
+		const file: H5pFileVo = {
 			name: filename,
 			data: dataStream,
 			mimeType: 'application/octet-stream',

@@ -13,7 +13,6 @@ import {
 import { Test, TestingModule } from '@nestjs/testing';
 import { BaseEntity } from '@shared/domain/entity';
 import { Readable } from 'stream';
-import { GetH5PFileResponse } from '../controller/dto';
 import { H5P_CONTENT_S3_CLIENT_INJECTION_TOKEN } from '../h5p-editor.const';
 import { H5PContent, H5PContentProperties, H5PContentRepo } from '../repo';
 import { h5pContentFactory } from '../testing';
@@ -622,7 +621,7 @@ describe('ContentStorage', () => {
 			const filename = 'testfile.txt';
 			const fileStream = Readable.from('content');
 			const contentID = new ObjectId().toString();
-			const fileResponse = createMock<GetH5PFileResponse>({ data: fileStream });
+			const fileResponse = createMock({ data: fileStream });
 			const user = helpers.createUser();
 
 			const getError = new Error('Could not get file');
