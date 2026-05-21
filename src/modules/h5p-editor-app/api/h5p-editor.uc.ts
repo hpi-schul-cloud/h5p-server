@@ -47,6 +47,7 @@ import { mkdtempSync, rmSync, unlinkSync } from 'node:fs';
 import { writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
+import { PassThrough, Readable } from 'node:stream';
 import { H5P_EDITOR_CONFIG_TOKEN, H5PEditorConfig } from '../h5p-editor-app.config';
 import { H5PUcErrorLoggable, H5PUcLoggable } from '../loggable';
 import { AjaxGetQueryParams, AjaxPostBodyParams, AjaxPostQueryParams, GetLibraryFile, H5PContentResponse } from './dto';
@@ -203,6 +204,35 @@ export class H5PEditorUc {
 				this.deleteTemporarySvgFile(contentUploadFile.tempFilePath);
 			}
 		}
+	}
+
+	public async downloadH5pContent(
+		currentUser: ICurrentUser,
+		contentId: string
+	): Promise<{ filename: string; passThrough: Readable }> {
+		const {
+			parentType,
+			parentId,
+			metadata: { title },
+		} = await this.h5pContentService.getContentById(contentId);
+		await this.checkContentPermission(parentType, parentId, AuthorizationContextBuilder.write([]));
+
+		const sanitizedTitle = this.sanitizeFilename(title);
+		const filename = `${sanitizedTitle}.h5p`;
+
+		const user = this.changeUserType(currentUser.userId);
+		const passThrough = new PassThrough();
+
+		this.h5pAjaxEndpoint.getDownload(contentId, user, passThrough).catch((error: unknown) => {
+			this.logger.warning(
+				new H5PUcErrorLoggable(error, { contentId, userId: currentUser.userId }, 'Error downloading H5P content')
+			);
+			passThrough.destroy(error instanceof Error ? error : new Error(String(error)));
+		});
+
+		const result = { filename, passThrough };
+
+		return result;
 	}
 
 	private async createContentUploadFile(contentFile?: Express.Multer.File): Promise<H5PUploadFile | undefined> {
@@ -508,5 +538,19 @@ export class H5PEditorUc {
 		const userLanguage = userData.language ?? LanguageType.DE;
 
 		return userLanguage;
+	}
+
+	private sanitizeFilename(filename: string): string {
+		const truncated = filename.slice(0, 250);
+
+		let sanitized = truncated.replaceAll(/[<>:"/\\|?*\x00-\x1f]/g, '_');
+
+		while (sanitized.endsWith('.')) {
+			sanitized = sanitized.slice(0, -1);
+		}
+
+		const result = sanitized.trim().slice(0, 200);
+
+		return result || 'content';
 	}
 }

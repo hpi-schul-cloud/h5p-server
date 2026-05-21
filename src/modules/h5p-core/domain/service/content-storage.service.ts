@@ -25,6 +25,7 @@ import { H5PContent } from '../h5p-content.do';
 import { H5P_CONTENT_REPO, H5PContentRepo } from '../interface';
 import { H5PCountUsageResult, LumiUserWithContentData } from '../types';
 import { H5pFileVo } from '../vo';
+import { createLazyS3Readable } from './create-lazy-s3-readable.helper';
 
 @Injectable()
 export class ContentStorage implements IContentStorage {
@@ -153,13 +154,14 @@ export class ContentStorage implements IContentStorage {
 		return fileStats;
 	}
 
-	public async getFileStream(
+	public getFileStream(
 		contentId: string,
 		file: string,
 		_user: ILumiUser,
 		rangeStart = 0,
 		rangeEnd?: number
 	): Promise<Readable> {
+		this.checkFilename(file);
 		const filePath = this.getFilePath(contentId, file);
 
 		let range: string | undefined;
@@ -168,9 +170,10 @@ export class ContentStorage implements IContentStorage {
 			range = `bytes=${rangeStart}-${rangeEnd}`;
 		}
 
-		const { data } = await this.storageClient.get(filePath, range);
+		const storageClient = this.storageClient;
+		const lazyReadable = createLazyS3Readable(() => storageClient.get(filePath, range));
 
-		return data;
+		return Promise.resolve(lazyReadable);
 	}
 
 	public async getMetadata(contentId: string): Promise<IContentMetadata> {
@@ -211,8 +214,9 @@ export class ContentStorage implements IContentStorage {
 
 		const path = this.getContentPath(contentId);
 		const { files } = await this.storageClient.list({ path });
+		const filteredFiles = files.filter((file) => file.length > 0 && !file.endsWith('/'));
 
-		return files;
+		return filteredFiles;
 	}
 
 	public async copyAllFiles(sourceContentId: string, targetContentId: string): Promise<void> {

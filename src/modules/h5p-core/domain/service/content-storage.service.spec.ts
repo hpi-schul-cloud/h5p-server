@@ -3,7 +3,7 @@ import { createMock, DeepMocked } from '@golevelup/ts-jest';
 import { CopyFiles, S3ClientAdapter } from '@infra/s3-client';
 import { s3ObjectKeysRecursiveFactory } from '@infra/s3-client/testing';
 import { IContentMetadata, ILibraryName, IUser, LibraryName } from '@lumieducation/h5p-server';
-import { ObjectId } from '@mikro-orm/mongodb';
+import { BaseEntity, ObjectId } from '@mikro-orm/mongodb';
 import {
 	HttpException,
 	InternalServerErrorException,
@@ -17,6 +17,7 @@ import { h5pContentDoFactory, h5pContentFactory } from '../../testing';
 import { H5P_CONTENT_REPO, H5PContentRepo } from '../interface';
 import { H5PContentParentParams, H5PContentParentType, LumiUserWithContentData } from '../types';
 import { ContentStorage } from './content-storage.service';
+import { GetH5PFileResponse } from '@modules/h5p-editor-app/api/dto';
 
 const helpers = {
 	buildMetadata(
@@ -76,7 +77,33 @@ const helpers = {
 		};
 	},
 
-	repoSaveMock: () => Promise.resolve(),
+	repoSaveMock: <Entity extends BaseEntity>(entities: Entity | Entity[]) => {
+		if (!Array.isArray(entities)) {
+			entities = [entities];
+		}
+
+		for (const entity of entities) {
+			if (!entity._id) {
+				const id = new ObjectId();
+				entity._id = id;
+				entity.id = id.toString();
+			}
+		}
+
+		return Promise.resolve();
+	},
+
+	readStream(stream: Readable): Promise<string> {
+		return new Promise((resolve, reject) => {
+			const chunks: Buffer[] = [];
+
+			stream.on('data', (chunk: Buffer | string) => {
+				chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
+			});
+			stream.on('end', () => resolve(Buffer.concat(chunks).toString('utf-8')));
+			stream.on('error', reject);
+		});
+	},
 };
 
 describe('ContentStorage', () => {
@@ -608,8 +635,6 @@ describe('ContentStorage', () => {
 			const fileResponse = createMock({ data: fileStream });
 			const user = helpers.createUser();
 
-			const getError = new Error('Could not get file');
-
 			// [start, end, expected range]
 			const testRanges = [
 				[undefined, undefined, undefined],
@@ -618,40 +643,41 @@ describe('ContentStorage', () => {
 				[100, 999, 'bytes=100-999'],
 			] as const;
 
-			return { filename, contentID, fileStream, fileResponse, testRanges, user, getError };
+			return { filename, contentID, fileStream, fileResponse, testRanges, user };
 		};
 
 		describe('WHEN file exists', () => {
 			it('should S3ClientAdapter.get with range', async () => {
-				const { testRanges, contentID, filename, user, fileResponse } = setup();
+				const { testRanges } = setup();
 
 				for (const range of testRanges) {
+					const { contentID, filename, user } = setup();
+					const fileResponse = createMock<GetH5PFileResponse>({ data: Readable.from('content') });
 					s3ClientAdapter.get.mockResolvedValueOnce(fileResponse);
 
-					await service.getFileStream(contentID, filename, user, range[0], range[1]);
+					const stream = await service.getFileStream(contentID, filename, user, range[0], range[1]);
+					await helpers.readStream(stream);
 
 					expect(s3ClientAdapter.get).toHaveBeenCalledWith(expect.stringContaining(filename), range[2]);
 				}
 			});
 
 			it('should return stream from S3ClientAdapter', async () => {
-				const { fileStream, contentID, filename, user, fileResponse } = setup();
+				const { contentID, filename, user, fileResponse } = setup();
 				s3ClientAdapter.get.mockResolvedValueOnce(fileResponse);
 
 				const stream = await service.getFileStream(contentID, filename, user);
 
-				expect(stream).toBe(fileStream);
+				await expect(helpers.readStream(stream)).resolves.toBe('content');
+				expect(s3ClientAdapter.get).toHaveBeenCalledWith(expect.stringContaining(filename), undefined);
 			});
 		});
 
-		describe('WHEN S3ClientAdapter.get throws error', () => {
-			it('should throw the error', async () => {
-				const { contentID, filename, user, getError } = setup();
-				s3ClientAdapter.get.mockRejectedValueOnce(getError);
+		describe('WHEN filename is invalid', () => {
+			it('should throw error', () => {
+				const { contentID, user } = setup();
 
-				const streamPromise = service.getFileStream(contentID, filename, user);
-
-				await expect(streamPromise).rejects.toBe(getError);
+				expect(() => service.getFileStream(contentID, 'ex#ample.txt', user)).toThrow(HttpException);
 			});
 		});
 	});
@@ -754,6 +780,17 @@ describe('ContentStorage', () => {
 				const files = await service.listFiles(content.id);
 
 				expect(files).toEqual(filenames);
+			});
+
+			it('should filter out directory marker entries', async () => {
+				const { content } = setup();
+				contentRepo.existsOne.mockResolvedValueOnce(true);
+				// @ts-expect-error test case
+				s3ClientAdapter.list.mockResolvedValueOnce({ files: ['1.txt', 'nested/', '', '2.txt'] });
+
+				const files = await service.listFiles(content.id);
+
+				expect(files).toEqual(['1.txt', '2.txt']);
 			});
 		});
 

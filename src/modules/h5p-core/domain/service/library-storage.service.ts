@@ -19,6 +19,7 @@ import { H5P_LIBRARIES_S3_CLIENT_INJECTION_TOKEN } from '../../h5p-editor.const'
 import { InstalledLibrary } from '../installed-library.do';
 import { H5P_LIBRARY_REPO, HP5LibraryRepo } from '../interface';
 import { H5pFileVo } from '../vo';
+import { createLazyS3Readable } from './create-lazy-s3-readable.helper';
 
 enum LibraryDependencyType {
 	PreloadedDependencies = 'preloadedDependencies',
@@ -45,10 +46,12 @@ export class LibraryStorage implements ILibraryStorage {
 	 * @param filename the requested file
 	 */
 	private checkFilename(filename: string): void {
+		const isEmptyPath = filename.length === 0;
 		const hasPathTraversal = filename.includes('../');
 		const isAbsolutePath = filename.startsWith('/');
+		const isDirectoryPath = filename.endsWith('/');
 
-		if (hasPathTraversal || isAbsolutePath) {
+		if (isEmptyPath || hasPathTraversal || isAbsolutePath || isDirectoryPath) {
 			throw new H5pError('illegal-filename', { filename }, 400);
 		}
 	}
@@ -385,11 +388,20 @@ export class LibraryStorage implements ILibraryStorage {
 	 * @param file
 	 */
 	public async getFileStream(library: ILibraryName, file: string, readLibraryJsonFromS3 = false): Promise<Readable> {
-		const ubername = LibraryName.toUberName(library);
+		if (file === 'library.json' && !readLibraryJsonFromS3) {
+			const ubername = LibraryName.toUberName(library);
+			const response = await this.getLibraryFile(ubername, file, readLibraryJsonFromS3);
 
-		const response = await this.getLibraryFile(ubername, file, readLibraryJsonFromS3);
+			return response.stream;
+		}
 
-		return response.stream;
+		this.checkFilename(file);
+		const s3Path = this.getS3Key(library, file);
+
+		const s3Client = this.s3Client;
+		const lazyReadable = createLazyS3Readable(() => s3Client.get(s3Path));
+
+		return lazyReadable;
 	}
 
 	/**
@@ -466,12 +478,13 @@ export class LibraryStorage implements ILibraryStorage {
 		const s3Path = this.getS3Key(libraryName, '');
 
 		const { files } = await this.s3Client.list({ path: s3Path });
+		const filteredFiles = files.filter((file) => file.length > 0 && !file.endsWith('/'));
 
 		if (withMetadata) {
-			return files.concat('library.json');
+			return filteredFiles.concat('library.json');
 		}
 
-		return files;
+		return filteredFiles;
 	}
 
 	/**
