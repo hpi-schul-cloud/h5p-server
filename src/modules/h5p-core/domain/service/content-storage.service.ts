@@ -8,6 +8,7 @@ import {
 	ILibraryName,
 	IUser as ILumiUser,
 } from '@lumieducation/h5p-server';
+import { ObjectId } from '@mikro-orm/mongodb';
 import {
 	HttpException,
 	Inject,
@@ -20,14 +21,15 @@ import {
 } from '@nestjs/common';
 import { Readable } from 'node:stream';
 import { H5P_CONTENT_S3_CLIENT_INJECTION_TOKEN } from '../../h5p-editor.const';
-import { H5PContent, H5PContentRepo } from '../../repo';
+import { H5PContent } from '../h5p-content.do';
+import { H5P_CONTENT_REPO, H5PContentRepo } from '../interface';
 import { H5PCountUsageResult, LumiUserWithContentData } from '../types';
 import { H5pFileVo } from '../vo';
 
 @Injectable()
 export class ContentStorage implements IContentStorage {
 	constructor(
-		private readonly repo: H5PContentRepo,
+		@Inject(H5P_CONTENT_REPO) private readonly repo: H5PContentRepo,
 		@Inject(H5P_CONTENT_S3_CLIENT_INJECTION_TOKEN) private readonly storageClient: S3ClientAdapter
 	) {}
 
@@ -44,13 +46,17 @@ export class ContentStorage implements IContentStorage {
 			h5pContent.metadata = metadata;
 			h5pContent.content = content;
 		} else {
+			const now = new Date();
 			h5pContent = new H5PContent({
+				id: new ObjectId().toHexString(),
 				parentType: user.contentParentType,
 				parentId: user.contentParentId,
 				creatorId: user.id,
 				schoolId: user.schoolId,
 				metadata,
 				content,
+				createdAt: now,
+				updatedAt: now,
 			});
 		}
 

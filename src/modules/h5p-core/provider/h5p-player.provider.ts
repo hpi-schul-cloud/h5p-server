@@ -1,6 +1,6 @@
 import { cacheImplementations, H5PPlayer, ITranslationFunction } from '@lumieducation/h5p-server';
 import { Cache } from 'cache-manager';
-import { ContentStorage, LibraryStorage, Translator } from '../domain';
+import { ContentStorage, LibraryStorage, Translator } from '../domain/service';
 import { H5P_CORE_CONFIG_TOKEN, H5PCoreConfig } from '../h5p-core.config';
 import { H5P_CACHE_PROVIDER_TOKEN } from './h5p-cache.provider';
 import { h5pConfig, h5pUrlGenerator } from './h5p-service-config';

@@ -11,11 +11,10 @@ import {
 	NotImplementedException,
 } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
-import { BaseEntity } from '@shared/domain/entity';
-import { Readable } from 'stream';
+import { Readable } from 'node:stream';
 import { H5P_CONTENT_S3_CLIENT_INJECTION_TOKEN } from '../../h5p-editor.const';
-import { H5PContent, H5PContentProperties, H5PContentRepo } from '../../repo';
-import { h5pContentFactory } from '../../testing';
+import { h5pContentDoFactory, h5pContentFactory } from '../../testing';
+import { H5P_CONTENT_REPO, H5PContentRepo } from '../interface';
 import { H5PContentParentParams, H5PContentParentType, LumiUserWithContentData } from '../types';
 import { ContentStorage } from './content-storage.service';
 
@@ -45,26 +44,25 @@ const helpers = {
 		const content = {
 			data: `Data #${n}`,
 		};
-		const h5pContentProperties: H5PContentProperties = {
-			creatorId: new ObjectId().toString(),
-			parentId: new ObjectId().toString(),
-			schoolId: new ObjectId().toString(),
+		const id = new ObjectId().toHexString();
+		const now = new Date();
+		const h5pContentDo = h5pContentDoFactory.build({
+			id,
 			metadata,
 			content,
-			parentType: H5PContentParentType.BoardElement,
-		};
-		const h5pContent = new H5PContent(h5pContentProperties);
+			createdAt: now,
+			updatedAt: now,
+		});
 
 		return {
-			withID(id?: number) {
-				const objectId = new ObjectId(id);
-				h5pContent._id = objectId;
-				h5pContent.id = objectId.toString();
-
-				return h5pContent;
+			withID(customId?: string) {
+				return h5pContentDoFactory.build({
+					...h5pContentDo.getProps(),
+					id: customId ?? id,
+				});
 			},
 			new() {
-				return h5pContent;
+				return h5pContentDo;
 			},
 		};
 	},
@@ -78,21 +76,7 @@ const helpers = {
 		};
 	},
 
-	repoSaveMock: <Entity extends BaseEntity>(entities: Entity | Entity[]) => {
-		if (!Array.isArray(entities)) {
-			entities = [entities];
-		}
-
-		for (const entity of entities) {
-			if (!entity._id) {
-				const id = new ObjectId();
-				entity._id = id;
-				entity.id = id.toString();
-			}
-		}
-
-		return Promise.resolve();
-	},
+	repoSaveMock: () => Promise.resolve(),
 };
 
 describe('ContentStorage', () => {
@@ -105,14 +89,14 @@ describe('ContentStorage', () => {
 		module = await Test.createTestingModule({
 			providers: [
 				ContentStorage,
-				{ provide: H5PContentRepo, useValue: createMock<H5PContentRepo>() },
+				{ provide: H5P_CONTENT_REPO, useValue: createMock<H5PContentRepo>() },
 				{ provide: H5P_CONTENT_S3_CLIENT_INJECTION_TOKEN, useValue: createMock<S3ClientAdapter>() },
 			],
 		}).compile();
 
 		service = module.get(ContentStorage);
 		s3ClientAdapter = module.get(H5P_CONTENT_S3_CLIENT_INJECTION_TOKEN);
-		contentRepo = module.get(H5PContentRepo);
+		contentRepo = module.get(H5P_CONTENT_REPO);
 	});
 
 	afterAll(async () => {

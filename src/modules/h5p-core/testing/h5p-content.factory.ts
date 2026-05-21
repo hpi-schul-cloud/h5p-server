@@ -1,16 +1,16 @@
 import { ObjectId } from '@mikro-orm/mongodb';
 import { BaseFactory } from '@testing/factory/base.factory';
 import { H5PContentParentType } from '../domain';
-import { ContentMetadata, H5PContent, H5PContentProperties, InstalledLibrary } from '../repo';
+import { ContentMetadata, H5PContentEntity, H5PContentEntityProperties, InstalledLibraryEntity } from '../repo';
 
-class H5PContentFactory extends BaseFactory<H5PContent, H5PContentProperties> {
-	public withMainLibrary(library: InstalledLibrary): this {
+class H5PContentFactory extends BaseFactory<H5PContentEntity, H5PContentEntityProperties> {
+	public withMainLibrary(library: InstalledLibraryEntity): this {
 		const params = { metadata: { mainLibrary: library.machineName } };
 
 		return this.params(params);
 	}
 
-	public addPreloadedDependencies(libraries: InstalledLibrary[]): this {
+	public addPreloadedDependencies(libraries: InstalledLibraryEntity[]): this {
 		const params = {
 			metadata: {
 				preloadedDependencies: libraries.map((lib) => {
@@ -27,8 +27,8 @@ class H5PContentFactory extends BaseFactory<H5PContent, H5PContentProperties> {
 	}
 }
 
-export const h5pContentFactory = H5PContentFactory.define(H5PContent, ({ sequence }) => {
-	const content: H5PContentProperties = {
+export const h5pContentFactory = H5PContentFactory.define(H5PContentEntity, ({ sequence }) => {
+	const content: H5PContentEntityProperties = {
 		id: new ObjectId().toHexString(),
 		parentType: H5PContentParentType.BoardElement,
 		parentId: new ObjectId().toHexString(),

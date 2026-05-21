@@ -104,7 +104,7 @@ export class ContentMetadata implements IContentMetadata {
 	}
 }
 
-export interface H5PContentProperties {
+export interface H5PContentEntityProperties {
 	id?: EntityId;
 	creatorId: EntityId;
 	parentType: H5PContentParentType;
@@ -115,7 +115,7 @@ export interface H5PContentProperties {
 }
 
 @Entity({ tableName: 'h5p-editor-content' })
-export class H5PContent extends BaseEntityWithTimestamps {
+export class H5PContentEntity extends BaseEntityWithTimestamps {
 	@Property({ fieldName: 'creator' })
 	_creatorId: ObjectId;
 
@@ -148,7 +148,7 @@ export class H5PContent extends BaseEntityWithTimestamps {
 	@Property({ type: JsonType })
 	content: unknown;
 
-	constructor(props: H5PContentProperties) {
+	constructor(props: H5PContentEntityProperties) {
 		super();
 
 		if (props.id) {

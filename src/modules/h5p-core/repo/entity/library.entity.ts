@@ -2,6 +2,7 @@
 import { IInstalledLibrary, ILibraryName } from '@lumieducation/h5p-server';
 import { IFileStats, ILibraryMetadata, IPath } from '@lumieducation/h5p-server/build/src/types';
 import { Entity, Index, Property } from '@mikro-orm/core';
+import { ObjectId } from '@mikro-orm/mongodb';
 import { BaseEntityWithTimestamps } from '@shared/domain/entity';
 
 export class Path implements IPath {
@@ -47,7 +48,7 @@ export class FileMetadata implements IFileStats {
 @Entity({ tableName: 'h5p_library' })
 @Index({ properties: ['machineName', 'majorVersion', 'minorVersion'] })
 @Index({ properties: ['machineName', 'majorVersion', 'minorVersion', 'patchVersion'] })
-export class InstalledLibrary extends BaseEntityWithTimestamps implements IInstalledLibrary {
+export class InstalledLibraryEntity extends BaseEntityWithTimestamps implements IInstalledLibrary {
 	[key: string]: unknown;
 	@Property()
 	@Index()
@@ -213,20 +214,25 @@ export class InstalledLibrary extends BaseEntityWithTimestamps implements IInsta
 	}
 
 	public compareVersions(otherLibrary: ILibraryName & { patchVersion?: number }): number {
-		let result = InstalledLibrary.simple_compare(this.majorVersion, otherLibrary.majorVersion);
+		let result = InstalledLibraryEntity.simple_compare(this.majorVersion, otherLibrary.majorVersion);
 		if (result !== 0) {
 			return result;
 		}
-		result = InstalledLibrary.simple_compare(this.minorVersion, otherLibrary.minorVersion);
+		result = InstalledLibraryEntity.simple_compare(this.minorVersion, otherLibrary.minorVersion);
 		if (result !== 0) {
 			return result;
 		}
 
-		return InstalledLibrary.simple_compare(this.patchVersion, otherLibrary?.patchVersion ?? 0);
+		return InstalledLibraryEntity.simple_compare(this.patchVersion, otherLibrary?.patchVersion ?? 0);
 	}
 
-	constructor(libraryMetadata: ILibraryMetadata, restricted = false, files: FileMetadata[] = []) {
+	constructor(libraryMetadata: ILibraryMetadata, restricted = false, files: FileMetadata[] = [], id?: string) {
 		super();
+		if (id) {
+			const objectId = new ObjectId(id);
+			this._id = objectId;
+			this.id = objectId.toHexString();
+		}
 		this.machineName = libraryMetadata.machineName;
 		this.majorVersion = libraryMetadata.majorVersion;
 		this.minorVersion = libraryMetadata.minorVersion;

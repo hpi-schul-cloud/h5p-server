@@ -2,12 +2,13 @@ import { ILibraryMetadata } from '@lumieducation/h5p-server';
 import { EntityManager } from '@mikro-orm/mongodb';
 import { Test, TestingModule } from '@nestjs/testing';
 import { cleanupCollections, MongoMemoryDatabaseModule } from '@testing/database';
-import { FileMetadata, InstalledLibrary } from './entity';
-import { LibraryRepo } from './library.repo';
+import { InstalledLibrary } from '../domain/installed-library.do';
+import { FileMetadata, InstalledLibraryEntity } from './entity';
+import { HP5LibraryMikroOrmRepo } from './library.repo';
 
 describe('LibraryRepo', () => {
 	let module: TestingModule;
-	let libraryRepo: LibraryRepo;
+	let libraryRepo: HP5LibraryMikroOrmRepo;
 	let addonLibVersionOne: InstalledLibrary;
 	let addonLibVersionOneDuplicate: InstalledLibrary;
 	let addonLibVersionTwo: InstalledLibrary;
@@ -15,10 +16,10 @@ describe('LibraryRepo', () => {
 
 	beforeAll(async () => {
 		module = await Test.createTestingModule({
-			imports: [MongoMemoryDatabaseModule.forRoot([InstalledLibrary])],
-			providers: [LibraryRepo],
+			imports: [MongoMemoryDatabaseModule.forRoot([InstalledLibraryEntity])],
+			providers: [HP5LibraryMikroOrmRepo],
 		}).compile();
-		libraryRepo = module.get(LibraryRepo);
+		libraryRepo = module.get(HP5LibraryMikroOrmRepo);
 		em = module.get(EntityManager);
 
 		const testingLibMetadataVersionOne: ILibraryMetadata = {
@@ -29,7 +30,7 @@ describe('LibraryRepo', () => {
 			majorVersion: 1,
 			minorVersion: 2,
 		};
-		const testingLibVersionOne = new InstalledLibrary(testingLibMetadataVersionOne);
+		const testingLibVersionOne = InstalledLibrary.fromMetadata(testingLibMetadataVersionOne).getProps();
 		testingLibVersionOne.files.push(
 			new FileMetadata('file1', new Date(), 2),
 			new FileMetadata('file2', new Date(), 4),
@@ -52,11 +53,11 @@ describe('LibraryRepo', () => {
 			majorVersion: 1,
 			minorVersion: 2,
 		};
-		addonLibVersionOne = new InstalledLibrary(addonLibMetadataVersionOne);
-		addonLibVersionOne.addTo = { player: { machineNames: [testingLibVersionOne.machineName] } };
+		addonLibVersionOne = InstalledLibrary.fromMetadata(addonLibMetadataVersionOne);
+		addonLibVersionOne.getProps().addTo = { player: { machineNames: [testingLibVersionOne.machineName] } };
 
-		addonLibVersionOneDuplicate = new InstalledLibrary(addonLibMetadataVersionOneDuplicate);
-		addonLibVersionOneDuplicate.addTo = { player: { machineNames: [testingLibVersionOne.machineName] } };
+		addonLibVersionOneDuplicate = InstalledLibrary.fromMetadata(addonLibMetadataVersionOneDuplicate);
+		addonLibVersionOneDuplicate.getProps().addTo = { player: { machineNames: [testingLibVersionOne.machineName] } };
 
 		const testingLibMetadataVersionTwo: ILibraryMetadata = {
 			runnable: false,
@@ -66,7 +67,7 @@ describe('LibraryRepo', () => {
 			majorVersion: 2,
 			minorVersion: 3,
 		};
-		const testingLibVersionTwo = new InstalledLibrary(testingLibMetadataVersionTwo);
+		const testingLibVersionTwo = InstalledLibrary.fromMetadata(testingLibMetadataVersionTwo).getProps();
 		testingLibVersionTwo.files.push(
 			new FileMetadata('file1', new Date(), 2),
 			new FileMetadata('file2', new Date(), 4),
@@ -81,8 +82,8 @@ describe('LibraryRepo', () => {
 			majorVersion: 2,
 			minorVersion: 3,
 		};
-		addonLibVersionTwo = new InstalledLibrary(addonLibMetadataVersionTwo);
-		addonLibVersionTwo.addTo = { player: { machineNames: [testingLibVersionTwo.machineName] } };
+		addonLibVersionTwo = InstalledLibrary.fromMetadata(addonLibMetadataVersionTwo);
+		addonLibVersionTwo.getProps().addTo = { player: { machineNames: [testingLibVersionTwo.machineName] } };
 
 		await libraryRepo.createLibrary(addonLibVersionOne);
 		await libraryRepo.createLibrary(addonLibVersionTwo);
@@ -95,10 +96,13 @@ describe('LibraryRepo', () => {
 
 	describe('createLibrary', () => {
 		it('should save a Library', async () => {
-			const saveSpy = jest.spyOn(libraryRepo, 'save').mockResolvedValueOnce(undefined);
-			await libraryRepo.createLibrary(addonLibVersionOne);
-			expect(saveSpy).toHaveBeenCalledWith(addonLibVersionOne);
-			saveSpy.mockRestore();
+			const found = await libraryRepo.findOneByNameAndVersionOrFail(
+				addonLibVersionOne.machineName,
+				addonLibVersionOne.majorVersion,
+				addonLibVersionOne.minorVersion
+			);
+			expect(found).toBeDefined();
+			expect(found.machineName).toBe(addonLibVersionOne.machineName);
 		});
 	});
 
@@ -114,7 +118,14 @@ describe('LibraryRepo', () => {
 		it('should get libaries by name', async () => {
 			const result = await libraryRepo.findByName('addonVersionTwo');
 			expect(result).toBeDefined();
-			expect(result).toEqual([addonLibVersionTwo]);
+			expect(result).toEqual([
+				expect.objectContaining({
+					machineName: addonLibVersionTwo.machineName,
+					majorVersion: addonLibVersionTwo.majorVersion,
+					minorVersion: addonLibVersionTwo.minorVersion,
+					patchVersion: addonLibVersionTwo.patchVersion,
+				}),
+			]);
 		});
 	});
 
@@ -148,7 +159,14 @@ describe('LibraryRepo', () => {
 		it('should get a library by name and version', async () => {
 			const result = await libraryRepo.findNewestByNameAndVersion('addonVersionTwo', 2, 3);
 			expect(result).toBeDefined();
-			expect(result).toEqual(addonLibVersionTwo);
+			expect(result).toEqual(
+				expect.objectContaining({
+					machineName: addonLibVersionTwo.machineName,
+					majorVersion: addonLibVersionTwo.majorVersion,
+					minorVersion: addonLibVersionTwo.minorVersion,
+					patchVersion: addonLibVersionTwo.patchVersion,
+				})
+			);
 		});
 	});
 
@@ -156,7 +174,14 @@ describe('LibraryRepo', () => {
 		it('should get a library by name and exact version', async () => {
 			const result = await libraryRepo.findByNameAndExactVersion('addonVersionTwo', 2, 3, 4);
 			expect(result).toBeDefined();
-			expect(result).toEqual(addonLibVersionTwo);
+			expect(result).toEqual(
+				expect.objectContaining({
+					machineName: addonLibVersionTwo.machineName,
+					majorVersion: addonLibVersionTwo.majorVersion,
+					minorVersion: addonLibVersionTwo.minorVersion,
+					patchVersion: addonLibVersionTwo.patchVersion,
+				})
+			);
 		});
 		it('should throw error', async () => {
 			try {

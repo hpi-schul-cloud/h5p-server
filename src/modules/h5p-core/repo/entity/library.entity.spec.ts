@@ -1,11 +1,11 @@
 import { ILibraryMetadata } from '@lumieducation/h5p-server';
-import { FileMetadata, InstalledLibrary, LibraryName, Path } from './library.entity';
+import { FileMetadata, InstalledLibraryEntity, LibraryName, Path } from './library.entity';
 
 describe('InstalledLibrary', () => {
-	let addonLibVersionOne: InstalledLibrary;
-	let addonLibVersionOneMinorChange: InstalledLibrary;
-	let addonLibVersionOnePatchChange: InstalledLibrary;
-	let addonLibVersionTwo: InstalledLibrary;
+	let addonLibVersionOne: InstalledLibraryEntity;
+	let addonLibVersionOneMinorChange: InstalledLibraryEntity;
+	let addonLibVersionOnePatchChange: InstalledLibraryEntity;
+	let addonLibVersionTwo: InstalledLibraryEntity;
 
 	beforeAll(() => {
 		const testingLibMetadataVersionOne: ILibraryMetadata = {
@@ -16,7 +16,7 @@ describe('InstalledLibrary', () => {
 			majorVersion: 1,
 			minorVersion: 2,
 		};
-		const testingLibVersionOne = new InstalledLibrary(testingLibMetadataVersionOne);
+		const testingLibVersionOne = new InstalledLibraryEntity(testingLibMetadataVersionOne);
 		testingLibVersionOne.files.push(
 			new FileMetadata('file1', new Date(), 2),
 			new FileMetadata('file2', new Date(), 4),
@@ -31,7 +31,7 @@ describe('InstalledLibrary', () => {
 			majorVersion: 1,
 			minorVersion: 2,
 		};
-		addonLibVersionOne = new InstalledLibrary(addonLibMetadataVersionOne);
+		addonLibVersionOne = new InstalledLibraryEntity(addonLibMetadataVersionOne);
 		addonLibVersionOne.addTo = { player: { machineNames: [testingLibVersionOne.machineName] } };
 
 		const testingLibMetadataVersionOneMinorChange: ILibraryMetadata = {
@@ -42,7 +42,7 @@ describe('InstalledLibrary', () => {
 			majorVersion: 1,
 			minorVersion: 5,
 		};
-		const testingLibVersionOneMinorChange = new InstalledLibrary(testingLibMetadataVersionOneMinorChange);
+		const testingLibVersionOneMinorChange = new InstalledLibraryEntity(testingLibMetadataVersionOneMinorChange);
 		testingLibVersionOne.files.push(
 			new FileMetadata('file1', new Date(), 2),
 			new FileMetadata('file2', new Date(), 4),
@@ -57,7 +57,7 @@ describe('InstalledLibrary', () => {
 			majorVersion: 1,
 			minorVersion: 5,
 		};
-		addonLibVersionOneMinorChange = new InstalledLibrary(addonLibMetadataVersionOneMinorChange);
+		addonLibVersionOneMinorChange = new InstalledLibraryEntity(addonLibMetadataVersionOneMinorChange);
 		addonLibVersionOneMinorChange.addTo = { player: { machineNames: [testingLibVersionOneMinorChange.machineName] } };
 
 		const testingLibMetadataVersionOnePatchChange: ILibraryMetadata = {
@@ -68,7 +68,7 @@ describe('InstalledLibrary', () => {
 			majorVersion: 1,
 			minorVersion: 2,
 		};
-		const testingLibVersionOnePatchChange = new InstalledLibrary(testingLibMetadataVersionOnePatchChange);
+		const testingLibVersionOnePatchChange = new InstalledLibraryEntity(testingLibMetadataVersionOnePatchChange);
 		testingLibVersionOne.files.push(
 			new FileMetadata('file1', new Date(), 2),
 			new FileMetadata('file2', new Date(), 4),
@@ -83,7 +83,7 @@ describe('InstalledLibrary', () => {
 			majorVersion: 1,
 			minorVersion: 2,
 		};
-		addonLibVersionOnePatchChange = new InstalledLibrary(addonLibMetadataVersionOnePatchChange);
+		addonLibVersionOnePatchChange = new InstalledLibraryEntity(addonLibMetadataVersionOnePatchChange);
 		addonLibVersionOnePatchChange.addTo = { player: { machineNames: [testingLibVersionOnePatchChange.machineName] } };
 
 		const testingLibMetadataVersionTwo: ILibraryMetadata = {
@@ -94,7 +94,7 @@ describe('InstalledLibrary', () => {
 			majorVersion: 2,
 			minorVersion: 3,
 		};
-		const testingLibVersionTwo = new InstalledLibrary(testingLibMetadataVersionTwo);
+		const testingLibVersionTwo = new InstalledLibraryEntity(testingLibMetadataVersionTwo);
 		testingLibVersionTwo.files.push(
 			new FileMetadata('file1', new Date(), 2),
 			new FileMetadata('file2', new Date(), 4),
@@ -109,21 +109,21 @@ describe('InstalledLibrary', () => {
 			majorVersion: 2,
 			minorVersion: 3,
 		};
-		addonLibVersionTwo = new InstalledLibrary(addonLibMetadataVersionTwo);
+		addonLibVersionTwo = new InstalledLibraryEntity(addonLibMetadataVersionTwo);
 		addonLibVersionTwo.addTo = { player: { machineNames: [testingLibVersionTwo.machineName] } };
 	});
 
 	describe('simple_compare', () => {
 		it('should return 1 if a is greater than b', () => {
-			expect(InstalledLibrary.simple_compare(5, 3)).toBe(1);
+			expect(InstalledLibraryEntity.simple_compare(5, 3)).toBe(1);
 		});
 
 		it('should return -1 if a is less than b', () => {
-			expect(InstalledLibrary.simple_compare(3, 5)).toBe(-1);
+			expect(InstalledLibraryEntity.simple_compare(3, 5)).toBe(-1);
 		});
 
 		it('should return 0 if a is equal to b', () => {
-			expect(InstalledLibrary.simple_compare(3, 3)).toBe(0);
+			expect(InstalledLibraryEntity.simple_compare(3, 3)).toBe(0);
 		});
 	});
 
@@ -150,7 +150,7 @@ describe('InstalledLibrary', () => {
 	describe('compareVersions', () => {
 		describe('when calling compareVersions with Major Change', () => {
 			it('should return -1 and call simple_compare once', () => {
-				const simpleCompareSpy = jest.spyOn(InstalledLibrary, 'simple_compare');
+				const simpleCompareSpy = jest.spyOn(InstalledLibraryEntity, 'simple_compare');
 				const result = addonLibVersionOne.compareVersions(addonLibVersionTwo);
 				expect(result).toBe(-1);
 				expect(simpleCompareSpy).toHaveBeenCalledTimes(1);
@@ -159,7 +159,7 @@ describe('InstalledLibrary', () => {
 
 		describe('when calling compareVersions with Minor Change', () => {
 			it('should return -1 and call simple_compare three times', () => {
-				const simpleCompareSpy = jest.spyOn(InstalledLibrary, 'simple_compare');
+				const simpleCompareSpy = jest.spyOn(InstalledLibraryEntity, 'simple_compare');
 				const result = addonLibVersionOne.compareVersions(addonLibVersionOneMinorChange);
 				expect(result).toBe(-1);
 				expect(simpleCompareSpy).toHaveBeenCalledTimes(3);
@@ -168,7 +168,7 @@ describe('InstalledLibrary', () => {
 
 		describe('when calling compareVersions with same Major & Minor Versions', () => {
 			it('should return call simple_compare with patch versions', () => {
-				const simpleCompareSpy = jest.spyOn(InstalledLibrary, 'simple_compare');
+				const simpleCompareSpy = jest.spyOn(InstalledLibraryEntity, 'simple_compare');
 				const result = addonLibVersionOne.compareVersions(addonLibVersionOnePatchChange);
 				expect(result).toBe(-1);
 				expect(simpleCompareSpy).toHaveBeenCalledWith(

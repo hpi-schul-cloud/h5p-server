@@ -7,7 +7,9 @@ import { Test, TestingModule } from '@nestjs/testing';
 import pLimit from 'p-limit';
 import { Readable } from 'stream';
 import { H5P_LIBRARIES_S3_CLIENT_INJECTION_TOKEN } from '../../h5p-editor.const';
-import { FileMetadata, InstalledLibrary, LibraryRepo } from '../../repo';
+import { FileMetadata, HP5LibraryMikroOrmRepo } from '../../repo';
+import { InstalledLibrary } from '../installed-library.do';
+import { H5P_LIBRARY_REPO } from '../interface';
 import { LibraryStorage } from './library-storage.service';
 
 function readStream(stream: Readable): Promise<string> {
@@ -26,15 +28,15 @@ describe('LibraryStorage', () => {
 	let module: TestingModule;
 	let storage: LibraryStorage;
 	let s3ClientAdapter: DeepMocked<S3ClientAdapter>;
-	let repo: DeepMocked<LibraryRepo>;
+	let repo: DeepMocked<HP5LibraryMikroOrmRepo>;
 
 	beforeAll(async () => {
 		module = await Test.createTestingModule({
 			providers: [
 				LibraryStorage,
 				{
-					provide: LibraryRepo,
-					useValue: createMock<LibraryRepo>(),
+					provide: H5P_LIBRARY_REPO,
+					useValue: createMock<HP5LibraryMikroOrmRepo>(),
 				},
 				{ provide: H5P_LIBRARIES_S3_CLIENT_INJECTION_TOKEN, useValue: createMock<S3ClientAdapter>() },
 			],
@@ -42,7 +44,7 @@ describe('LibraryStorage', () => {
 
 		storage = module.get(LibraryStorage);
 		s3ClientAdapter = module.get(H5P_LIBRARIES_S3_CLIENT_INJECTION_TOKEN);
-		repo = module.get(LibraryRepo);
+		repo = module.get(H5P_LIBRARY_REPO);
 	});
 
 	afterAll(async () => {
@@ -197,8 +199,9 @@ describe('LibraryStorage', () => {
 			majorVersion: 1,
 			minorVersion: 2,
 		};
-		const testingLib = new InstalledLibrary(testingLibMetadata);
-		testingLib.files.push(
+		const testingLib = InstalledLibrary.fromMetadata(testingLibMetadata);
+		// @ts-expect-error test
+		testingLib.props.files.push(
 			new FileMetadata('file1', new Date(), 2),
 			new FileMetadata('file2', new Date(), 4),
 			new FileMetadata('file3', new Date(), 6)
@@ -212,8 +215,9 @@ describe('LibraryStorage', () => {
 			majorVersion: 1,
 			minorVersion: 2,
 		};
-		const addonLib = new InstalledLibrary(addonLibMetadata);
-		addonLib.addTo = { player: { machineNames: [testingLib.machineName] } };
+		const addonLib = InstalledLibrary.fromMetadata(addonLibMetadata);
+		// @ts-expect-error test
+		addonLib.props.addTo = { player: { machineNames: [testingLib.machineName] } };
 
 		const circularALibMetadata: ILibraryMetadata = {
 			runnable: false,
@@ -223,7 +227,7 @@ describe('LibraryStorage', () => {
 			majorVersion: 1,
 			minorVersion: 2,
 		};
-		const circularA = new InstalledLibrary(circularALibMetadata);
+		const circularA = InstalledLibrary.fromMetadata(circularALibMetadata);
 		const circularBLibMetadata: ILibraryMetadata = {
 			runnable: false,
 			title: '',
@@ -232,9 +236,11 @@ describe('LibraryStorage', () => {
 			majorVersion: 1,
 			minorVersion: 2,
 		};
-		const circularB = new InstalledLibrary(circularBLibMetadata);
-		circularA.preloadedDependencies = [metadataToName(circularB)];
-		circularB.editorDependencies = [metadataToName(circularA)];
+		const circularB = InstalledLibrary.fromMetadata(circularBLibMetadata);
+		// @ts-expect-error test
+		circularA.props.preloadedDependencies = [metadataToName(circularB)];
+		// @ts-expect-error test
+		circularB.props.editorDependencies = [metadataToName(circularA)];
 
 		const fakeLibraryName: ILibraryName = { machineName: 'fake', majorVersion: 2, minorVersion: 3 };
 
@@ -246,8 +252,9 @@ describe('LibraryStorage', () => {
 			majorVersion: 2,
 			minorVersion: 5,
 		};
-		const testingLibDependentA = new InstalledLibrary(testingLibDependentAMetadata);
-		testingLibDependentA.dynamicDependencies = [metadataToName(testingLib)];
+		const testingLibDependentA = InstalledLibrary.fromMetadata(testingLibDependentAMetadata);
+		// @ts-expect-error test
+		testingLibDependentA.props.dynamicDependencies = [metadataToName(testingLib)];
 
 		const testingLibDependentBMetadata: ILibraryMetadata = {
 			runnable: false,
@@ -257,8 +264,9 @@ describe('LibraryStorage', () => {
 			majorVersion: 2,
 			minorVersion: 5,
 		};
-		const testingLibDependentB = new InstalledLibrary(testingLibDependentBMetadata);
-		testingLibDependentB.preloadedDependencies = [metadataToName(testingLib)];
+		const testingLibDependentB = InstalledLibrary.fromMetadata(testingLibDependentBMetadata);
+		// @ts-expect-error test
+		testingLibDependentB.props.preloadedDependencies = [metadataToName(testingLib)];
 
 		const libWithNonExistingDependencyMetadata: ILibraryMetadata = {
 			runnable: false,
@@ -268,8 +276,9 @@ describe('LibraryStorage', () => {
 			majorVersion: 2,
 			minorVersion: 5,
 		};
-		const libWithNonExistingDependency = new InstalledLibrary(libWithNonExistingDependencyMetadata);
-		libWithNonExistingDependency.editorDependencies = [fakeLibraryName];
+		const libWithNonExistingDependency = InstalledLibrary.fromMetadata(libWithNonExistingDependencyMetadata);
+		// @ts-expect-error test
+		libWithNonExistingDependency.props.editorDependencies = [fakeLibraryName];
 
 		return {
 			libraries: [
@@ -375,11 +384,12 @@ describe('LibraryStorage', () => {
 					majorVersion: testingLib.majorVersion,
 					minorVersion: testingLib.minorVersion,
 				};
-				const libFromDatabase = new InstalledLibrary(libFromDatabaseMetadata);
+				const libFromDatabase = InstalledLibrary.fromMetadata(libFromDatabaseMetadata);
 
 				repo.findOneByNameAndVersionOrFail.mockResolvedValue(libFromDatabase);
 
-				testingLib.author = 'Test Author';
+				// @ts-expect-error test
+				testingLib.props.author = 'Test Author';
 				const updatedLibrary = await storage.updateLibrary(testingLib);
 				const retrievedLibrary = await storage.getLibrary(testingLib);
 				expect(retrievedLibrary).toEqual(updatedLibrary);

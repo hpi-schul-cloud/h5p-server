@@ -8,6 +8,7 @@ import {
 } from '@lumieducation/h5p-server/build/src/types';
 import { ObjectId } from '@mikro-orm/mongodb';
 import { ContentStorage, LibraryStorage } from '@modules/h5p-core';
+import { InstalledLibrary } from '@modules/h5p-core/domain';
 import { H5P_CACHE_PROVIDER_TOKEN } from '@modules/h5p-core/provider';
 import { Test, TestingModule } from '@nestjs/testing';
 import {
@@ -712,6 +713,7 @@ describe('H5PLibraryManagementService', () => {
 						restricted: false,
 						runnable: true,
 						title: 'Library A',
+						getProps: jest.fn(),
 						compare: jest.fn(),
 						compareVersions: jest.fn(),
 					});
@@ -723,6 +725,7 @@ describe('H5PLibraryManagementService', () => {
 						restricted: false,
 						runnable: true,
 						title: 'Library A',
+						getProps: jest.fn(),
 						compare: jest.fn(),
 						compareVersions: jest.fn(),
 					});
@@ -740,6 +743,7 @@ describe('H5PLibraryManagementService', () => {
 						restricted: false,
 						runnable: true,
 						title: 'Library A',
+						getProps: jest.fn(),
 						compare: jest.fn(),
 						compareVersions: jest.fn(),
 						preloadedJs: [{ path: 'path/to/preloaded.js' }],
@@ -797,33 +801,20 @@ describe('H5PLibraryManagementService', () => {
 							minorVersion: 0,
 						},
 					]);
-					libraryStorage.getLibrary.mockResolvedValueOnce({
-						machineName: 'libraryA',
-						majorVersion: 1,
-						minorVersion: 0,
-						patchVersion: 0,
-						files: [],
-						_id: new ObjectId(),
-						id: 'mock_id',
-						createdAt: new Date(),
-						updatedAt: new Date(),
-						restricted: false,
-						runnable: true,
-						title: 'Library A',
-						compare: jest.fn(),
-						compareVersions: jest.fn(),
-					});
-					libraryStorage.updateLibrary.mockResolvedValueOnce({
-						machineName: 'libraryA',
-						majorVersion: 1,
-						minorVersion: 0,
-						patchVersion: 1,
-						restricted: false,
-						runnable: true,
-						title: 'Library A',
-						compare: jest.fn(),
-						compareVersions: jest.fn(),
-					});
+					const libraryA = InstalledLibrary.fromMetadata(
+						{
+							machineName: 'libraryA',
+							majorVersion: 1,
+							minorVersion: 0,
+							patchVersion: 0,
+							runnable: true,
+							title: 'Library A',
+						},
+						false
+					);
+					libraryStorage.getLibrary.mockResolvedValueOnce(libraryA);
+
+					libraryStorage.updateLibrary.mockResolvedValueOnce(libraryA);
 					libraryStorage.isInstalled.mockResolvedValueOnce(true);
 					libraryStorage.getLibrary.mockResolvedValueOnce({
 						machineName: 'libraryA',
@@ -838,6 +829,7 @@ describe('H5PLibraryManagementService', () => {
 						restricted: false,
 						runnable: true,
 						title: 'Library A',
+						getProps: jest.fn(),
 						compare: jest.fn(),
 						compareVersions: jest.fn(),
 						preloadedJs: [{ path: 'path/to/preloaded.js' }],
@@ -900,6 +892,7 @@ describe('H5PLibraryManagementService', () => {
 						restricted: false,
 						runnable: true,
 						title: 'Library A',
+						getProps: jest.fn(),
 						compare: jest.fn(),
 						compareVersions: jest.fn(),
 					});
@@ -917,6 +910,7 @@ describe('H5PLibraryManagementService', () => {
 						restricted: false,
 						runnable: true,
 						title: 'Library A',
+						getProps: jest.fn(),
 						compare: jest.fn(),
 						compareVersions: jest.fn(),
 						preloadedJs: [{ path: 'path/to/preloaded.js' }],
@@ -979,6 +973,7 @@ describe('H5PLibraryManagementService', () => {
 						restricted: false,
 						runnable: true,
 						title: 'Library A',
+						getProps: jest.fn(),
 						compare: jest.fn(),
 						compareVersions: jest.fn(),
 					});
@@ -1040,6 +1035,7 @@ describe('H5PLibraryManagementService', () => {
 						restricted: false,
 						runnable: true,
 						title: 'Library A',
+						getProps: jest.fn(),
 						compare: jest.fn(),
 						compareVersions: jest.fn(),
 					});
@@ -1100,6 +1096,7 @@ describe('H5PLibraryManagementService', () => {
 							restricted: false,
 							runnable: true,
 							title: 'Library A',
+							getProps: jest.fn(),
 							compare: jest.fn(),
 							compareVersions: jest.fn(),
 						});
@@ -1111,6 +1108,7 @@ describe('H5PLibraryManagementService', () => {
 							restricted: false,
 							runnable: true,
 							title: 'Library A',
+							getProps: jest.fn(),
 							compare: jest.fn(),
 							compareVersions: jest.fn(),
 						});
@@ -1171,6 +1169,7 @@ describe('H5PLibraryManagementService', () => {
 							restricted: false,
 							runnable: true,
 							title: 'Library A',
+							getProps: jest.fn(),
 							compare: jest.fn(),
 							compareVersions: jest.fn(),
 						});
@@ -1232,6 +1231,7 @@ describe('H5PLibraryManagementService', () => {
 							restricted: false,
 							runnable: true,
 							title: 'Library A',
+							getProps: jest.fn(),
 							compare: jest.fn(),
 							compareVersions: jest.fn(),
 						});
@@ -1249,6 +1249,7 @@ describe('H5PLibraryManagementService', () => {
 							restricted: false,
 							runnable: true,
 							title: 'Library A',
+							getProps: jest.fn(),
 							compare: jest.fn(),
 							compareVersions: jest.fn(),
 							preloadedJs: [{ path: 'path/to/preloaded.js' }],
@@ -1311,6 +1312,7 @@ describe('H5PLibraryManagementService', () => {
 							restricted: false,
 							runnable: true,
 							title: 'Library A',
+							getProps: jest.fn(),
 							compare: jest.fn(),
 							compareVersions: jest.fn(),
 						});
@@ -1328,6 +1330,7 @@ describe('H5PLibraryManagementService', () => {
 							restricted: false,
 							runnable: true,
 							title: 'Library A',
+							getProps: jest.fn(),
 							compare: jest.fn(),
 							compareVersions: jest.fn(),
 							preloadedJs: [{ path: 'path/to/preloaded.js' }],
@@ -1373,6 +1376,7 @@ describe('H5PLibraryManagementService', () => {
 						restricted: false,
 						runnable: true,
 						title: 'Library A',
+						getProps: jest.fn(),
 						compare: jest.fn(),
 						compareVersions: jest.fn(),
 					});
@@ -1390,6 +1394,7 @@ describe('H5PLibraryManagementService', () => {
 						restricted: false,
 						runnable: true,
 						title: 'Library A',
+						getProps: jest.fn(),
 						compare: jest.fn(),
 						compareVersions: jest.fn(),
 						preloadedJs: [{ path: 'path/to/preloaded.js' }],
@@ -1498,6 +1503,7 @@ describe('H5PLibraryManagementService', () => {
 						restricted: false,
 						runnable: true,
 						title: 'Library A',
+						getProps: jest.fn(),
 						compare: jest.fn(),
 						compareVersions: jest.fn(),
 					});
@@ -1604,6 +1610,7 @@ describe('H5PLibraryManagementService', () => {
 						restricted: false,
 						runnable: true,
 						title: 'Library A',
+						getProps: jest.fn(),
 						compare: jest.fn(),
 						compareVersions: jest.fn(),
 					});
@@ -1650,6 +1657,7 @@ describe('H5PLibraryManagementService', () => {
 					restricted: false,
 					runnable: true,
 					title: 'Library A',
+					getProps: jest.fn(),
 					compare: jest.fn(),
 					compareVersions: jest.fn(),
 					preloadedJs: [{ path: 'path/to/preloaded.js' }],
@@ -1732,6 +1740,7 @@ describe('H5PLibraryManagementService', () => {
 					restricted: false,
 					runnable: true,
 					title: 'Library A',
+					getProps: jest.fn(),
 					compare: jest.fn(),
 					compareVersions: jest.fn(),
 					preloadedJs: [{ path: 'path/to/preloaded.js' }],

@@ -2,21 +2,21 @@ import { EntityManager } from '@mikro-orm/mongodb';
 import { Test, TestingModule } from '@nestjs/testing';
 import { cleanupCollections, MongoMemoryDatabaseModule } from '@testing/database';
 import { h5pContentFactory, h5pEntityLibraryTestFactory } from '../testing';
-import { H5PContent, InstalledLibrary } from './entity';
-import { H5PContentRepo } from './h5p-content.repo';
+import { H5PContentEntity, InstalledLibraryEntity } from './entity';
+import { H5PContentMikroOrmRepo } from './h5p-content.repo';
 
 describe('ContentRepo', () => {
 	let module: TestingModule;
-	let repo: H5PContentRepo;
+	let repo: H5PContentMikroOrmRepo;
 	let em: EntityManager;
 
 	beforeAll(async () => {
 		module = await Test.createTestingModule({
-			imports: [MongoMemoryDatabaseModule.forRoot([H5PContent, InstalledLibrary])],
-			providers: [H5PContentRepo],
+			imports: [MongoMemoryDatabaseModule.forRoot([H5PContentEntity, InstalledLibraryEntity])],
+			providers: [H5PContentMikroOrmRepo],
 		}).compile();
 
-		repo = module.get(H5PContentRepo);
+		repo = module.get(H5PContentMikroOrmRepo);
 		em = module.get(EntityManager);
 	});
 
@@ -29,7 +29,7 @@ describe('ContentRepo', () => {
 	});
 
 	it('should implement entityName getter', () => {
-		expect(repo.entityName).toBe(H5PContent);
+		expect(repo.entityName).toBe(H5PContentEntity);
 	});
 
 	describe('createContentMetadata', () => {
@@ -40,7 +40,8 @@ describe('ContentRepo', () => {
 			const result = await repo.findById(h5pContent.id);
 
 			expect(result).toBeDefined();
-			expect(result).toEqual(h5pContent);
+			expect(result.id).toEqual(h5pContent.id);
+			expect(result.creatorId).toEqual(h5pContent.creatorId);
 		});
 	});
 
@@ -52,7 +53,9 @@ describe('ContentRepo', () => {
 			const result = await repo.findById(h5pContent.id);
 
 			expect(result).toBeDefined();
-			expect(result).toEqual(h5pContent);
+			expect(result.id).toEqual(h5pContent.id);
+			expect(result.creatorId).toEqual(h5pContent.creatorId);
+			expect(result.parentType).toEqual(h5pContent.parentType);
 		});
 
 		it('should fail if entity does not exist', async () => {
@@ -81,7 +84,8 @@ describe('ContentRepo', () => {
 			const h5pContent = h5pContentFactory.build();
 			await em.persist(h5pContent).flush();
 
-			await repo.deleteContent(h5pContent);
+			const contentDo = await repo.findById(h5pContent.id);
+			await repo.deleteContent(contentDo);
 
 			const findById = repo.findById(h5pContent.id);
 			await expect(findById).rejects.toThrow();

@@ -1,7 +1,7 @@
 import { ConfigProperty, Configuration } from '@infra/configuration';
 import { CommaSeparatedStringToArray, StringToNumber } from '@shared/transformer';
 import { IsEnum, IsNumber } from 'class-validator';
-import { LanguageType } from './domain';
+import { LanguageType } from './domain/types/language-type.enum';
 
 export const H5P_CORE_CONFIG_TOKEN = 'H5P_CORE_CONFIG_TOKEN';
 

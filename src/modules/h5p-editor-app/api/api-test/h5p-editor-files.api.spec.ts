@@ -13,7 +13,7 @@ import {
 	LibraryStorage,
 } from '@modules/h5p-core';
 import { TemporaryFileStorage } from '@modules/h5p-core/domain';
-import { H5PContent, H5PContentProperties } from '@modules/h5p-core/repo';
+import { H5PContentEntity, H5PContentEntityProperties } from '@modules/h5p-core/repo';
 import { h5pContentFactory } from '@modules/h5p-core/testing';
 import { HttpStatus, INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
@@ -47,7 +47,7 @@ const helpers = {
 		const content = {
 			data: `Data #${n}`,
 		};
-		const h5pContentProperties: H5PContentProperties = {
+		const h5pContentProperties: H5PContentEntityProperties = {
 			creatorId: new ObjectId().toString(),
 			parentId: new ObjectId().toString(),
 			schoolId: new ObjectId().toString(),
@@ -55,7 +55,7 @@ const helpers = {
 			content,
 			parentType: H5PContentParentType.BoardElement,
 		};
-		const h5pContent = new H5PContent(h5pContentProperties);
+		const h5pContent = new H5PContentEntity(h5pContentProperties);
 
 		return {
 			withID(id?: number) {

@@ -1,27 +1,40 @@
-import { EntityName } from '@mikro-orm/core';
+import { EntityManager } from '@mikro-orm/mongodb';
 import { Injectable } from '@nestjs/common';
-import { BaseRepo } from '@shared/repo/base.repo';
-import { InstalledLibrary } from './entity';
+import { InstalledLibrary } from '../domain/installed-library.do';
+import { InstalledLibraryEntity } from './entity';
+import { InstalledLibraryEntityMapper } from './mapper';
 
 @Injectable()
-export class LibraryRepo extends BaseRepo<InstalledLibrary> {
-	get entityName(): EntityName<InstalledLibrary> {
-		return InstalledLibrary;
+export class HP5LibraryMikroOrmRepo {
+	constructor(protected readonly _em: EntityManager) {}
+
+	get entityName(): typeof InstalledLibraryEntity {
+		return InstalledLibraryEntity;
 	}
 
 	public async createLibrary(library: InstalledLibrary): Promise<void> {
-		const entity = this.create(library);
+		const entity = InstalledLibraryEntityMapper.mapDoToEntity(this._em, library);
+		await this._em.persist(entity).flush();
+	}
 
-		await this.save(entity);
+	public async save(library: InstalledLibrary): Promise<void> {
+		const entity = InstalledLibraryEntityMapper.mapDoToEntity(this._em, library);
+		await this._em.persist(entity).flush();
+	}
+
+	public async delete(library: InstalledLibrary | InstalledLibrary[]): Promise<void> {
+		const libraries = Array.isArray(library) ? library : [library];
+		const entities = libraries.map((l) => InstalledLibraryEntityMapper.mapDoToEntity(this._em, l));
+		await this._em.remove(entities).flush();
 	}
 
 	/**
 	 * This is a operation that need high memory consumption.
 	 */
 	public async getAll(): Promise<InstalledLibrary[]> {
-		const libraries = await this._em.find(this.entityName, {});
+		const entities = await this._em.find(this.entityName, {});
 
-		return libraries;
+		return entities.map((e) => InstalledLibraryEntityMapper.mapEntityToDo(e));
 	}
 
 	public async findOneByNameAndVersionOrFail(
@@ -29,12 +42,12 @@ export class LibraryRepo extends BaseRepo<InstalledLibrary> {
 		majorVersion: number,
 		minorVersion: number
 	): Promise<InstalledLibrary> {
-		const libs = await this._em.find(this.entityName, { machineName, majorVersion, minorVersion });
-		if (libs.length === 1) {
-			return libs[0];
+		const entities = await this._em.find(this.entityName, { machineName, majorVersion, minorVersion });
+		if (entities.length === 1) {
+			return InstalledLibraryEntityMapper.mapEntityToDo(entities[0]);
 		}
 
-		if (libs.length === 0) {
+		if (entities.length === 0) {
 			throw new Error('Library not found');
 		}
 
@@ -42,9 +55,9 @@ export class LibraryRepo extends BaseRepo<InstalledLibrary> {
 	}
 
 	public async findByName(machineName: string): Promise<InstalledLibrary[]> {
-		const libraries = await this._em.find(this.entityName, { machineName });
+		const entities = await this._em.find(this.entityName, { machineName });
 
-		return libraries;
+		return entities.map((e) => InstalledLibraryEntityMapper.mapEntityToDo(e));
 	}
 
 	public async findNewestByNameAndVersion(
@@ -52,20 +65,20 @@ export class LibraryRepo extends BaseRepo<InstalledLibrary> {
 		majorVersion: number,
 		minorVersion: number
 	): Promise<InstalledLibrary | null> {
-		const libs = await this._em.find(this.entityName, {
+		const entities = await this._em.find(this.entityName, {
 			machineName,
 			majorVersion,
 			minorVersion,
 		});
-		let latest: InstalledLibrary | null = null;
+		let latest: InstalledLibraryEntity | null = null;
 
-		for (const lib of libs) {
-			if (latest === null || lib.patchVersion > latest.patchVersion) {
-				latest = lib;
+		for (const entity of entities) {
+			if (latest === null || entity.patchVersion > latest.patchVersion) {
+				latest = entity;
 			}
 		}
 
-		return latest;
+		return latest ? InstalledLibraryEntityMapper.mapEntityToDo(latest) : null;
 	}
 
 	public async findByNameAndExactVersion(
@@ -74,7 +87,7 @@ export class LibraryRepo extends BaseRepo<InstalledLibrary> {
 		minorVersion: number,
 		patchVersion: number
 	): Promise<InstalledLibrary | null> {
-		const [libs, count] = await this._em.findAndCount(this.entityName, {
+		const [entities, count] = await this._em.findAndCount(this.entityName, {
 			machineName,
 			majorVersion,
 			minorVersion,
@@ -86,7 +99,7 @@ export class LibraryRepo extends BaseRepo<InstalledLibrary> {
 		}
 
 		if (count === 1) {
-			return libs[0];
+			return InstalledLibraryEntityMapper.mapEntityToDo(entities[0]);
 		}
 
 		return null;

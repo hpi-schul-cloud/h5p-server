@@ -16,7 +16,8 @@ import path from 'node:path/posix';
 import { Readable } from 'node:stream';
 import pLimit from 'p-limit';
 import { H5P_LIBRARIES_S3_CLIENT_INJECTION_TOKEN } from '../../h5p-editor.const';
-import { InstalledLibrary, LibraryRepo } from '../../repo';
+import { InstalledLibrary } from '../installed-library.do';
+import { H5P_LIBRARY_REPO, HP5LibraryRepo } from '../interface';
 import { H5pFileVo } from '../vo';
 
 enum LibraryDependencyType {
@@ -34,7 +35,7 @@ export class LibraryStorage implements ILibraryStorage {
 	 * @param s3Client
 	 */
 	constructor(
-		private readonly libraryRepo: LibraryRepo,
+		@Inject(H5P_LIBRARY_REPO) private readonly libraryRepo: HP5LibraryRepo,
 		@Inject(H5P_LIBRARIES_S3_CLIENT_INJECTION_TOKEN) private readonly s3Client: S3ClientAdapter
 	) {}
 
@@ -91,7 +92,7 @@ export class LibraryStorage implements ILibraryStorage {
 	 * @param restricted
 	 * @returns The newly created library object
 	 */
-	public async addLibrary(libMeta: ILibraryMetadata, restricted: boolean): Promise<IInstalledLibrary> {
+	public async addLibrary(libMeta: ILibraryMetadata, restricted: boolean): Promise<InstalledLibrary> {
 		const existingLibrary = await this.libraryRepo.findByNameAndExactVersion(
 			libMeta.machineName,
 			libMeta.majorVersion,
@@ -103,7 +104,7 @@ export class LibraryStorage implements ILibraryStorage {
 			throw new ConflictException("Can't add library because it already exists");
 		}
 
-		const library = new InstalledLibrary(libMeta, restricted, undefined);
+		const library = InstalledLibrary.fromMetadata(libMeta, restricted);
 
 		await this.libraryRepo.createLibrary(library);
 
@@ -484,10 +485,11 @@ export class LibraryStorage implements ILibraryStorage {
 	): Promise<boolean> {
 		const library = await this.getLibrary(libraryName);
 
+		const libraryProps = library.getProps();
 		let dirty = false;
 		for (const [property, value] of Object.entries(additionalMetadata)) {
-			if (value !== library[property]) {
-				library[property] = value;
+			if (value !== libraryProps[property]) {
+				libraryProps[property] = value;
 				dirty = true;
 			}
 		}
@@ -496,8 +498,8 @@ export class LibraryStorage implements ILibraryStorage {
 		if (!dirty) {
 			return false;
 		}
-
-		await this.libraryRepo.save(library);
+		const newInstance = new InstalledLibrary(libraryProps);
+		await this.libraryRepo.save(newInstance);
 
 		return true;
 	}
@@ -512,9 +514,10 @@ export class LibraryStorage implements ILibraryStorage {
 			library.majorVersion,
 			library.minorVersion
 		);
+		const skipProperties = new Set(['_id', 'id', 'createdAt', 'updatedAt', 'files']);
 		let dirty = false;
 		for (const [property, value] of Object.entries(library)) {
-			if (property !== '_id' && value !== existingLibrary[property]) {
+			if (!skipProperties.has(property) && value !== existingLibrary[property]) {
 				existingLibrary[property] = value;
 				dirty = true;
 			}

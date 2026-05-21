@@ -1,8 +1,9 @@
 import { createMock, DeepMocked } from '@golevelup/ts-jest';
 import { InternalServerErrorException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
-import { H5PContentRepo } from '../../repo';
-import { h5pContentFactory, h5pCopyContentParamsFactory } from '../../testing';
+import { h5pContentDoFactory, h5pCopyContentParamsFactory } from '../../testing';
+import { H5PContent } from '../h5p-content.do';
+import { H5P_CONTENT_REPO, H5PContentRepo } from '../interface';
 import { H5pEditorContentInvalidIdLoggableException } from '../loggable';
 import { ContentStorage } from './content-storage.service';
 import { H5pEditorContentService } from './h5p-editor-content.service';
@@ -19,7 +20,7 @@ describe(H5pEditorContentService.name, () => {
 			providers: [
 				H5pEditorContentService,
 				{
-					provide: H5PContentRepo,
+					provide: H5P_CONTENT_REPO,
 					useValue: createMock<H5PContentRepo>(),
 				},
 				{
@@ -30,7 +31,7 @@ describe(H5pEditorContentService.name, () => {
 		}).compile();
 
 		service = module.get(H5pEditorContentService);
-		h5PContentRepo = module.get(H5PContentRepo);
+		h5PContentRepo = module.get(H5P_CONTENT_REPO);
 		contentStorage = module.get(ContentStorage);
 	});
 
@@ -47,16 +48,14 @@ describe(H5pEditorContentService.name, () => {
 	describe('copyH5pContent', () => {
 		describe('when the copy params are passed', () => {
 			const setup = () => {
-				const sourceContent = h5pContentFactory.build();
+				const sourceContent = h5pContentDoFactory.build();
 				const params = h5pCopyContentParamsFactory.build();
 
-				const copiedContent = h5pContentFactory.buildWithId(
-					{
-						...sourceContent,
-						...params,
-					},
-					params.copiedContentId
-				);
+				const copiedContent = new H5PContent({
+					...sourceContent.getProps(),
+					...params,
+					id: params.copiedContentId,
+				});
 
 				h5PContentRepo.findById.mockResolvedValueOnce(sourceContent);
 
@@ -82,16 +81,14 @@ describe(H5pEditorContentService.name, () => {
 
 		describe('when the files of the h5p content fail to be copied', () => {
 			const setup = () => {
-				const sourceContent = h5pContentFactory.build();
+				const sourceContent = h5pContentDoFactory.build();
 				const params = h5pCopyContentParamsFactory.build();
 
-				const copiedContent = h5pContentFactory.buildWithId(
-					{
-						...sourceContent,
-						...params,
-					},
-					params.copiedContentId
-				);
+				const copiedContent = new H5PContent({
+					...sourceContent.getProps(),
+					...params,
+					id: params.copiedContentId,
+				});
 
 				const error = new InternalServerErrorException();
 
@@ -132,7 +129,7 @@ describe(H5pEditorContentService.name, () => {
 
 	describe('getContentById', () => {
 		it('should return the content of the given id', async () => {
-			const content = h5pContentFactory.build();
+			const content = h5pContentDoFactory.build();
 			h5PContentRepo.findById.mockResolvedValueOnce(content);
 
 			const result = await service.getContentById(content.id);
