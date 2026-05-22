@@ -551,7 +551,6 @@ describe('LibraryStorage', () => {
 			const { addonLib } = await setup();
 
 			const addons = await storage.listAddons();
-			//expect(addons).toEqual([addonLib]); @TODO: Fix this test, it fails because the returned addon library is missing some properties that are not stored in the database but calculated in the InstalledLibrary class (like addTo)
 			expect(addons).toMatchObject([
 				expect.objectContaining({
 					machineName: addonLib.machineName,
