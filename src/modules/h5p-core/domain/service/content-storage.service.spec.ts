@@ -3,7 +3,7 @@ import { createMock, DeepMocked } from '@golevelup/ts-jest';
 import { CopyFiles, S3ClientAdapter } from '@infra/s3-client';
 import { s3ObjectKeysRecursiveFactory } from '@infra/s3-client/testing';
 import { IContentMetadata, ILibraryName, IUser, LibraryName } from '@lumieducation/h5p-server';
-import { BaseEntity, ObjectId } from '@mikro-orm/mongodb';
+import { ObjectId } from '@mikro-orm/mongodb';
 import {
 	HttpException,
 	InternalServerErrorException,
@@ -17,7 +17,6 @@ import { h5pContentDoFactory, h5pContentFactory } from '../../testing';
 import { H5P_CONTENT_REPO, H5PContentRepo } from '../interface';
 import { H5PContentParentParams, H5PContentParentType, LumiUserWithContentData } from '../types';
 import { ContentStorage } from './content-storage.service';
-import { GetH5PFileResponse } from '@modules/h5p-editor-app/api/dto';
 
 const helpers = {
 	buildMetadata(
@@ -75,22 +74,6 @@ const helpers = {
 			name: 'Example User',
 			type: 'user',
 		};
-	},
-
-	repoSaveMock: <Entity extends BaseEntity>(entities: Entity | Entity[]) => {
-		if (!Array.isArray(entities)) {
-			entities = [entities];
-		}
-
-		for (const entity of entities) {
-			if (!entity._id) {
-				const id = new ObjectId();
-				entity._id = id;
-				entity.id = id.toString();
-			}
-		}
-
-		return Promise.resolve();
 	},
 
 	readStream(stream: Readable): Promise<string> {
@@ -176,7 +159,6 @@ describe('ContentStorage', () => {
 					newContent: { metadata, content },
 					user,
 				} = setup();
-				contentRepo.save.mockImplementationOnce(helpers.repoSaveMock);
 
 				const id = await service.addContent(metadata, content, user);
 
@@ -205,7 +187,6 @@ describe('ContentStorage', () => {
 					user,
 				} = setup();
 				const oldId = existingContent.id;
-				contentRepo.save.mockImplementationOnce(helpers.repoSaveMock);
 				contentRepo.findById.mockResolvedValueOnce(existingContent);
 
 				const newId = await service.addContent(metadata, content, user, oldId);
@@ -507,7 +488,6 @@ describe('ContentStorage', () => {
 		describe('WHEN file does not exist', () => {
 			it('should return false', async () => {
 				const { contentID, filename } = setup();
-				// s3ClientAdapter.head.mockRejectedValueOnce(new NotFoundException('NoSuchKey'));
 				s3ClientAdapter.get.mockRejectedValue(new NotFoundException('NoSuchKey'));
 
 				const exists = await service.fileExists(contentID, filename);
@@ -519,7 +499,7 @@ describe('ContentStorage', () => {
 		describe('WHEN S3ClientAdapter.head throws error', () => {
 			it('should throw HttpException', async () => {
 				const { contentID, filename } = setup();
-				s3ClientAdapter.get.mockRejectedValueOnce(new Error());
+				s3ClientAdapter.get.mockRejectedValueOnce(new Error('S3 error'));
 
 				const existsPromise = service.fileExists(contentID, filename);
 
@@ -652,7 +632,7 @@ describe('ContentStorage', () => {
 
 				for (const range of testRanges) {
 					const { contentID, filename, user } = setup();
-					const fileResponse = createMock<GetH5PFileResponse>({ data: Readable.from('content') });
+					const fileResponse = createMock({ data: Readable.from('content') });
 					s3ClientAdapter.get.mockResolvedValueOnce(fileResponse);
 
 					const stream = await service.getFileStream(contentID, filename, user, range[0], range[1]);
