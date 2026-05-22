@@ -17,7 +17,13 @@ import { H5P_CONTENT_S3_CLIENT_CONFIG_TOKEN, H5PContentS3ClientConfig } from './
 import { H5P_CORE_CONFIG_TOKEN, H5PCoreConfig } from './h5p-core.config';
 import { H5P_CONTENT_S3_CLIENT_INJECTION_TOKEN, H5P_LIBRARIES_S3_CLIENT_INJECTION_TOKEN } from './h5p-editor.const';
 import { H5P_LIBRARIES_S3_CLIENT_CONFIG_TOKEN, H5PLibrariesS3ClientConfig } from './h5p-libraries-s3-client.config';
-import { H5PAjaxEndpointProvider, H5PCacheProvider, H5PEditorProvider, H5PPlayerProvider } from './provider';
+import {
+	H5P_CACHE_PROVIDER_TOKEN,
+	H5PAjaxEndpointProvider,
+	H5PCacheProvider,
+	H5PEditorProvider,
+	H5PPlayerProvider,
+} from './provider';
 import { H5PContentMikroOrmRepo, HP5LibraryMikroOrmRepo } from './repo';
 
 @Module({
@@ -49,6 +55,14 @@ import { H5PContentMikroOrmRepo, HP5LibraryMikroOrmRepo } from './repo';
 		TemporaryFileStorage,
 		H5pEditorContentService,
 	],
-	exports: [ContentStorage, LibraryStorage, H5PEditor, H5PPlayer, H5PAjaxEndpoint, H5pEditorContentService],
+	exports: [
+		ContentStorage,
+		LibraryStorage,
+		H5PEditor,
+		H5PPlayer,
+		H5PAjaxEndpoint,
+		H5pEditorContentService,
+		H5P_CACHE_PROVIDER_TOKEN,
+	],
 })
 export class H5PEditorModule {}
