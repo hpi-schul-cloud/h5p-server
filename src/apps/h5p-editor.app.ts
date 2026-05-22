@@ -7,7 +7,8 @@ import { install as sourceMapInstall } from 'source-map-support';
 
 // application imports
 import { Logger, LOGGER_CONFIG_TOKEN } from '@infra/logger';
-import { H5P_EDITOR_CONFIG_TOKEN, H5PEditorAppModule, H5PEditorConfig } from '@modules/h5p-editor-app';
+import { H5P_EDITOR_CONFIG_TOKEN, H5PEditorConfig } from '@modules/h5p-editor-app/h5p-editor-app.config';
+import { H5PEditorAppModule } from '@modules/h5p-editor-app/h5p-editor.app.module';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { AppStartLoggable, createRequestLoggerMiddleware, enableOpenApiDocs } from './helpers';
 

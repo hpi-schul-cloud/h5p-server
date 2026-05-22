@@ -27,4 +27,4 @@ import { H5P_EXCHANGE_CONFIG_TOKEN, H5pExchangeConfig } from './h5p-exchange.con
 	],
 	providers: [H5pEditorConsumer],
 })
-export class H5PEditorAMQPModule {}
+export class H5PConsumerModule {}
