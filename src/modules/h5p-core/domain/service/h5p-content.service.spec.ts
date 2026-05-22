@@ -6,11 +6,11 @@ import { H5PContent } from '../h5p-content.do';
 import { H5P_CONTENT_REPO, H5PContentRepo } from '../interface';
 import { H5pEditorContentInvalidIdLoggableException } from '../loggable';
 import { ContentStorage } from './content-storage.service';
-import { H5pEditorContentService } from './h5p-editor-content.service';
+import { H5pContentService } from './h5p-content.service';
 
-describe(H5pEditorContentService.name, () => {
+describe(H5pContentService.name, () => {
 	let module: TestingModule;
-	let service: H5pEditorContentService;
+	let service: H5pContentService;
 
 	let h5PContentRepo: DeepMocked<H5PContentRepo>;
 	let contentStorage: DeepMocked<ContentStorage>;
@@ -18,7 +18,7 @@ describe(H5pEditorContentService.name, () => {
 	beforeAll(async () => {
 		module = await Test.createTestingModule({
 			providers: [
-				H5pEditorContentService,
+				H5pContentService,
 				{
 					provide: H5P_CONTENT_REPO,
 					useValue: createMock<H5PContentRepo>(),
@@ -30,7 +30,7 @@ describe(H5pEditorContentService.name, () => {
 			],
 		}).compile();
 
-		service = module.get(H5pEditorContentService);
+		service = module.get(H5pContentService);
 		h5PContentRepo = module.get(H5P_CONTENT_REPO);
 		contentStorage = module.get(ContentStorage);
 	});

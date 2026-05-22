@@ -17,7 +17,7 @@ export interface H5pCopyContentParams {
 }
 
 @Injectable()
-export class H5pEditorContentService {
+export class H5pContentService {
 	constructor(
 		@Inject(H5P_CONTENT_REPO) private readonly h5PContentRepo: H5PContentRepo,
 		private readonly contentStorage: ContentStorage

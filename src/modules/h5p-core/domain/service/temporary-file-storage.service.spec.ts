@@ -5,7 +5,7 @@ import { HttpException, InternalServerErrorException, NotAcceptableException, No
 import { Test, TestingModule } from '@nestjs/testing';
 import { ReadStream } from 'node:fs';
 import { Readable } from 'node:stream';
-import { H5P_CONTENT_S3_CLIENT_INJECTION_TOKEN } from '../../h5p-editor.const';
+import { H5P_CONTENT_S3_CLIENT_INJECTION_TOKEN } from '../../h5p-core.const';
 import { TemporaryFileStorage } from './temporary-file-storage.service';
 
 const helpers = {

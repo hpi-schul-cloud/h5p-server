@@ -6,7 +6,7 @@ import { NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { Readable } from 'node:stream';
 import pLimit from 'p-limit';
-import { H5P_LIBRARIES_S3_CLIENT_INJECTION_TOKEN } from '../../h5p-editor.const';
+import { H5P_LIBRARIES_S3_CLIENT_INJECTION_TOKEN } from '../../h5p-core.const';
 import { FileMetadata, HP5LibraryMikroOrmRepo } from '../../repo';
 import { InstalledLibrary } from '../installed-library.do';
 import { H5P_LIBRARY_REPO } from '../interface';

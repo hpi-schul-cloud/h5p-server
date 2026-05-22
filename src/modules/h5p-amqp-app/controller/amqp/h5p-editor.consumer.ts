@@ -3,7 +3,7 @@ import { Logger } from '@infra/logger';
 import { registerAmqpSubscriber } from '@infra/rabbitmq';
 import { H5PEditor, IUser as LumiIUser } from '@lumieducation/h5p-server';
 import { MikroORM, RequestContext } from '@mikro-orm/core';
-import { H5PContentParentType, H5pEditorContentService } from '@modules/h5p-core';
+import { H5PContentParentType, H5pContentService } from '@modules/h5p-core';
 import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
 import { CopyContentParams, DeleteContentParams, H5pEditorEvents } from '../../domain/interface';
 import {
@@ -18,7 +18,7 @@ export class H5pEditorConsumer implements OnModuleInit {
 	constructor(
 		private readonly logger: Logger,
 		private readonly h5pEditor: H5PEditor,
-		private readonly h5pEditorContentService: H5pEditorContentService,
+		private readonly H5pContentService: H5pContentService,
 		private readonly orm: MikroORM,
 		private readonly amqpConnection: AmqpConnection,
 		@Inject(H5P_EXCHANGE_CONFIG_TOKEN)
@@ -71,7 +71,7 @@ export class H5pEditorConsumer implements OnModuleInit {
 				throw new H5pEditorExchangeInvalidParamsLoggableException(H5pEditorEvents.COPY_CONTENT, payload);
 			}
 
-			await this.h5pEditorContentService.copyH5pContent({
+			await this.H5pContentService.copyH5pContent({
 				...payload,
 				parentType,
 				creatorId: payload.userId,

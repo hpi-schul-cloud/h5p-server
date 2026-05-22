@@ -1,7 +1,7 @@
 export {
 	ContentStorage,
 	H5PContentParentType,
-	H5pEditorContentService,
+	H5pContentService,
 	H5PUploadFile,
 	LanguageType,
 	LibraryStorage,
@@ -11,5 +11,5 @@ export {
 	H5P_AVAILABLE_LIBRARIES,
 	H5P_CONTENT_S3_CLIENT_INJECTION_TOKEN,
 	H5P_LIBRARIES_S3_CLIENT_INJECTION_TOKEN,
-} from './h5p-editor.const';
-export { H5PEditorModule } from './h5p-editor.module';
+} from './h5p-core.const';
+export { H5PCoreModule } from './h5p-core.module';

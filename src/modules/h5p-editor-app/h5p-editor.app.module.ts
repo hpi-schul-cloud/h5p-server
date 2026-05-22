@@ -9,8 +9,8 @@ import { CoreModule } from '@infra/core';
 import { DATABASE_CONFIG_TOKEN, DatabaseConfig, DatabaseModule } from '@infra/database';
 import { ErrorModule } from '@infra/error';
 import { LoggerModule } from '@infra/logger';
-import { H5PEditorModule } from '@modules/h5p-core';
-import { ENTITIES } from '@modules/h5p-core/h5p-editor.entity.exports';
+import { H5PCoreModule } from '@modules/h5p-core';
+import { ENTITIES } from '@modules/h5p-core/h5p-core.entity.exports';
 import { Module } from '@nestjs/common';
 import { H5PEditorController, H5PEditorUc } from './api';
 import {
@@ -27,7 +27,7 @@ export const imports = [
 	AuthGuardModule.register([AuthGuardOptions.JWT]),
 	ConfigurationModule.register(H5P_EDITOR_CONFIG_TOKEN, H5PEditorConfig),
 	LoggerModule,
-	H5PEditorModule,
+	H5PCoreModule,
 ];
 export const controllers = [H5PEditorController];
 export const providers = [H5PEditorUc];

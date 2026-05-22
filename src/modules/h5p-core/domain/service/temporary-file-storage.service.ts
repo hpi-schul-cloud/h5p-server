@@ -11,7 +11,7 @@ import {
 } from '@nestjs/common';
 import { ReadStream } from 'node:fs';
 import { Readable } from 'node:stream';
-import { H5P_CONTENT_S3_CLIENT_INJECTION_TOKEN } from '../../h5p-editor.const';
+import { H5P_CONTENT_S3_CLIENT_INJECTION_TOKEN } from '../../h5p-core.const';
 import { H5pFileVo } from '../vo';
 
 @Injectable()

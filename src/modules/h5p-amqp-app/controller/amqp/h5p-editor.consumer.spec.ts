@@ -5,8 +5,8 @@ import * as AmqpSubscriberHelper from '@infra/rabbitmq';
 import { H5PEditor } from '@lumieducation/h5p-server';
 import { MikroORM } from '@mikro-orm/core';
 import { ObjectId } from '@mikro-orm/mongodb';
-import { H5PContentParentType, H5pEditorContentService } from '@modules/h5p-core';
-import { ENTITIES } from '@modules/h5p-core/h5p-editor.entity.exports';
+import { H5PContentParentType, H5pContentService } from '@modules/h5p-core';
+import { ENTITIES } from '@modules/h5p-core/h5p-core.entity.exports';
 import { h5pCopyContentParamsFactory } from '@modules/h5p-core/testing';
 import { Test, TestingModule } from '@nestjs/testing';
 import { setupEntities } from '@testing/database';
@@ -26,7 +26,7 @@ describe(H5pEditorConsumer.name, () => {
 
 	let logger: DeepMocked<Logger>;
 	let h5pEditor: DeepMocked<H5PEditor>;
-	let h5pEditorContentService: DeepMocked<H5pEditorContentService>;
+	let h5pContentService: DeepMocked<H5pContentService>;
 	let amqpConnection: DeepMocked<AmqpConnection>;
 
 	beforeAll(async () => {
@@ -42,8 +42,8 @@ describe(H5pEditorConsumer.name, () => {
 					useValue: createMock<H5PEditor>(),
 				},
 				{
-					provide: H5pEditorContentService,
-					useValue: createMock<H5pEditorContentService>(),
+					provide: H5pContentService,
+					useValue: createMock<H5pContentService>(),
 				},
 				{
 					provide: MikroORM,
@@ -66,7 +66,7 @@ describe(H5pEditorConsumer.name, () => {
 		consumer = module.get(H5pEditorConsumer);
 		logger = module.get(Logger);
 		h5pEditor = module.get(H5PEditor);
-		h5pEditorContentService = module.get(H5pEditorContentService);
+		h5pContentService = module.get(H5pContentService);
 		amqpConnection = module.get(AmqpConnection);
 	});
 
@@ -227,7 +227,7 @@ describe(H5pEditorConsumer.name, () => {
 
 				await consumer.copyContent(payload);
 
-				expect(h5pEditorContentService.copyH5pContent).toHaveBeenCalledWith(params);
+				expect(h5pContentService.copyH5pContent).toHaveBeenCalledWith(params);
 			});
 
 			it('should log a success info', async () => {
@@ -257,7 +257,7 @@ describe(H5pEditorConsumer.name, () => {
 			const setup = () => {
 				const payload = h5pEditorExchangeCopyContentParamsFactory.build();
 
-				h5pEditorContentService.copyH5pContent.mockRejectedValueOnce(new Error());
+				h5pContentService.copyH5pContent.mockRejectedValueOnce(new Error());
 
 				return { payload };
 			};

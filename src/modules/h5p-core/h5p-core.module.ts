@@ -8,14 +8,14 @@ import {
 	ContentStorage,
 	H5P_CONTENT_REPO,
 	H5P_LIBRARY_REPO,
-	H5pEditorContentService,
+	H5pContentService,
 	LibraryStorage,
 	TemporaryFileStorage,
 } from './domain';
 import { H5P_CACHE_CONFIG_TOKEN, H5PCacheConfig } from './h5p-cache.config';
 import { H5P_CONTENT_S3_CLIENT_CONFIG_TOKEN, H5PContentS3ClientConfig } from './h5p-content-s3-client.config';
 import { H5P_CORE_CONFIG_TOKEN, H5PCoreConfig } from './h5p-core.config';
-import { H5P_CONTENT_S3_CLIENT_INJECTION_TOKEN, H5P_LIBRARIES_S3_CLIENT_INJECTION_TOKEN } from './h5p-editor.const';
+import { H5P_CONTENT_S3_CLIENT_INJECTION_TOKEN, H5P_LIBRARIES_S3_CLIENT_INJECTION_TOKEN } from './h5p-core.const';
 import { H5P_LIBRARIES_S3_CLIENT_CONFIG_TOKEN, H5PLibrariesS3ClientConfig } from './h5p-libraries-s3-client.config';
 import {
 	H5P_CACHE_PROVIDER_TOKEN,
@@ -53,7 +53,7 @@ import { H5PContentMikroOrmRepo, HP5LibraryMikroOrmRepo } from './repo';
 		ContentStorage,
 		LibraryStorage,
 		TemporaryFileStorage,
-		H5pEditorContentService,
+		H5pContentService,
 	],
 	exports: [
 		ContentStorage,
@@ -61,8 +61,8 @@ import { H5PContentMikroOrmRepo, HP5LibraryMikroOrmRepo } from './repo';
 		H5PEditor,
 		H5PPlayer,
 		H5PAjaxEndpoint,
-		H5pEditorContentService,
+		H5pContentService,
 		H5P_CACHE_PROVIDER_TOKEN,
 	],
 })
-export class H5PEditorModule {}
+export class H5PCoreModule {}

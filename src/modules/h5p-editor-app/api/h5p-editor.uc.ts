@@ -25,7 +25,7 @@ import {
 } from '@lumieducation/h5p-server/build/src/types';
 import {
 	H5PContentParentType,
-	H5pEditorContentService,
+	H5pContentService,
 	H5PUploadFile,
 	LanguageType,
 	LibraryStorage,
@@ -66,7 +66,7 @@ export class H5PEditorUc {
 		private readonly h5pAjaxEndpoint: H5PAjaxEndpoint,
 		private readonly libraryService: LibraryStorage,
 		private readonly authorizationClientAdapter: AuthorizationClientAdapter,
-		private readonly h5pContentService: H5pEditorContentService,
+		private readonly h5pContentService: H5pContentService,
 		private readonly logger: Logger
 	) {
 		this.logger.setContext(H5PEditorUc.name);

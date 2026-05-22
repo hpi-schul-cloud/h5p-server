@@ -12,7 +12,7 @@ import {
 } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { Readable } from 'node:stream';
-import { H5P_CONTENT_S3_CLIENT_INJECTION_TOKEN } from '../../h5p-editor.const';
+import { H5P_CONTENT_S3_CLIENT_INJECTION_TOKEN } from '../../h5p-core.const';
 import { h5pContentDoFactory, h5pContentFactory } from '../../testing';
 import { H5P_CONTENT_REPO, H5PContentRepo } from '../interface';
 import { H5PContentParentParams, H5PContentParentType, LumiUserWithContentData } from '../types';
