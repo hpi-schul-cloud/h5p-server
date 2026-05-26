@@ -10,14 +10,14 @@ import { ENTITIES } from '@modules/h5p-core/h5p-core.entity.exports';
 import { h5pCopyContentParamsFactory } from '@modules/h5p-core/testing';
 import { Test, TestingModule } from '@nestjs/testing';
 import { setupEntities } from '@testing/database';
-import { CopyContentParams, CopyContentParentType, DeleteContentParams, H5pEditorEvents } from '../../domain/interface';
+import { CopyContentParams, CopyContentParentType, DeleteContentParams, H5pEditorEvents } from '../domain/interface';
 import {
 	H5pEditorContentCopySuccessfulLoggable,
 	H5pEditorContentDeletionSuccessfulLoggable,
 	H5pEditorExchangeInvalidParamsLoggableException,
-} from '../../domain/loggable';
-import { H5P_EXCHANGE_CONFIG_TOKEN } from '../../h5p-exchange.config';
-import { h5pEditorExchangeCopyContentParamsFactory } from '../../testing';
+} from '../domain/loggable';
+import { H5P_EXCHANGE_CONFIG_TOKEN } from '../h5p-exchange.config';
+import { h5pEditorExchangeCopyContentParamsFactory } from '../testing';
 import { H5pEditorConsumer } from './h5p-editor.consumer';
 
 describe(H5pEditorConsumer.name, () => {

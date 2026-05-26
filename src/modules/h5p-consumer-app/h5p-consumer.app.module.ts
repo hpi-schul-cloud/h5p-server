@@ -5,7 +5,7 @@ import { RABBITMQ_CONFIG_TOKEN, RabbitMQConfig, RabbitMQWrapperModule } from '@i
 import { H5PCoreModule } from '@modules/h5p-core';
 import { ENTITIES } from '@modules/h5p-core/h5p-core.entity.exports';
 import { Module } from '@nestjs/common';
-import { H5pEditorConsumer } from './controller/amqp';
+import { H5pEditorConsumer } from './amqp';
 import { H5P_EXCHANGE_CONFIG_TOKEN, H5pExchangeConfig } from './h5p-exchange.config';
 
 @Module({

@@ -5,13 +5,13 @@ import { H5PEditor, IUser as LumiIUser } from '@lumieducation/h5p-server';
 import { MikroORM, RequestContext } from '@mikro-orm/core';
 import { H5PContentParentType, H5pContentService } from '@modules/h5p-core';
 import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
-import { CopyContentParams, DeleteContentParams, H5pEditorEvents } from '../../domain/interface';
+import { CopyContentParams, DeleteContentParams, H5pEditorEvents } from '../domain/interface';
 import {
 	H5pEditorContentCopySuccessfulLoggable,
 	H5pEditorContentDeletionSuccessfulLoggable,
 	H5pEditorExchangeInvalidParamsLoggableException,
-} from '../../domain/loggable';
-import { H5P_EXCHANGE_CONFIG_TOKEN, H5pExchangeConfig } from '../../h5p-exchange.config';
+} from '../domain/loggable';
+import { H5P_EXCHANGE_CONFIG_TOKEN, H5pExchangeConfig } from '../h5p-exchange.config';
 
 @Injectable()
 export class H5pEditorConsumer implements OnModuleInit {
