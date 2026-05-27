@@ -388,11 +388,14 @@ describe('LibraryStorage', () => {
 
 				repo.findOneByNameAndVersionOrFail.mockResolvedValue(libFromDatabase);
 
-				// @ts-expect-error test
-				testingLib.props.author = 'Test Author';
-				const updatedLibrary = await storage.updateLibrary(testingLib);
-				const retrievedLibrary = await storage.getLibrary(testingLib);
-				expect(retrievedLibrary).toEqual(updatedLibrary);
+				const updateMetadata: ILibraryMetadata = {
+					...libFromDatabaseMetadata,
+					author: 'Test Author',
+				};
+				const updatedLibrary = await storage.updateLibrary(updateMetadata);
+
+				expect(updatedLibrary.author).toEqual('Test Author');
+				expect(updatedLibrary.machineName).toEqual(testingLib.machineName);
 				expect(repo.save).toHaveBeenCalled();
 			});
 
