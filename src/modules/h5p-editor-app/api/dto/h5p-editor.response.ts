@@ -1,7 +1,6 @@
 /* eslint-disable max-classes-per-file */
 import { ContentParameters, IContentMetadata, IEditorModel, IIntegration } from '@lumieducation/h5p-server';
 import { ApiProperty } from '@nestjs/swagger';
-import type { Readable } from 'node:stream';
 
 export class H5PEditorModelResponse {
 	constructor(editorModel: IEditorModel) {
@@ -20,15 +19,6 @@ export class H5PEditorModelResponse {
 	// This is a list of URLs that point to the CSS files the H5P editor needs to load
 	@ApiProperty()
 	styles: string[];
-}
-
-export interface GetH5PFileResponse {
-	data: Readable;
-	etag?: string;
-	contentType?: string;
-	contentLength?: number;
-	contentRange?: string;
-	name: string;
 }
 
 export interface H5PContentResponse {
