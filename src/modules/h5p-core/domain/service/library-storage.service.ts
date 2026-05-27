@@ -408,9 +408,11 @@ export class LibraryStorage implements ILibraryStorage {
 	 * Lists all installed libraries or the installed libraries that have the machine name
 	 * @param machineName (optional) only return libraries that have this machine name
 	 */
-	public getInstalledLibraryNames(machineName?: string): Promise<ILibraryName[]> {
+	public async getInstalledLibraryNames(machineName?: string): Promise<ILibraryName[]> {
 		if (machineName) {
-			return this.libraryRepo.findByName(machineName);
+			const library = await this.libraryRepo.findByName(machineName);
+
+			return library.map((lib) => lib.getProps());
 		}
 
 		return this.libraryRepo.getAll();
