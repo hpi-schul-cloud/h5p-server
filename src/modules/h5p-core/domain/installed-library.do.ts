@@ -181,4 +181,12 @@ export class InstalledLibrary extends DomainObject<InstalledLibraryProps> implem
 			updatedAt: now,
 		});
 	}
+
+	/**
+	 * Returns a plain object representation for JSON serialization.
+	 * This ensures the object is cached correctly in CachedLibraryStorage.
+	 */
+	public toJSON(): InstalledLibraryProps {
+		return this.getProps();
+	}
 }

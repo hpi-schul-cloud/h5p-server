@@ -409,13 +409,17 @@ export class LibraryStorage implements ILibraryStorage {
 	 * @param machineName (optional) only return libraries that have this machine name
 	 */
 	public async getInstalledLibraryNames(machineName?: string): Promise<ILibraryName[]> {
-		if (machineName) {
-			const library = await this.libraryRepo.findByName(machineName);
+		const libraries = machineName ? await this.libraryRepo.findByName(machineName) : await this.libraryRepo.getAll();
 
-			return library.map((lib) => lib.getProps());
-		}
+		return libraries.map((lib) => {
+			const props = lib.getProps();
 
-		return this.libraryRepo.getAll();
+			return {
+				machineName: props.machineName,
+				majorVersion: props.majorVersion,
+				minorVersion: props.minorVersion,
+			};
+		});
 	}
 
 	/**
@@ -438,11 +442,13 @@ export class LibraryStorage implements ILibraryStorage {
 	 * @param library
 	 */
 	public getLibrary(library: ILibraryName): Promise<InstalledLibrary> {
-		return this.libraryRepo.findOneByNameAndVersionOrFail(
+		const installedLibrary = this.libraryRepo.findOneByNameAndVersionOrFail(
 			library.machineName,
 			library.majorVersion,
 			library.minorVersion
 		);
+
+		return installedLibrary;
 	}
 
 	/**
@@ -529,16 +535,23 @@ export class LibraryStorage implements ILibraryStorage {
 			library.majorVersion,
 			library.minorVersion
 		);
+		const existingProps = existingLibrary.getProps();
 		const skipProperties = new Set(['_id', 'id', 'createdAt', 'updatedAt', 'files']);
 		let dirty = false;
+
 		for (const [property, value] of Object.entries(library)) {
-			if (!skipProperties.has(property) && value !== existingLibrary[property]) {
-				existingLibrary[property] = value;
+			if (!skipProperties.has(property) && value !== existingProps[property]) {
+				existingProps[property] = value;
 				dirty = true;
 			}
 		}
+
 		if (dirty) {
-			await this.libraryRepo.save(existingLibrary);
+			existingProps.updatedAt = new Date();
+			const updatedLibrary = new InstalledLibrary(existingProps);
+			await this.libraryRepo.save(updatedLibrary);
+
+			return updatedLibrary;
 		}
 
 		return existingLibrary;
