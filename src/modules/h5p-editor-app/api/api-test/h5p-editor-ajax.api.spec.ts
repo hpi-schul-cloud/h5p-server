@@ -224,6 +224,64 @@ describe('H5PEditor Controller (api)', () => {
 			});
 		});
 
+		describe('when postAjax throws an error with a message', () => {
+			const setup = () => {
+				const teacherUser = currentUserFactory.withRoleTeacher().build();
+
+				const loggedInClient = TestApiClient.createWithJwt(app, baseRoute, teacherUser);
+
+				const dummyBody = { contentId: 'id', field: 'field', libraries: ['dummyLibrary-1.0'], libraryParameters: '' };
+
+				const errorMessage = 'Something went wrong in H5P';
+				ajaxEndpoint.postAjax.mockRejectedValueOnce(new Error(errorMessage));
+				authorizationClientAdapter.getUser.mockResolvedValueOnce({ language: 'de' } as MeResponse);
+
+				return { loggedInClient, dummyBody, errorMessage };
+			};
+
+			it('should return InternalServerErrorException with the error message', async () => {
+				const { loggedInClient, dummyBody, errorMessage } = setup();
+
+				const response = await loggedInClient.post(`ajax?action=libraries`, dummyBody);
+
+				expect(response.status).toEqual(HttpStatus.INTERNAL_SERVER_ERROR);
+				expect(response.body).toEqual(
+					new AjaxErrorResponse('', HttpStatus.INTERNAL_SERVER_ERROR, 'InternalServerErrorException', errorMessage)
+				);
+			});
+		});
+
+		describe('when postAjax throws an error without a message', () => {
+			const setup = () => {
+				const teacherUser = currentUserFactory.withRoleTeacher().build();
+
+				const loggedInClient = TestApiClient.createWithJwt(app, baseRoute, teacherUser);
+
+				const dummyBody = { contentId: 'id', field: 'field', libraries: ['dummyLibrary-1.0'], libraryParameters: '' };
+
+				ajaxEndpoint.postAjax.mockRejectedValueOnce({});
+				authorizationClientAdapter.getUser.mockResolvedValueOnce({ language: 'de' } as MeResponse);
+
+				return { loggedInClient, dummyBody };
+			};
+
+			it('should return InternalServerErrorException with default error message', async () => {
+				const { loggedInClient, dummyBody } = setup();
+
+				const response = await loggedInClient.post(`ajax?action=libraries`, dummyBody);
+
+				expect(response.status).toEqual(HttpStatus.INTERNAL_SERVER_ERROR);
+				expect(response.body).toEqual(
+					new AjaxErrorResponse(
+						'',
+						HttpStatus.INTERNAL_SERVER_ERROR,
+						'InternalServerErrorException',
+						'Error processing H5P AJAX request'
+					)
+				);
+			});
+		});
+
 		describe('when an error is thrown', () => {
 			const setup = () => {
 				const teacherUser = currentUserFactory.withRoleTeacher().build();

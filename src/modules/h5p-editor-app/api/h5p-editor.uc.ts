@@ -343,6 +343,9 @@ export class H5PEditorUc {
 				contentRange: range, // Range can be undefined, typings from @lumieducation/h5p-server are wrong
 			};
 		} catch (err) {
+			if (err instanceof HttpException) {
+				throw err;
+			}
 			throw new NotFoundException('getContentFile failed', { cause: err });
 		}
 	}
@@ -378,6 +381,9 @@ export class H5PEditorUc {
 				contentRange: range, // Range can be undefined, typings from @lumieducation/h5p-server are wrong
 			};
 		} catch (err) {
+			if (err instanceof HttpException) {
+				throw err;
+			}
 			throw new NotFoundException('getTemporaryFile failed', { cause: err });
 		}
 	}

@@ -234,6 +234,53 @@ describe('H5PEditor Controller (api)', () => {
 
 				expect(response.statusCode).toEqual(HttpStatus.NOT_FOUND);
 			});
+
+			// Note: Testing 'invalid range' (range === -2) requires a malformed Range header like 'foo=0-5'.
+			// This cannot be reliably tested via API integration tests because the H5P library
+			// doesn't properly handle exceptions from the range callback, causing test timeouts.
+			// The 'invalid range' case is covered by unit tests in h5p-editor.uc.spec.ts.
+			it.skip('should return 400 for invalid range header', async () => {
+				const { loggedInClient, content } = await setup();
+
+				const mockFile = { content: 'Test File', size: 9, name: 'test.txt', birthtime: new Date() };
+
+				contentStorage.getFileStats.mockResolvedValueOnce({ birthtime: mockFile.birthtime, size: mockFile.size });
+
+				const response = await loggedInClient.get(`content/${content.id}/${mockFile.name}`).set('Range', 'foo=0-5'); // Triggers range === -2 (malformed range type)
+
+				expect(response.statusCode).toEqual(HttpStatus.BAD_REQUEST);
+				expect(response.body.message).toBe('invalid range');
+			});
+
+			it('should return 400 for unsatisfiable range', async () => {
+				const { loggedInClient, content } = await setup();
+
+				const mockFile = { content: 'Test File', size: 9, name: 'test.txt', birthtime: new Date() };
+
+				contentStorage.getFileStats.mockResolvedValueOnce({ birthtime: mockFile.birthtime, size: mockFile.size });
+
+				const response = await loggedInClient
+					.get(`content/${content.id}/${mockFile.name}`)
+					.set('Range', 'bytes=100-200');
+
+				expect(response.statusCode).toEqual(HttpStatus.BAD_REQUEST);
+				expect(response.body.message).toBe('unsatisfiable range');
+			});
+
+			it('should return 400 for multipart ranges', async () => {
+				const { loggedInClient, content } = await setup();
+
+				const mockFile = { content: 'Test File', size: 9, name: 'test.txt', birthtime: new Date() };
+
+				contentStorage.getFileStats.mockResolvedValueOnce({ birthtime: mockFile.birthtime, size: mockFile.size });
+
+				const response = await loggedInClient
+					.get(`content/${content.id}/${mockFile.name}`)
+					.set('Range', 'bytes=0-2,4-6');
+
+				expect(response.statusCode).toEqual(HttpStatus.BAD_REQUEST);
+				expect(response.body.message).toBe('multipart ranges are unsupported');
+			});
 		});
 	});
 
@@ -303,6 +350,43 @@ describe('H5PEditor Controller (api)', () => {
 				const response = await loggedInClient.get(`temp-files/nonexistant.txt`);
 
 				expect(response.statusCode).toEqual(HttpStatus.NOT_FOUND);
+			});
+
+			// Note: Testing 'invalid range' (range === -2) requires a malformed Range header like 'foo=0-5'.
+			// This cannot be reliably tested via API integration tests because the H5P library
+			// doesn't properly handle exceptions from the range callback, causing test timeouts.
+			// The 'invalid range' case is covered by unit tests in h5p-editor.uc.spec.ts.
+			it.skip('should return 400 for invalid range header', async () => {
+				const { loggedInClient, mockFile, mockFileStats } = setup();
+
+				temporaryStorage.getFileStats.mockResolvedValueOnce(mockFileStats);
+
+				const response = await loggedInClient.get(`temp-files/${mockFile.name}`).set('Range', 'foo=0-5');
+
+				expect(response.statusCode).toEqual(HttpStatus.BAD_REQUEST);
+				expect(response.body.message).toBe('invalid range');
+			});
+
+			it('should return 400 for unsatisfiable range', async () => {
+				const { loggedInClient, mockFile, mockFileStats } = setup();
+
+				temporaryStorage.getFileStats.mockResolvedValueOnce(mockFileStats);
+
+				const response = await loggedInClient.get(`temp-files/${mockFile.name}`).set('Range', 'bytes=100-200');
+
+				expect(response.statusCode).toEqual(HttpStatus.BAD_REQUEST);
+				expect(response.body.message).toBe('unsatisfiable range');
+			});
+
+			it('should return 400 for multipart ranges', async () => {
+				const { loggedInClient, mockFile, mockFileStats } = setup();
+
+				temporaryStorage.getFileStats.mockResolvedValueOnce(mockFileStats);
+
+				const response = await loggedInClient.get(`temp-files/${mockFile.name}`).set('Range', 'bytes=0-2,4-6');
+
+				expect(response.statusCode).toEqual(HttpStatus.BAD_REQUEST);
+				expect(response.body.message).toBe('multipart ranges are unsupported');
 			});
 		});
 	});
