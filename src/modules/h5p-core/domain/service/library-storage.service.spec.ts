@@ -19,7 +19,14 @@ function readStream(stream: Readable): Promise<string> {
 	return new Promise((resolve, reject) => {
 		stream.on('data', (chunk) => chunks.push(chunk));
 		stream.on('error', reject);
-		stream.on('end', () => resolve(Buffer.concat(chunks).toString('utf-8')));
+		stream.on('end', () => {
+			const allBuffers = chunks.every((chunk) => Buffer.isBuffer(chunk));
+			if (allBuffers) {
+				resolve(Buffer.concat(chunks).toString('utf-8'));
+			} else {
+				resolve(chunks.join(''));
+			}
+		});
 	});
 }
 
@@ -409,6 +416,39 @@ describe('LibraryStorage', () => {
 				const updateLibrary = storage.updateLibrary(testingLib);
 				await expect(updateLibrary).rejects.toThrow('Library is not installed');
 			});
+
+			it('should return existing library without saving when nothing has changed', async () => {
+				const { testingLib } = await setup();
+
+				repo.save.mockClear();
+
+				const libFromDatabaseMetadata: ILibraryMetadata = {
+					runnable: false,
+					title: 'Existing Title',
+					patchVersion: testingLib.patchVersion,
+					machineName: testingLib.machineName,
+					majorVersion: testingLib.majorVersion,
+					minorVersion: testingLib.minorVersion,
+				};
+				const libFromDatabase = InstalledLibrary.fromMetadata(libFromDatabaseMetadata);
+
+				repo.findOneByNameAndVersionOrFail.mockResolvedValue(libFromDatabase);
+
+				// Pass the same metadata - nothing should change
+				const updateMetadata: ILibraryMetadata = {
+					runnable: false,
+					title: 'Existing Title',
+					patchVersion: testingLib.patchVersion,
+					machineName: testingLib.machineName,
+					majorVersion: testingLib.majorVersion,
+					minorVersion: testingLib.minorVersion,
+				};
+
+				const result = await storage.updateLibrary(updateMetadata);
+
+				expect(result).toBe(libFromDatabase);
+				expect(repo.save).not.toHaveBeenCalled();
+			});
 		});
 
 		describe('when updating additional metadata', () => {
@@ -511,6 +551,74 @@ describe('LibraryStorage', () => {
 				const { ubername } = await setup();
 
 				await expect(storage.getLibraryFile(ubername, 'language/')).rejects.toThrow('illegal-filename');
+			});
+		});
+
+		describe('when getting a non-library.json file from S3', () => {
+			const setup = () => {
+				const ubername = 'H5P.TestLib-1.2';
+				const fileContent = 'console.log("test");';
+				const mockStream = Readable.from(Buffer.from(fileContent));
+
+				s3ClientAdapter.get.mockResolvedValueOnce({
+					data: mockStream,
+					contentType: 'application/javascript',
+					contentLength: fileContent.length,
+					contentRange: undefined,
+					etag: 'test-etag',
+				});
+
+				return { ubername, fileContent, mockStream };
+			};
+
+			it('should fetch JavaScript file from S3 with correct mimetype', async () => {
+				const { ubername, fileContent } = setup();
+				const fileName = 'scripts/test.js';
+
+				const result = await storage.getLibraryFile(ubername, fileName);
+
+				expect(result.mimetype).toBe('text/javascript');
+				expect(result.size).toBe(fileContent.length);
+				expect(s3ClientAdapter.get).toHaveBeenCalledWith(`h5p-libraries/${ubername}/${fileName}`);
+			});
+
+			it('should fetch CSS file from S3 with correct mimetype', async () => {
+				const { ubername } = setup();
+				const fileName = 'styles/main.css';
+
+				const result = await storage.getLibraryFile(ubername, fileName);
+
+				expect(result.mimetype).toBe('text/css');
+			});
+
+			it('should use application/octet-stream for unknown file types', async () => {
+				const { ubername } = setup();
+				const fileName = 'data/unknown.unknownext';
+
+				const result = await storage.getLibraryFile(ubername, fileName);
+
+				expect(result.mimetype).toBe('application/octet-stream');
+			});
+
+			it('should return stream from S3 response', async () => {
+				const { ubername, fileContent } = setup();
+				const fileName = 'scripts/test.js';
+
+				const result = await storage.getLibraryFile(ubername, fileName);
+
+				const content = await readStream(result.stream);
+				expect(content).toBe(fileContent);
+			});
+
+			it('should fetch from S3 when readLibraryJsonFromS3 is true for library.json', async () => {
+				const { ubername, fileContent } = setup();
+				const fileName = 'library.json';
+
+				const result = await storage.getLibraryFile(ubername, fileName, true);
+
+				expect(result.mimetype).toBe('application/json');
+				expect(result.size).toBe(fileContent.length);
+				expect(s3ClientAdapter.get).toHaveBeenCalledWith(`h5p-libraries/${ubername}/${fileName}`);
 			});
 		});
 	});
@@ -890,6 +998,20 @@ describe('LibraryStorage', () => {
 				});
 
 				expect(streamContents).toEqual(testFile.content);
+			});
+
+			it('should return library.json stream from metadata when readLibraryJsonFromS3 is false', async () => {
+				const { testingLib } = await setup();
+				repo.findOneByNameAndVersionOrFail.mockResolvedValueOnce(testingLib);
+
+				const fileStream = await storage.getFileStream(testingLib, 'library.json', false);
+
+				const streamContents = await readStream(fileStream);
+
+				const parsedContents = JSON.parse(streamContents);
+				expect(parsedContents.machineName).toEqual(testingLib.machineName);
+				expect(parsedContents.majorVersion).toEqual(testingLib.majorVersion);
+				expect(parsedContents.minorVersion).toEqual(testingLib.minorVersion);
 			});
 		});
 		describe('when getting file stats', () => {
