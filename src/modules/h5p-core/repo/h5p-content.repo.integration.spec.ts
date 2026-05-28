@@ -1,7 +1,7 @@
 import { EntityManager } from '@mikro-orm/mongodb';
 import { Test, TestingModule } from '@nestjs/testing';
 import { cleanupCollections, MongoMemoryDatabaseModule } from '@testing/database';
-import { h5pContentFactory, h5pEntityLibraryTestFactory } from '../testing';
+import { h5pContentDoFactory, h5pContentFactory, h5pEntityLibraryTestFactory } from '../testing';
 import { H5PContentEntity, InstalledLibraryEntity } from './entity';
 import { H5PContentMikroOrmRepo } from './h5p-content.repo';
 
@@ -79,6 +79,25 @@ describe('ContentRepo', () => {
 
 			expect(result).toBeDefined();
 			expect(result).toBeTruthy();
+		});
+	});
+
+	describe('save', () => {
+		it('should create a new entity when it does not exist in unit of work', async () => {
+			const h5pContentDo = h5pContentDoFactory.build();
+
+			await repo.save(h5pContentDo);
+
+			const result = await repo.findById(h5pContentDo.id);
+
+			expect(result).toBeDefined();
+			expect(result.id).toEqual(h5pContentDo.id);
+			expect(result.creatorId).toEqual(h5pContentDo.creatorId);
+			expect(result.parentType).toEqual(h5pContentDo.parentType);
+			expect(result.parentId).toEqual(h5pContentDo.parentId);
+			expect(result.schoolId).toEqual(h5pContentDo.schoolId);
+			expect(result.metadata).toEqual(h5pContentDo.metadata);
+			expect(result.content).toEqual(h5pContentDo.content);
 		});
 	});
 
