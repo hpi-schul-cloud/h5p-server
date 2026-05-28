@@ -4,7 +4,12 @@ import { AuthorizationClientAdapter } from '@infra/authorization-client';
 import { Logger } from '@infra/logger';
 import { H5PAjaxEndpoint, H5PEditor, H5PPlayer } from '@lumieducation/h5p-server';
 import { H5PContentParentType, H5pContentService, LibraryStorage } from '@modules/h5p-core';
-import { BadRequestException, InternalServerErrorException } from '@nestjs/common';
+import {
+    BadRequestException,
+    HttpException,
+    InternalServerErrorException,
+    NotAcceptableException,
+} from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { Request } from 'express';
 import * as fs from 'node:fs';
@@ -28,6 +33,7 @@ describe('H5PEditorUc', () => {
 	let module: TestingModule;
 	let uc: H5PEditorUc;
 
+	let h5pEditor: DeepMocked<H5PEditor>;
 	let h5pAjaxEndpoint: DeepMocked<H5PAjaxEndpoint>;
 	let h5pContentService: DeepMocked<H5pContentService>;
 	let authorizationClientAdapter: DeepMocked<AuthorizationClientAdapter>;
@@ -72,6 +78,7 @@ describe('H5PEditorUc', () => {
 		}).compile();
 
 		uc = module.get(H5PEditorUc);
+		h5pEditor = module.get(H5PEditor);
 		h5pAjaxEndpoint = module.get(H5PAjaxEndpoint);
 		h5pContentService = module.get(H5pContentService);
 		authorizationClientAdapter = module.get(AuthorizationClientAdapter);
@@ -419,6 +426,41 @@ describe('H5PEditorUc', () => {
 					undefined,
 					undefined // libraryUploadFile should be undefined
 				);
+			});
+		});
+	});
+
+	describe('deleteH5pContent', () => {
+		const setup = () => {
+			const userId = 'test-user-id';
+			const contentId = 'test-content-id';
+
+			h5pContentService.getContentById.mockResolvedValue({
+				parentType: H5PContentParentType.BoardElement,
+				parentId: 'parent-id',
+				metadata: { title: 'Test' },
+			} as never);
+
+			authorizationClientAdapter.checkPermissionsByReference.mockResolvedValue(undefined);
+
+			return { userId, contentId };
+		};
+
+		describe('when h5pEditor.deleteContent throws an error', () => {
+			it('should throw HttpException with NotAcceptableException as cause', async () => {
+				const { userId, contentId } = setup();
+				const errorMessage = 'Content could not be deleted';
+
+				h5pEditor.deleteContent.mockRejectedValue(new Error(errorMessage));
+
+				try {
+					await uc.deleteH5pContent(userId, contentId);
+					fail('Expected HttpException to be thrown');
+				} catch (error) {
+					expect(error).toBeInstanceOf(HttpException);
+					expect((error as HttpException).getStatus()).toBe(400);
+					expect((error as HttpException).cause).toBeInstanceOf(NotAcceptableException);
+				}
 			});
 		});
 	});
