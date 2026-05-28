@@ -56,6 +56,9 @@ describe('ContentRepo', () => {
 			expect(result.id).toEqual(h5pContent.id);
 			expect(result.creatorId).toEqual(h5pContent.creatorId);
 			expect(result.parentType).toEqual(h5pContent.parentType);
+			expect(result.schoolId).toEqual(h5pContent.schoolId);
+			expect(result.createdAt).toEqual(h5pContent.createdAt);
+			expect(result.updatedAt).toEqual(h5pContent.updatedAt);
 		});
 
 		it('should fail if entity does not exist', async () => {
