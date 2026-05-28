@@ -5,11 +5,11 @@ import { Logger } from '@infra/logger';
 import { H5PAjaxEndpoint, H5PEditor, H5PPlayer } from '@lumieducation/h5p-server';
 import { H5PContentParentType, H5pContentService, LibraryStorage } from '@modules/h5p-core';
 import {
-    BadRequestException,
-    HttpException,
-    InternalServerErrorException,
-    NotAcceptableException,
-    NotFoundException,
+	BadRequestException,
+	HttpException,
+	InternalServerErrorException,
+	NotAcceptableException,
+	NotFoundException,
 } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { Request } from 'express';

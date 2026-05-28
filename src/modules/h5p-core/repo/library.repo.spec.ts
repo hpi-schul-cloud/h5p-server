@@ -470,4 +470,62 @@ describe('LibraryRepo', () => {
 			expect(result.getProps().files[1].size).toBe(300);
 		});
 	});
+
+	describe('delete', () => {
+		it('should delete a single library', async () => {
+			const libMetadata: ILibraryMetadata = {
+				runnable: false,
+				title: 'Delete Single Test',
+				patchVersion: 1,
+				machineName: 'deleteSingleTestLib',
+				majorVersion: 1,
+				minorVersion: 0,
+			};
+			const library = InstalledLibrary.fromMetadata(libMetadata);
+			await libraryRepo.createLibrary(library);
+
+			const found = await libraryRepo.findOneByNameAndVersionOrFail('deleteSingleTestLib', 1, 0);
+			expect(found).toBeDefined();
+
+			await libraryRepo.delete(library);
+
+			const result = await libraryRepo.findByName('deleteSingleTestLib');
+			expect(result).toHaveLength(0);
+		});
+
+		it('should delete multiple libraries at once', async () => {
+			const libMetadata1: ILibraryMetadata = {
+				runnable: false,
+				title: 'Delete Multi Test 1',
+				patchVersion: 1,
+				machineName: 'deleteMultiTestLib1',
+				majorVersion: 1,
+				minorVersion: 0,
+			};
+			const libMetadata2: ILibraryMetadata = {
+				runnable: false,
+				title: 'Delete Multi Test 2',
+				patchVersion: 1,
+				machineName: 'deleteMultiTestLib2',
+				majorVersion: 1,
+				minorVersion: 0,
+			};
+			const library1 = InstalledLibrary.fromMetadata(libMetadata1);
+			const library2 = InstalledLibrary.fromMetadata(libMetadata2);
+			await libraryRepo.createLibrary(library1);
+			await libraryRepo.createLibrary(library2);
+
+			const found1 = await libraryRepo.findByName('deleteMultiTestLib1');
+			const found2 = await libraryRepo.findByName('deleteMultiTestLib2');
+			expect(found1).toHaveLength(1);
+			expect(found2).toHaveLength(1);
+
+			await libraryRepo.delete([library1, library2]);
+
+			const result1 = await libraryRepo.findByName('deleteMultiTestLib1');
+			const result2 = await libraryRepo.findByName('deleteMultiTestLib2');
+			expect(result1).toHaveLength(0);
+			expect(result2).toHaveLength(0);
+		});
+	});
 });
