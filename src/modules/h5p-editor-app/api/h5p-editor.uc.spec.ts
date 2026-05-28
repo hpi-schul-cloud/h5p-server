@@ -117,16 +117,16 @@ describe('H5PEditorUc', () => {
 				// Mock getContentFile to call the range callback immediately
 				h5pAjaxEndpoint.getContentFile.mockImplementation(
 					// eslint-disable-next-line @typescript-eslint/no-explicit-any
-					async (_contentId, _file, _user, rangeCallback): Promise<any> => {
+					(_contentId, _file, _user, rangeCallback): Promise<any> => {
 						// Call the range callback with a file size - this triggers our getRange method
 						rangeCallback?.(1000);
 
-						return {
+						return Promise.resolve({
 							mimetype: 'text/plain',
 							range: { start: 0, end: 5 },
 							stats: { size: 1000, birthtime: new Date() },
 							stream: Readable.from(['test']),
-						};
+						});
 					}
 				);
 
@@ -151,16 +151,16 @@ describe('H5PEditorUc', () => {
 
 				// Mock getTemporaryFile to call the range callback immediately
 				// eslint-disable-next-line @typescript-eslint/no-explicit-any
-				h5pAjaxEndpoint.getTemporaryFile.mockImplementation(async (_file, _user, rangeCallback): Promise<any> => {
+				h5pAjaxEndpoint.getTemporaryFile.mockImplementation((_file, _user, rangeCallback): Promise<any> => {
 					// Call the range callback with a file size - this triggers our getRange method
 					rangeCallback?.(1000);
 
-					return {
+					return Promise.resolve({
 						mimetype: 'text/plain',
 						range: { start: 0, end: 5 },
 						stats: { size: 1000, birthtime: new Date() },
 						stream: Readable.from(['test']),
-					};
+					});
 				});
 
 				await expect(uc.getTemporaryFile(file, req, currentUser)).rejects.toThrow(
@@ -176,15 +176,15 @@ describe('H5PEditorUc', () => {
 
 				h5pAjaxEndpoint.getContentFile.mockImplementation(
 					// eslint-disable-next-line @typescript-eslint/no-explicit-any
-					async (_contentId, _file, _user, rangeCallback): Promise<any> => {
+					(_contentId, _file, _user, rangeCallback): Promise<any> => {
 						rangeCallback?.(1000);
 
-						return {
+						return Promise.resolve({
 							mimetype: 'text/plain',
 							range: { start: 0, end: 5 },
 							stats: { size: 1000, birthtime: new Date() },
 							stream: Readable.from(['test']),
-						};
+						});
 					}
 				);
 
@@ -204,15 +204,15 @@ describe('H5PEditorUc', () => {
 
 				h5pAjaxEndpoint.getContentFile.mockImplementation(
 					// eslint-disable-next-line @typescript-eslint/no-explicit-any
-					async (_contentId, _file, _user, rangeCallback): Promise<any> => {
+					(_contentId, _file, _user, rangeCallback): Promise<any> => {
 						rangeCallback?.(1000);
 
-						return {
+						return Promise.resolve({
 							mimetype: 'text/plain',
 							range: { start: 0, end: 5 },
 							stats: { size: 1000, birthtime: new Date() },
 							stream: Readable.from(['test']),
-						};
+						});
 					}
 				);
 
@@ -229,15 +229,15 @@ describe('H5PEditorUc', () => {
 
 				h5pAjaxEndpoint.getContentFile.mockImplementation(
 					// eslint-disable-next-line @typescript-eslint/no-explicit-any
-					async (_contentId, _file, _user, rangeCallback): Promise<any> => {
+					(_contentId, _file, _user, rangeCallback): Promise<any> => {
 						const range = rangeCallback?.(1000);
 
-						return {
+						return Promise.resolve({
 							mimetype: 'text/plain',
 							range,
 							stats: { size: 1000, birthtime: new Date() },
 							stream: Readable.from(['test']),
-						};
+						});
 					}
 				);
 
@@ -255,15 +255,15 @@ describe('H5PEditorUc', () => {
 
 				h5pAjaxEndpoint.getContentFile.mockImplementation(
 					// eslint-disable-next-line @typescript-eslint/no-explicit-any
-					async (_contentId, _file, _user, rangeCallback): Promise<any> => {
+					(_contentId, _file, _user, rangeCallback): Promise<any> => {
 						const range = rangeCallback?.(1000);
 
-						return {
+						return Promise.resolve({
 							mimetype: 'text/plain',
 							range,
 							stats: { size: 1000, birthtime: new Date() },
 							stream: Readable.from(['test']),
-						};
+						});
 					}
 				);
 
