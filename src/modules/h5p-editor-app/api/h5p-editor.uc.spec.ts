@@ -9,6 +9,7 @@ import {
     HttpException,
     InternalServerErrorException,
     NotAcceptableException,
+    NotFoundException,
 } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { Request } from 'express';
@@ -37,6 +38,7 @@ describe('H5PEditorUc', () => {
 	let h5pAjaxEndpoint: DeepMocked<H5PAjaxEndpoint>;
 	let h5pContentService: DeepMocked<H5pContentService>;
 	let authorizationClientAdapter: DeepMocked<AuthorizationClientAdapter>;
+	let logger: DeepMocked<Logger>;
 
 	beforeAll(async () => {
 		module = await Test.createTestingModule({
@@ -82,6 +84,7 @@ describe('H5PEditorUc', () => {
 		h5pAjaxEndpoint = module.get(H5PAjaxEndpoint);
 		h5pContentService = module.get(H5pContentService);
 		authorizationClientAdapter = module.get(AuthorizationClientAdapter);
+		logger = module.get(Logger);
 	});
 
 	afterAll(async () => {
@@ -345,6 +348,23 @@ describe('H5PEditorUc', () => {
 			});
 		});
 
+		describe('when SVG file deletion fails', () => {
+			it('should log a warning and not throw an error', async () => {
+				const currentUser = createCurrentUser();
+				const svgFile = createSvgFile();
+				const deletionError = new Error('ENOENT: no such file or directory');
+
+				h5pAjaxEndpoint.postAjax.mockResolvedValue([]);
+				(fs.unlinkSync as jest.Mock).mockImplementation(() => {
+					throw deletionError;
+				});
+
+				await uc.postAjax(currentUser, { action: 'libraries' }, {} as never, svgFile);
+
+				expect(logger.warning).toHaveBeenCalled();
+			});
+		});
+
 		describe('when non-SVG file is uploaded', () => {
 			it('should not attempt to clean up any temporary file', async () => {
 				const currentUser = createCurrentUser();
@@ -460,6 +480,85 @@ describe('H5PEditorUc', () => {
 					expect(error).toBeInstanceOf(HttpException);
 					expect((error as HttpException).getStatus()).toBe(400);
 					expect((error as HttpException).cause).toBeInstanceOf(NotAcceptableException);
+				}
+			});
+		});
+	});
+
+	describe('getAjax', () => {
+		describe('when action is content-type-cache', () => {
+			const createCurrentUser = (): ICurrentUser => ({
+				userId: 'test-user-id',
+				schoolId: 'test-school-id',
+				accountId: 'test-account-id',
+				roles: [],
+				isExternalUser: false,
+				support: false,
+			});
+
+			it('should filter libraries based on whitelist', async () => {
+				const currentUser = createCurrentUser();
+
+				authorizationClientAdapter.checkPermissionsByReference.mockResolvedValue(undefined);
+				authorizationClientAdapter.getUser.mockResolvedValue({ language: 'de' } as never);
+
+				const allLibraries = [
+					{ machineName: 'H5P.Blanks' },
+					{ machineName: 'H5P.DragQuestion' },
+					{ machineName: 'H5P.NotAllowed' },
+				];
+
+				h5pAjaxEndpoint.getAjax.mockResolvedValue({
+					libraries: allLibraries,
+				} as never);
+
+				// Get the config mock and set libraryList
+				const config = module.get<H5PEditorConfig>(H5P_EDITOR_CONFIG_TOKEN);
+				(config as { libraryList: string[] }).libraryList = ['H5P.Blanks', 'H5P.DragQuestion'];
+
+				const result = await uc.getAjax({ action: 'content-type-cache' }, currentUser);
+
+				// eslint-disable-next-line @typescript-eslint/no-explicit-any
+				const hubInfo = result as any;
+				expect(hubInfo.libraries).toHaveLength(2);
+				expect(hubInfo.libraries).toEqual(
+					expect.arrayContaining([{ machineName: 'H5P.Blanks' }, { machineName: 'H5P.DragQuestion' }])
+				);
+				expect(hubInfo.libraries).not.toEqual(expect.arrayContaining([{ machineName: 'H5P.NotAllowed' }]));
+			});
+		});
+	});
+
+	describe('getContentParameters', () => {
+		const setup = () => {
+			const contentId = 'test-content-id';
+			const userId = 'test-user-id';
+
+			h5pContentService.getContentById.mockResolvedValue({
+				parentType: H5PContentParentType.BoardElement,
+				parentId: 'parent-id',
+				metadata: { title: 'Test' },
+			} as never);
+
+			authorizationClientAdapter.checkPermissionsByReference.mockResolvedValue(undefined);
+
+			return { contentId, userId };
+		};
+
+		describe('when h5pAjaxEndpoint.getContentParameters throws an error', () => {
+			it('should throw NotFoundException with the original error as cause', async () => {
+				const { contentId, userId } = setup();
+				const originalError = new Error('Content parameters not found');
+
+				h5pAjaxEndpoint.getContentParameters.mockRejectedValue(originalError);
+
+				try {
+					await uc.getContentParameters(contentId, userId);
+					fail('Expected NotFoundException to be thrown');
+				} catch (error) {
+					expect(error).toBeInstanceOf(NotFoundException);
+					expect((error as NotFoundException).message).toBe('Not Found');
+					expect((error as NotFoundException).cause).toBe(originalError);
 				}
 			});
 		});
