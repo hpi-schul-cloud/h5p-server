@@ -2,7 +2,7 @@ import { ILibraryMetadata } from '@lumieducation/h5p-server';
 import { EntityManager } from '@mikro-orm/mongodb';
 import { Test, TestingModule } from '@nestjs/testing';
 import { cleanupCollections, MongoMemoryDatabaseModule } from '@testing/database';
-import { InstalledLibrary } from '../domain/installed-library.do';
+import { InstalledLibrary } from '../domain';
 import { FileMetadata, InstalledLibraryEntity, LibraryName, Path } from './entity';
 import { HP5LibraryMikroOrmRepo } from './library.repo';
 

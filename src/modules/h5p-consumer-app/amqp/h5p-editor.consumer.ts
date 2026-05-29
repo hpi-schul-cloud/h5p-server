@@ -18,7 +18,7 @@ export class H5pEditorConsumer implements OnModuleInit {
 	constructor(
 		private readonly logger: Logger,
 		private readonly h5pEditor: H5PEditor,
-		private readonly H5pContentService: H5pContentService,
+		private readonly h5pContentService: H5pContentService,
 		private readonly orm: MikroORM,
 		private readonly amqpConnection: AmqpConnection,
 		@Inject(H5P_EXCHANGE_CONFIG_TOKEN)
@@ -71,7 +71,7 @@ export class H5pEditorConsumer implements OnModuleInit {
 				throw new H5pEditorExchangeInvalidParamsLoggableException(H5pEditorEvents.COPY_CONTENT, payload);
 			}
 
-			await this.H5pContentService.copyH5pContent({
+			await this.h5pContentService.copyH5pContent({
 				...payload,
 				parentType,
 				creatorId: payload.userId,

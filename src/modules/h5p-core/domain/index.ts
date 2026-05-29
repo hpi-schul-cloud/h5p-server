@@ -1,4 +1,3 @@
-export * from '../provider';
 export * from './factory';
 export * from './h5p-content.do';
 export * from './installed-library.do';

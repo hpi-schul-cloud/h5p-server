@@ -3,8 +3,7 @@ import { Utils } from '@mikro-orm/core';
 import { EntityManager } from '@mikro-orm/mongodb';
 import { Injectable } from '@nestjs/common';
 import { EntityId } from '@shared/domain/types';
-import { H5PContentRepo, H5PCountUsageResult } from '../domain';
-import { H5PContent } from '../domain/h5p-content.do';
+import { H5PContent, H5PContentRepo, H5PCountUsageResult } from '../domain';
 import { H5PContentEntity } from './entity';
 import { H5PContentEntityMapper } from './mapper';
 
@@ -45,7 +44,9 @@ export class H5PContentMikroOrmRepo implements H5PContentRepo {
 	public async findById(contentId: EntityId): Promise<H5PContent> {
 		const entity = await this._em.findOneOrFail(this.entityName, { id: contentId });
 
-		return H5PContentEntityMapper.mapEntityToDo(entity);
+		const domainObject = H5PContentEntityMapper.mapEntityToDo(entity);
+
+		return domainObject;
 	}
 
 	public async countUsage(library: ILibraryName): Promise<H5PCountUsageResult> {
