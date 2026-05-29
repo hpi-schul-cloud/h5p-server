@@ -1,5 +1,6 @@
 import { Loggable, LogMessage } from '@infra/logger';
 import { ILibraryAdministrationOverviewItem, ILibraryInstallResult } from '@lumieducation/h5p-server';
+import { formatLibraryInstallResults } from './format-library-install-result.helper';
 
 export class H5PLibraryManagementMetricsLoggable implements Loggable {
 	constructor(
@@ -21,44 +22,8 @@ export class H5PLibraryManagementMetricsLoggable implements Loggable {
 				uninstalledLibraries: this.uninstalledLibraries
 					.map((lib) => `${lib.machineName}-${lib.majorVersion}.${lib.minorVersion}.${lib.patchVersion}`)
 					.join(', '),
-				installedLibraries: this.installedLibraries
-					.map((lib) => {
-						let result = '';
-						if (lib.type === 'new') {
-							result = `${lib.newVersion?.machineName ?? ''}-${lib.newVersion?.majorVersion ?? ''}.${
-								lib.newVersion?.minorVersion ?? ''
-							}.${lib.newVersion?.patchVersion ?? ''}`;
-						}
-						if (lib.type === 'patch') {
-							result = `${lib.oldVersion?.machineName ?? ''}-${lib.oldVersion?.majorVersion ?? ''}.${
-								lib.oldVersion?.minorVersion ?? ''
-							}.${lib.oldVersion?.patchVersion ?? ''} -> ${lib.newVersion?.machineName ?? ''}-${
-								lib.newVersion?.majorVersion ?? ''
-							}.${lib.newVersion?.minorVersion ?? ''}.${lib.newVersion?.patchVersion ?? ''}`;
-						}
-
-						return result;
-					})
-					.join(', '),
-				synchronizedLibraries: this.synchronizedLibraries
-					.map((lib) => {
-						let result = '';
-						if (lib.type === 'new') {
-							result = `${lib.newVersion?.machineName ?? ''}-${lib.newVersion?.majorVersion ?? ''}.${
-								lib.newVersion?.minorVersion ?? ''
-							}.${lib.newVersion?.patchVersion ?? ''}`;
-						}
-						if (lib.type === 'patch') {
-							result = `${lib.oldVersion?.machineName ?? ''}-${lib.oldVersion?.majorVersion ?? ''}.${
-								lib.oldVersion?.minorVersion ?? ''
-							}.${lib.oldVersion?.patchVersion ?? ''} -> ${lib.newVersion?.machineName ?? ''}-${
-								lib.newVersion?.majorVersion ?? ''
-							}.${lib.newVersion?.minorVersion ?? ''}.${lib.newVersion?.patchVersion ?? ''}`;
-						}
-
-						return result;
-					})
-					.join(', '),
+				installedLibraries: formatLibraryInstallResults(this.installedLibraries),
+				synchronizedLibraries: formatLibraryInstallResults(this.synchronizedLibraries),
 				brokenLibraries: this.brokenLibraries
 					.map((lib) => `${lib.machineName}-${lib.majorVersion}.${lib.minorVersion}.${lib.patchVersion}`)
 					.join(', '),

@@ -1,5 +1,6 @@
 import { Loggable, LogMessage } from '@infra/logger';
 import { ILibraryInstallResult } from '@lumieducation/h5p-server';
+import { formatLibraryInstallResults } from './format-library-install-result.helper';
 
 export class H5PLibraryManagementInstallResultsLoggable implements Loggable {
 	constructor(private readonly installResult: ILibraryInstallResult[]) {}
@@ -9,25 +10,7 @@ export class H5PLibraryManagementInstallResultsLoggable implements Loggable {
 		const logMessage = {
 			message: `Added/updated ${this.installResult.length} libraries from H5P Hub.`,
 			data: {
-				installResult: this.installResult
-					.map((lib) => {
-						let result = '';
-						if (lib.type === 'new') {
-							result = `${lib.newVersion?.machineName ?? ''}-${lib.newVersion?.majorVersion ?? ''}.${
-								lib.newVersion?.minorVersion ?? ''
-							}.${lib.newVersion?.patchVersion ?? ''}`;
-						}
-						if (lib.type === 'patch') {
-							result = `${lib.oldVersion?.machineName ?? ''}-${lib.oldVersion?.majorVersion ?? ''}.${
-								lib.oldVersion?.minorVersion ?? ''
-							}.${lib.oldVersion?.patchVersion ?? ''} -> ${lib.newVersion?.machineName ?? ''}-${
-								lib.newVersion?.majorVersion ?? ''
-							}.${lib.newVersion?.minorVersion ?? ''}.${lib.newVersion?.patchVersion ?? ''}`;
-						}
-
-						return result;
-					})
-					.join(', '),
+				installResult: formatLibraryInstallResults(this.installResult),
 			},
 		};
 
