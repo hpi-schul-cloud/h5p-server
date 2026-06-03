@@ -8,7 +8,6 @@
 		"start:h5p:dev": "nest start h5p-editor --debug --watch",
 		"start:h5p:prod": "node dist/apps/h5p-editor.app",
 		"start:h5p:consumer": "nest start h5p-editor-consumer",
-		"start:h5p:consumer:dev": "nest start h5p-editor-consumer --debug --watch",
 		"start:h5p:consumer:prod": "node dist/apps/h5p-editor-consumer.app",
 		"start:h5p:library-management": "nest start h5p-library-management",
 		"start:h5p:library-management:dev": "nest start h5p-library-management --debug --watch",
