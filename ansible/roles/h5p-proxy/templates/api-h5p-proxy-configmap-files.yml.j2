@@ -16,9 +16,11 @@ data:
         # BC-11625 - disable buffering to prevent 504 Gateway Timeout for large file uploads
         proxy_buffering off;
         proxy_request_buffering off;
-        proxy_connect_timeout {{ H5P_PROXY_CONNECT_TIMEOUT }};
-        proxy_read_timeout {{ H5P_PROXY_READ_TIMEOUT }};
-        proxy_send_timeout {{ H5P_PROXY_SEND_TIMEOUT }};
+        # client_body_timeout controls how long nginx waits between successive client body reads
+        client_body_timeout {{ H5P_PROXY_READ_TIMEOUT_IN_SECONDS }}s;
+        proxy_connect_timeout {{ H5P_PROXY_CONNECT_TIMEOUT_IN_SECONDS }}s;
+        proxy_read_timeout {{ H5P_PROXY_READ_TIMEOUT_IN_SECONDS }}s;
+        proxy_send_timeout {{ H5P_PROXY_SEND_TIMEOUT_IN_SECONDS }}s;
         proxy_hide_header 'Access-Control-Allow-Origin';
         add_header 'Access-Control-Allow-Origin' $http_origin;
         proxy_ssl_server_name on;
@@ -57,9 +59,11 @@ data:
         # BC-11625 - disable buffering to prevent 504 Gateway Timeout for large file uploads
         proxy_buffering off;
         proxy_request_buffering off;
-        proxy_connect_timeout {{ H5P_PROXY_CONNECT_TIMEOUT }};
-        proxy_read_timeout {{ H5P_PROXY_READ_TIMEOUT }};
-        proxy_send_timeout {{ H5P_PROXY_SEND_TIMEOUT }};
+        # client_body_timeout controls how long nginx waits between successive client body reads
+        client_body_timeout {{ H5P_PROXY_READ_TIMEOUT_IN_SECONDS }}s;
+        proxy_connect_timeout {{ H5P_PROXY_CONNECT_TIMEOUT_IN_SECONDS }}s;
+        proxy_read_timeout {{ H5P_PROXY_READ_TIMEOUT_IN_SECONDS }}s;
+        proxy_send_timeout {{ H5P_PROXY_SEND_TIMEOUT_IN_SECONDS }}s;
         proxy_ssl_server_name on;
         proxy_intercept_errors off;
         proxy_cookie_domain h5p.org '{{ H5P_PROXY_PREFIX }}{{ DOMAIN }}';

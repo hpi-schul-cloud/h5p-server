@@ -104,7 +104,7 @@ Set this variable in your environment before running the script.
 
 To package H5P libraries using `package-h5p-libraries.ts`, you need the following environment variables:
 
-- `H5P_EDITOR__LIBRARY_LIST`: Required. A comma-separated list of H5P library machine names to package (e.g., `H5P.Blanks,H5P.MultiChoice,H5P.DragQuestion`). See [`src/modules/h5p-content-management/h5p-editor.config.ts`](../../src/modules/h5p-content-management/h5p-editor.config.ts) for the default list of supported libraries.
+- `H5P_EDITOR__LIBRARY_LIST`: Required. A comma-separated list of H5P library machine names to package (e.g., `H5P.Blanks,H5P.MultiChoice,H5P.DragQuestion`). See [`src/modules/h5p-content-management/h5p-core.const.ts`](../../src/modules/h5p-core/h5p-core.const.ts) for the default list of supported libraries.
 - `GITHUB_PERSONAL_ACCESS_TOKEN`: Required. Set this variable to a valid GitHub personal access token. Without a token, the script uses unauthenticated GitHub API access, which is limited to 60 requests per hour and will likely fail for larger operations. With a token, the rate limit increases to 5,000 requests per hour. A token is also required to access private repositories.
 
 Set these variables in your environment before running the script.

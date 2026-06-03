@@ -6,12 +6,22 @@ export interface S3Config {
 	bucket: string;
 	accessKeyId: string;
 	secretAccessKey: string;
+	maximumAttempts: number;
+	backoffDelayTimeMs: number;
+	maxSockets: number;
 }
 
 export interface S3ClientModuleOptions {
 	clientInjectionToken: string;
 	configInjectionToken: string;
 	configConstructor: new () => S3Config;
+	folderLifecycleRules?: FolderLifecycleRule[];
+	deletedFolderName?: string;
+}
+
+export interface FolderLifecycleRule {
+	folder: string;
+	expirationDays: number;
 }
 
 export interface GetFile {
