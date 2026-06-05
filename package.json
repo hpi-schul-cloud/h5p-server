@@ -43,7 +43,8 @@
 	"homepage": "https://github.com/hpi-schul-cloud/h5p-server#readme",
 	"description": "A server for hosting H5P content, providing an API for content management and delivery.",
 	"overrides": {
-		"underscore": "1.13.8"
+		"underscore": "1.13.8",
+		"sanitize-html": "2.17.4"
 	},
 	"dependencies": {
 		"@aws-sdk/client-s3": "^3.1021.0",
