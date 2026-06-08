@@ -98,7 +98,7 @@
 		"@nestjs/testing": "^11.1.17",
 		"@openapitools/openapi-generator-cli": "^2.31.0",
 		"@swc/cli": "^0.8.1",
-		"@swc/core": "^1.15.21",
+		"@swc/core": "^1.15.40",
 		"@swc/jest": "^0.2.39",
 		"@types/express": "^5.0.6",
 		"@types/jest": "^30.0.0",
