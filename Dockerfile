@@ -11,7 +11,7 @@ COPY src ./src
 RUN npm run build
 RUN npm prune --production
 
-FROM registry.opencode.de/oci-community/images/zendis/nodejs:24-minimal AS production
+FROM gcr.io/distroless/nodejs24-debian13:nonroot AS production
 
 WORKDIR /app
 
@@ -24,6 +24,6 @@ COPY --from=builder /app/dist ./dist
 
 USER nonroot
 
-EXPOSE 4448 9090
+EXPOSE 3344 9090
 
-CMD ["node", "dist/apps/h5p-editor.app.js"]
+CMD ["/nodejs/bin/node", "dist/apps/h5p-editor.app.js"]
