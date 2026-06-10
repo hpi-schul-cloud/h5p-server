@@ -3,10 +3,9 @@ import { Logger } from '@infra/logger';
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { AmqpConnectionLostLoggable } from './loggable';
 
-export type ShutdownCallback = (exitCode: number) => void;
+export type ShutdownCallback = (exitCode: number) => void | Promise<void>;
 
-// eslint-disable-next-line @typescript-eslint/no-empty-function
-const noopShutdown: ShutdownCallback = () => {};
+const noopShutdown: ShutdownCallback = () => undefined;
 
 @Injectable()
 export class AmqpConnectionGuard implements OnModuleInit {
