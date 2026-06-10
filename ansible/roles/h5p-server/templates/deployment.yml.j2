@@ -53,7 +53,7 @@ spec:
       - name: api-h5p
         image: {{ H5P_SERVER_IMAGE }}:{{ H5P_SERVER_IMAGE_TAG }}
         imagePullPolicy: IfNotPresent
-        command: ['node', 'dist/apps/h5p-editor.app.js']
+        command: ['/nodejs/bin/node', 'dist/apps/h5p-editor.app.js']
         ports:
         - containerPort: 4448
           name: api-h5p
