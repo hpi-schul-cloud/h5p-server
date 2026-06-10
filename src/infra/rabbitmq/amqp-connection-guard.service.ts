@@ -47,8 +47,13 @@ export class AmqpConnectionGuard implements OnModuleInit {
 	}
 
 	private invokeShutdownCallback(exitCode: number): void {
+		// Swap to noop before invoking to ensure idempotency - if multiple
+		// disconnect/connectFailed events fire, only the first invokes the callback
+		const callback = this.shutdownCallback;
+		this.shutdownCallback = noopShutdown;
+
 		try {
-			const result = this.shutdownCallback(exitCode);
+			const result = callback(exitCode);
 			if (result instanceof Promise) {
 				result.catch((err: unknown) => {
 					this.logger.warning(new ErrorLoggable(err, { msg: 'Shutdown callback rejected' }));

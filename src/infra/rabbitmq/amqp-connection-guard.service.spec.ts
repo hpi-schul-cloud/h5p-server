@@ -213,4 +213,25 @@ describe('AmqpConnectionGuard', () => {
 			expect(logger.warning).toHaveBeenNthCalledWith(2, expect.any(ErrorLoggable));
 		});
 	});
+
+	describe('when multiple connection events fire', () => {
+		const setup = () => {
+			const shutdownCallback: ShutdownCallback = jest.fn();
+
+			guard.setShutdownCallback(shutdownCallback);
+			guard.onModuleInit();
+
+			return { shutdownCallback };
+		};
+
+		it('should only invoke the shutdown callback once', () => {
+			const { shutdownCallback } = setup();
+
+			mockManagedConnection.emit('disconnect', { err: new Error('First disconnect') });
+			mockManagedConnection.emit('disconnect', { err: new Error('Second disconnect') });
+			mockManagedConnection.emit('connectFailed', { err: new Error('Connect failed') });
+
+			expect(shutdownCallback).toHaveBeenCalledTimes(1);
+		});
+	});
 });
