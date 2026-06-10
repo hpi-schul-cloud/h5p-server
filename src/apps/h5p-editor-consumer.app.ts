@@ -12,12 +12,14 @@ async function bootstrap(): Promise<void> {
 	sourceMapInstall();
 
 	const nestApp = await NestFactory.create(H5PConsumerModule);
-	await nestApp.init();
 
+	// Set up graceful shutdown before init() so the callback is registered
+	// before AmqpConnectionGuard.onModuleInit() runs and potentially emits connection failures
 	const logger = await nestApp.resolve(Logger);
 	logger.setContext('H5P_CONSUMER_APP');
-
 	setupGracefulShutdown(nestApp, logger);
+
+	await nestApp.init();
 
 	const appStartLoggable = new AppStartLoggable({ appName: 'H5P Editor AMQP Consumer' });
 	logger.info(appStartLoggable);
