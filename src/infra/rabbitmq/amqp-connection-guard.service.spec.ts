@@ -1,5 +1,6 @@
 import { AmqpConnection } from '@golevelup/nestjs-rabbitmq';
 import { createMock, DeepMocked } from '@golevelup/ts-jest';
+import { ErrorLoggable } from '@infra/error/loggable';
 import { Logger } from '@infra/logger';
 import { Test, TestingModule } from '@nestjs/testing';
 import { AmqpConnectionGuard, ShutdownCallback } from './amqp-connection-guard.service';
@@ -153,6 +154,63 @@ describe('AmqpConnectionGuard', () => {
 			mockManagedConnection.emit('disconnect', { err: new Error('Test error') });
 
 			expect(shutdownCallback).toHaveBeenCalledWith(1);
+		});
+	});
+
+	describe('when shutdown callback throws synchronously', () => {
+		const setup = () => {
+			const callbackError = new Error('Callback threw');
+			const shutdownCallback: ShutdownCallback = () => {
+				throw callbackError;
+			};
+
+			guard.setShutdownCallback(shutdownCallback);
+			guard.onModuleInit();
+
+			return { callbackError };
+		};
+
+		it('should catch the error and log it', () => {
+			setup();
+
+			mockManagedConnection.emit('disconnect', { err: new Error('Connection lost') });
+
+			expect(logger.warning).toHaveBeenCalledTimes(2);
+			expect(logger.warning).toHaveBeenNthCalledWith(1, expect.any(AmqpConnectionLostLoggable));
+			expect(logger.warning).toHaveBeenNthCalledWith(2, expect.any(ErrorLoggable));
+		});
+
+		it('should not throw', () => {
+			setup();
+
+			expect(() => {
+				mockManagedConnection.emit('disconnect', { err: new Error('Connection lost') });
+			}).not.toThrow();
+		});
+	});
+
+	describe('when shutdown callback returns a rejected promise', () => {
+		const setup = () => {
+			const callbackError = new Error('Callback rejected');
+			const shutdownCallback: ShutdownCallback = jest.fn(() => Promise.reject(callbackError));
+
+			guard.setShutdownCallback(shutdownCallback);
+			guard.onModuleInit();
+
+			return { shutdownCallback, callbackError };
+		};
+
+		it('should catch the rejection and log it', async () => {
+			setup();
+
+			mockManagedConnection.emit('disconnect', { err: new Error('Connection lost') });
+
+			// Allow the promise rejection to be handled
+			await Promise.resolve();
+
+			expect(logger.warning).toHaveBeenCalledTimes(2);
+			expect(logger.warning).toHaveBeenNthCalledWith(1, expect.any(AmqpConnectionLostLoggable));
+			expect(logger.warning).toHaveBeenNthCalledWith(2, expect.any(ErrorLoggable));
 		});
 	});
 });

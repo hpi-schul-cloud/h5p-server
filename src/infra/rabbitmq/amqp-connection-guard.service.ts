@@ -1,4 +1,5 @@
 import { AmqpConnection } from '@golevelup/nestjs-rabbitmq';
+import { ErrorLoggable } from '@infra/error/loggable';
 import { Logger } from '@infra/logger';
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { AmqpConnectionLostLoggable } from './loggable';
@@ -42,6 +43,19 @@ export class AmqpConnectionGuard implements OnModuleInit {
 
 	private handleConnectionLost(error: Error): void {
 		this.logger.warning(new AmqpConnectionLostLoggable(error));
-		this.shutdownCallback(1);
+		this.invokeShutdownCallback(1);
+	}
+
+	private invokeShutdownCallback(exitCode: number): void {
+		try {
+			const result = this.shutdownCallback(exitCode);
+			if (result instanceof Promise) {
+				result.catch((err: unknown) => {
+					this.logger.warning(new ErrorLoggable(err, { msg: 'Shutdown callback rejected' }));
+				});
+			}
+		} catch (err) {
+			this.logger.warning(new ErrorLoggable(err, { msg: 'Shutdown callback threw' }));
+		}
 	}
 }
