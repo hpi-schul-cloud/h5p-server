@@ -61,7 +61,7 @@ spec:
             name: api-h5p-configmap
         - secretRef:
             name: api-h5p-secret
-        command: ['node', 'dist/apps/h5p-editor-consumer.app.js']
+        command: ['/nodejs/bin/node', 'dist/apps/h5p-editor-consumer.app.js']
         resources:
           limits:
             cpu: {{ API_H5P_CONSUMER_CPU_LIMITS|default("1000m", true) }}
