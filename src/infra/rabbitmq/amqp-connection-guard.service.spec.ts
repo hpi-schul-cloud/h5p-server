@@ -1,9 +1,8 @@
 import { AmqpConnection } from '@golevelup/nestjs-rabbitmq';
 import { createMock, DeepMocked } from '@golevelup/ts-jest';
-import { ErrorLoggable } from '@infra/error/loggable';
 import { Logger } from '@infra/logger';
 import { Test, TestingModule } from '@nestjs/testing';
-import { AmqpConnectionGuard, ShutdownCallback } from './amqp-connection-guard.service';
+import { AmqpConnectionGuard } from './amqp-connection-guard.service';
 import { AmqpConnectionLostLoggable } from './loggable';
 
 describe('AmqpConnectionGuard', () => {
@@ -11,6 +10,7 @@ describe('AmqpConnectionGuard', () => {
 	let guard: AmqpConnectionGuard;
 	let amqpConnection: DeepMocked<AmqpConnection>;
 	let logger: DeepMocked<Logger>;
+	let processExitSpy: jest.SpyInstance;
 
 	const createMockManagedConnection = () => {
 		const listeners = new Map<string, ((...args: unknown[]) => void)[]>();
@@ -53,10 +53,12 @@ describe('AmqpConnectionGuard', () => {
 
 		guard = module.get(AmqpConnectionGuard);
 		logger = module.get(Logger);
+		processExitSpy = jest.spyOn(process, 'exit').mockImplementation(() => undefined as never);
 	});
 
 	afterEach(() => {
 		jest.resetAllMocks();
+		processExitSpy.mockRestore();
 	});
 
 	it('should be defined', () => {
@@ -79,13 +81,11 @@ describe('AmqpConnectionGuard', () => {
 
 	describe('when connection is lost (disconnect event)', () => {
 		const setup = () => {
-			const shutdownCallback: ShutdownCallback = jest.fn();
 			const error = new Error('Connection lost');
 
-			guard.setShutdownCallback(shutdownCallback);
 			guard.onModuleInit();
 
-			return { shutdownCallback, error };
+			return { error };
 		};
 
 		it('should log the error', () => {
@@ -96,35 +96,33 @@ describe('AmqpConnectionGuard', () => {
 			expect(logger.warning).toHaveBeenCalledWith(expect.any(AmqpConnectionLostLoggable));
 		});
 
-		it('should call the shutdown callback with exit code 1', () => {
-			const { shutdownCallback, error } = setup();
+		it('should call process.exit with exit code 1', () => {
+			const { error } = setup();
 
 			mockManagedConnection.emit('disconnect', { err: error });
 
-			expect(shutdownCallback).toHaveBeenCalledWith(1);
+			expect(processExitSpy).toHaveBeenCalledWith(1);
 		});
 
 		describe('when error is undefined', () => {
 			it('should use a default error message', () => {
-				const { shutdownCallback } = setup();
+				setup();
 
 				mockManagedConnection.emit('disconnect', {});
 
 				expect(logger.warning).toHaveBeenCalledWith(expect.any(AmqpConnectionLostLoggable));
-				expect(shutdownCallback).toHaveBeenCalledWith(1);
+				expect(processExitSpy).toHaveBeenCalledWith(1);
 			});
 		});
 	});
 
 	describe('when connection fails (connectFailed event)', () => {
 		const setup = () => {
-			const shutdownCallback: ShutdownCallback = jest.fn();
 			const error = new Error('Failed to connect');
 
-			guard.setShutdownCallback(shutdownCallback);
 			guard.onModuleInit();
 
-			return { shutdownCallback, error };
+			return { error };
 		};
 
 		it('should log the error', () => {
@@ -135,103 +133,12 @@ describe('AmqpConnectionGuard', () => {
 			expect(logger.warning).toHaveBeenCalledWith(expect.any(AmqpConnectionLostLoggable));
 		});
 
-		it('should call the shutdown callback with exit code 1', () => {
-			const { shutdownCallback, error } = setup();
+		it('should call process.exit with exit code 1', () => {
+			const { error } = setup();
 
 			mockManagedConnection.emit('connectFailed', { err: error });
 
-			expect(shutdownCallback).toHaveBeenCalledWith(1);
-		});
-	});
-
-	describe('setShutdownCallback', () => {
-		it('should store the callback and call it when connection is lost', () => {
-			const shutdownCallback: ShutdownCallback = jest.fn();
-
-			guard.setShutdownCallback(shutdownCallback);
-			guard.onModuleInit();
-
-			mockManagedConnection.emit('disconnect', { err: new Error('Test error') });
-
-			expect(shutdownCallback).toHaveBeenCalledWith(1);
-		});
-	});
-
-	describe('when shutdown callback throws synchronously', () => {
-		const setup = () => {
-			const callbackError = new Error('Callback threw');
-			const shutdownCallback: ShutdownCallback = () => {
-				throw callbackError;
-			};
-
-			guard.setShutdownCallback(shutdownCallback);
-			guard.onModuleInit();
-
-			return { callbackError };
-		};
-
-		it('should catch the error and log it', () => {
-			setup();
-
-			mockManagedConnection.emit('disconnect', { err: new Error('Connection lost') });
-
-			expect(logger.warning).toHaveBeenCalledTimes(2);
-			expect(logger.warning).toHaveBeenNthCalledWith(1, expect.any(AmqpConnectionLostLoggable));
-			expect(logger.warning).toHaveBeenNthCalledWith(2, expect.any(ErrorLoggable));
-		});
-
-		it('should not throw', () => {
-			setup();
-
-			expect(() => {
-				mockManagedConnection.emit('disconnect', { err: new Error('Connection lost') });
-			}).not.toThrow();
-		});
-	});
-
-	describe('when shutdown callback returns a rejected promise', () => {
-		const setup = () => {
-			const callbackError = new Error('Callback rejected');
-			const shutdownCallback: ShutdownCallback = jest.fn(() => Promise.reject(callbackError));
-
-			guard.setShutdownCallback(shutdownCallback);
-			guard.onModuleInit();
-
-			return { shutdownCallback, callbackError };
-		};
-
-		it('should catch the rejection and log it', async () => {
-			setup();
-
-			mockManagedConnection.emit('disconnect', { err: new Error('Connection lost') });
-
-			// Allow the promise rejection to be handled
-			await Promise.resolve();
-
-			expect(logger.warning).toHaveBeenCalledTimes(2);
-			expect(logger.warning).toHaveBeenNthCalledWith(1, expect.any(AmqpConnectionLostLoggable));
-			expect(logger.warning).toHaveBeenNthCalledWith(2, expect.any(ErrorLoggable));
-		});
-	});
-
-	describe('when multiple connection events fire', () => {
-		const setup = () => {
-			const shutdownCallback: ShutdownCallback = jest.fn();
-
-			guard.setShutdownCallback(shutdownCallback);
-			guard.onModuleInit();
-
-			return { shutdownCallback };
-		};
-
-		it('should only invoke the shutdown callback once', () => {
-			const { shutdownCallback } = setup();
-
-			mockManagedConnection.emit('disconnect', { err: new Error('First disconnect') });
-			mockManagedConnection.emit('disconnect', { err: new Error('Second disconnect') });
-			mockManagedConnection.emit('connectFailed', { err: new Error('Connect failed') });
-
-			expect(shutdownCallback).toHaveBeenCalledTimes(1);
+			expect(processExitSpy).toHaveBeenCalledWith(1);
 		});
 	});
 });
