@@ -37,7 +37,7 @@ export class RabbitMQWrapperModule {
 				LoggerModule,
 			],
 			providers: [AmqpConnectionGuard],
-			exports: [RabbitMQModule, AmqpConnectionGuard],
+			exports: [RabbitMQModule],
 		};
 	}
 }
