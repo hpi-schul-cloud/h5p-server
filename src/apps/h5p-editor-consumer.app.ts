@@ -9,11 +9,14 @@ async function bootstrap(): Promise<void> {
 	sourceMapInstall();
 
 	const nestApp = await NestFactory.create(H5PConsumerModule);
-	await nestApp.init();
 
 	const logger = await nestApp.resolve(Logger);
-	const appStartLoggable = new AppStartLoggable({ appName: 'H5P Editor AMQP Consumer' });
 	logger.setContext('H5P_CONSUMER_APP');
+
+	await nestApp.init();
+
+	const appStartLoggable = new AppStartLoggable({ appName: 'H5P Editor AMQP Consumer' });
 	logger.info(appStartLoggable);
 }
+
 void bootstrap();
