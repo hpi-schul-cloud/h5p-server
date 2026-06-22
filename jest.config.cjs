@@ -5,10 +5,7 @@ module.exports = {
 		'/node_modules/(?!(mime|p-limit|yocto-queue)/)',
 	],
 	transform: {
-		'^.+\\.tsx?$': [
-			'ts-jest',
-		],
-		'^.+\\.m?js$': '@swc/jest',
+		'^.+\\.(t|j)s?$': ['@swc/jest']
 	},
 	moduleFileExtensions: ['js', 'json', 'ts'],
 	rootDir: 'src',
