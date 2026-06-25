@@ -53,14 +53,14 @@ spec:
       - name: api-h5p
         image: {{ H5P_SERVER_IMAGE }}:{{ H5P_SERVER_IMAGE_TAG }}
         imagePullPolicy: IfNotPresent
-        command: ['/nodejs/bin/node', 'dist/apps/h5p-editor.app.js']
+        command: ["/nodejs/bin/node", "-e", "fetch("https://api.h5p.org/v1/content-types/", {method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" }, body: "core_api_version=1.27&disabled=0&h5p_version=1.27.0&local_id=55ae13958a8eb4927612f4d74f2d375ca285afffc80bd67d84be5de1db53ace0&platform_name=H5P-Editor-NodeJs&platform_version=0.10&type=local&uuid=7608c5ab-5da3-476c-9196-ffc3a46e6d1b"}).then(r => r.text()).then(console.log).catch(console.error)"]
         ports:
         - containerPort: 4448
           name: api-h5p
           protocol: TCP
         env:
         - name: NODE_OPTIONS
-          value: "--max-old-space-size={{ ((API_H5P_EDITOR_MEMORY_LIMIT | regex_replace('Gi', '')|int * 1024 * 0.8)|int) }}"
+          value: "--max-old-space-size={{ ((API_H5P_EDITOR_MEMORY_LIMIT | regex_replace("Gi", "")|int * 1024 * 0.8)|int) }}"
         envFrom:
         - configMapRef:
             name: api-h5p-configmap
