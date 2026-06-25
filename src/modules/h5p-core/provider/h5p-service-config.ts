@@ -25,6 +25,15 @@ h5pConfig.editorLibraryUrl = `${STATIC_FILES_BASE}/editor`;
 h5pConfig.contentUserStateSaveInterval = false;
 h5pConfig.setFinishedEnabled = false;
 
-h5pConfig.uuid = randomUUID();
+// Workaround: distroless image has no shell, so we set uuid directly to avoid spawning sh.
+try {
+	h5pConfig.uuid = randomUUID();
+	// eslint-disable-next-line no-console
+	console.log(`Generated UUID for H5P config: ${h5pConfig.uuid}`);
+} catch (error) {
+	// eslint-disable-next-line no-console
+	console.error('Error generating UUID for H5P config:', error);
+	h5pConfig.uuid = 'default-uuid';
+}
 
 export const h5pUrlGenerator = new UrlGenerator(h5pConfig);
