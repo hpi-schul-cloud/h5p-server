@@ -1,4 +1,5 @@
 import { H5PConfig, UrlGenerator } from '@lumieducation/h5p-server';
+import { randomUUID } from 'node:crypto';
 
 const STATIC_FILES_BASE = '/h5pstatics';
 
@@ -23,5 +24,7 @@ h5pConfig.editorLibraryUrl = `${STATIC_FILES_BASE}/editor`;
 
 h5pConfig.contentUserStateSaveInterval = false;
 h5pConfig.setFinishedEnabled = false;
+
+h5pConfig.uuid = randomUUID();
 
 export const h5pUrlGenerator = new UrlGenerator(h5pConfig);
