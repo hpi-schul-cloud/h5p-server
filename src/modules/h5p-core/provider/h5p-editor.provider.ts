@@ -1,4 +1,4 @@
-import { cacheImplementations, H5PEditor } from '@lumieducation/h5p-server';
+import { cacheImplementations, ContentTypeCache, H5PEditor } from '@lumieducation/h5p-server';
 import { IH5PEditorOptions, ITranslationFunction } from '@lumieducation/h5p-server/build/src/types';
 import SvgSanitizer from '@lumieducation/h5p-svg-sanitizer';
 import { Cache } from 'cache-manager';
@@ -20,6 +20,18 @@ export const H5PEditorProvider = {
 	): Promise<H5PEditor> {
 		const cache = new cacheImplementations.CachedKeyValueStorage('kvcache', cacheAdapter);
 		const cachedLibraryStorage = new cacheImplementations.CachedLibraryStorage(libraryStorage, cacheAdapter);
+
+		const contentTypeCache = new ContentTypeCache(h5pConfig, cache);
+		try {
+			const result = await contentTypeCache.downloadContentTypesFromHub();
+			// eslint-disable-next-line no-console
+			console.log(`Downloaded ${result.length} content types from H5P Hub`);
+			// eslint-disable-next-line no-console
+			console.log(`Result:`, result);
+		} catch (error) {
+			// eslint-disable-next-line no-console
+			console.error('Error downloading content types from H5P Hub:', error);
+		}
 
 		const { availableLanguages, maxFileSize, maxTotalSize } = h5pEditorConfig;
 
