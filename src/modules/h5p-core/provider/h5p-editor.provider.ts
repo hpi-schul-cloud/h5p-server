@@ -1,8 +1,8 @@
-import { cacheImplementations, ContentTypeCache, H5PEditor } from '@lumieducation/h5p-server';
+import { cacheImplementations, H5PEditor } from '@lumieducation/h5p-server';
 import { IH5PEditorOptions, ITranslationFunction } from '@lumieducation/h5p-server/build/src/types';
 import SvgSanitizer from '@lumieducation/h5p-svg-sanitizer';
 import { Cache } from 'cache-manager';
-import { randomUUID } from 'node:crypto';
+import { randomUUID } from 'crypto';
 import { ContentStorage, LibraryStorage, TemporaryFileStorage, Translator } from '../domain/service';
 import { H5P_CORE_CONFIG_TOKEN, H5PCoreConfig } from '../h5p-core.config';
 import EditorPermissionSystem from './editor-permission-system';
@@ -22,33 +22,6 @@ export const H5PEditorProvider = {
 		const cache = new cacheImplementations.CachedKeyValueStorage('kvcache', cacheAdapter);
 		const cachedLibraryStorage = new cacheImplementations.CachedLibraryStorage(libraryStorage, cacheAdapter);
 
-		const getLocalIdOverride = (): string => {
-			try {
-				const uuid = randomUUID();
-				// eslint-disable-next-line no-console
-				console.log(`Generated UUID for ContentTypeCache: ${uuid}`);
-
-				return uuid;
-			} catch (error) {
-				// eslint-disable-next-line no-console
-				console.error('Error generating UUID:', error);
-
-				return 'default-uuid';
-			}
-		};
-
-		const contentTypeCache = new ContentTypeCache(h5pConfig, cache, getLocalIdOverride);
-		try {
-			const result = await contentTypeCache.downloadContentTypesFromHub();
-			// eslint-disable-next-line no-console
-			console.log(`Downloaded ${result.length} content types from H5P Hub`);
-			// eslint-disable-next-line no-console
-			console.log(`Result:`, result);
-		} catch (error) {
-			// eslint-disable-next-line no-console
-			console.error('Error downloading content types from H5P Hub:', error);
-		}
-
 		const { availableLanguages, maxFileSize, maxTotalSize } = h5pEditorConfig;
 
 		h5pConfig.maxFileSize = maxFileSize;
@@ -60,6 +33,8 @@ export const H5PEditorProvider = {
 			enableLibraryNameLocalization: true,
 			permissionSystem,
 			fileSanitizers: [new SvgSanitizer()],
+			// We need to use randomUUID here because the distroless image has no shell, so we set uuid directly to avoid spawning sh.
+			getLocalIdOverride: randomUUID,
 		};
 
 		const translationFunction: ITranslationFunction = await Translator.translate(availableLanguages);
