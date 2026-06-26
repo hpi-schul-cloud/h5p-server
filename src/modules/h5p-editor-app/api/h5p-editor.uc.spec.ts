@@ -152,6 +152,7 @@ describe('H5PEditorUc', () => {
 					accountId: 'test-account-id',
 					roles: [],
 					isExternalUser: false,
+					isServiceAccount: false,
 					support: false,
 				};
 				const file = 'test.txt';
@@ -291,6 +292,7 @@ describe('H5PEditorUc', () => {
 			accountId: 'test-account-id',
 			roles: [],
 			isExternalUser: false,
+			isServiceAccount: false,
 			support: false,
 		});
 
@@ -493,6 +495,7 @@ describe('H5PEditorUc', () => {
 				accountId: 'test-account-id',
 				roles: [],
 				isExternalUser: false,
+				isServiceAccount: false,
 				support: false,
 			});
 
