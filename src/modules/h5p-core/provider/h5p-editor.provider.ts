@@ -2,6 +2,7 @@ import { cacheImplementations, H5PEditor } from '@lumieducation/h5p-server';
 import { IH5PEditorOptions, ITranslationFunction } from '@lumieducation/h5p-server/build/src/types';
 import SvgSanitizer from '@lumieducation/h5p-svg-sanitizer';
 import { Cache } from 'cache-manager';
+import { randomUUID } from 'node:crypto';
 import { ContentStorage, LibraryStorage, TemporaryFileStorage, Translator } from '../domain/service';
 import { H5P_CORE_CONFIG_TOKEN, H5PCoreConfig } from '../h5p-core.config';
 import EditorPermissionSystem from './editor-permission-system';
@@ -32,6 +33,8 @@ export const H5PEditorProvider = {
 			enableLibraryNameLocalization: true,
 			permissionSystem,
 			fileSanitizers: [new SvgSanitizer()],
+			// We need to use randomUUID here because the distroless image has no shell, so we set uuid directly to avoid spawning sh.
+			getLocalIdOverride: randomUUID,
 		};
 
 		const translationFunction: ITranslationFunction = await Translator.translate(availableLanguages);

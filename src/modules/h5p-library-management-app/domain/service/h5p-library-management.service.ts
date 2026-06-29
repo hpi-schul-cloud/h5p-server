@@ -24,6 +24,7 @@ import { H5P_CACHE_PROVIDER_TOKEN } from '@modules/h5p-core/provider';
 import { Inject, Injectable } from '@nestjs/common';
 import { TypeGuard } from '@shared/guard';
 import { Cache } from 'cache-manager';
+import { randomUUID } from 'node:crypto';
 import { Readable } from 'node:stream';
 import { H5P_LIBRARY_MANAGEMENT_CONFIG_TOKEN, H5PLibraryManagementConfig } from '../../h5p-library-managment.config';
 import { H5pConsistencyError, H5pTimeoutError } from '../interface';
@@ -62,7 +63,8 @@ export class H5PLibraryManagementService {
 			installLibraryLockMaxOccupationTime,
 		});
 
-		this.contentTypeCache = new ContentTypeCache(h5pConfig, kvCache);
+		// We need to use randomUUID here because the distroless image has no shell, so we set uuid directly to avoid spawning sh.
+		this.contentTypeCache = new ContentTypeCache(h5pConfig, kvCache, randomUUID);
 		this.libraryManager = new LibraryManager(
 			cachedLibraryStorage,
 			undefined,

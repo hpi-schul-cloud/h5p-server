@@ -1,7 +1,7 @@
 import { AmqpConnection } from '@golevelup/nestjs-rabbitmq';
 import { createMock, DeepMocked } from '@golevelup/ts-jest';
 import { Logger } from '@infra/logger';
-import * as AmqpSubscriberHelper from '@infra/rabbitmq';
+import { registerAmqpSubscriber } from '@infra/rabbitmq';
 import { H5PEditor } from '@lumieducation/h5p-server';
 import { MikroORM } from '@mikro-orm/core';
 import { ObjectId } from '@mikro-orm/mongodb';
@@ -19,6 +19,10 @@ import {
 import { H5P_EXCHANGE_CONFIG_TOKEN } from '../h5p-exchange.config';
 import { h5pEditorExchangeCopyContentParamsFactory } from '../testing';
 import { H5pEditorConsumer } from './h5p-editor.consumer';
+
+jest.mock('@infra/rabbitmq', () => ({
+	registerAmqpSubscriber: jest.fn(),
+}));
 
 describe(H5pEditorConsumer.name, () => {
 	let module: TestingModule;
@@ -80,20 +84,16 @@ describe(H5pEditorConsumer.name, () => {
 
 	describe('onModuleInit', () => {
 		describe('when module is initialized', () => {
-			let registerAmqpSubscriberSpy: jest.SpyInstance;
+			const registerAmqpSubscriberMock = jest.mocked(registerAmqpSubscriber);
 
 			beforeEach(() => {
-				registerAmqpSubscriberSpy = jest.spyOn(AmqpSubscriberHelper, 'registerAmqpSubscriber').mockResolvedValue();
-			});
-
-			afterEach(() => {
-				registerAmqpSubscriberSpy.mockRestore();
+				registerAmqpSubscriberMock.mockResolvedValue();
 			});
 
 			it('should register a subscriber for DELETE_CONTENT event', async () => {
 				await consumer.onModuleInit();
 
-				expect(registerAmqpSubscriberSpy).toHaveBeenCalledWith(
+				expect(registerAmqpSubscriberMock).toHaveBeenCalledWith(
 					amqpConnection,
 					'h5p-exchange',
 					H5pEditorEvents.DELETE_CONTENT,
@@ -106,7 +106,7 @@ describe(H5pEditorConsumer.name, () => {
 			it('should register a subscriber for COPY_CONTENT event', async () => {
 				await consumer.onModuleInit();
 
-				expect(registerAmqpSubscriberSpy).toHaveBeenCalledWith(
+				expect(registerAmqpSubscriberMock).toHaveBeenCalledWith(
 					amqpConnection,
 					'h5p-exchange',
 					H5pEditorEvents.COPY_CONTENT,
@@ -122,7 +122,7 @@ describe(H5pEditorConsumer.name, () => {
 
 				await consumer.onModuleInit();
 
-				const deleteContentHandler = registerAmqpSubscriberSpy.mock.calls.find(
+				const deleteContentHandler = registerAmqpSubscriberMock.mock.calls.find(
 					(call) => call[2] === H5pEditorEvents.DELETE_CONTENT
 				)?.[3] as (payload: DeleteContentParams) => Promise<void>;
 
@@ -139,7 +139,7 @@ describe(H5pEditorConsumer.name, () => {
 
 				await consumer.onModuleInit();
 
-				const copyContentHandler = registerAmqpSubscriberSpy.mock.calls.find(
+				const copyContentHandler = registerAmqpSubscriberMock.mock.calls.find(
 					(call) => call[2] === H5pEditorEvents.COPY_CONTENT
 				)?.[3] as (payload: CopyContentParams) => Promise<void>;
 
