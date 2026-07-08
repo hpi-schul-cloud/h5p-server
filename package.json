@@ -22,8 +22,7 @@
 		"h5p:build": "rimraf --glob \"scripts/h5p/**/*.js\" \"scripts/h5p/**/*.js.map\" && swc scripts/h5p -d .",
 		"h5p:package-h5p-libraries": "npm run h5p:build && dotenv -- node ./scripts/h5p/package-h5p-libraries.js",
 		"h5p:update-h5p-map": "npm run h5p:build && dotenv -- node ./scripts/h5p/update-h5p-map.js",
-		"h5p:upload-h5p-libraries": "npm run h5p:build && dotenv -- node ./scripts/h5p/upload-h5p-libraries.js",
-		"knip": "knip"
+		"h5p:upload-h5p-libraries": "npm run h5p:build && dotenv -- node ./scripts/h5p/upload-h5p-libraries.js"
 	},
 	"repository": {
 		"type": "git",
@@ -122,7 +121,6 @@
 		"fishery": "^2.4.0",
 		"globals": "^17.7.0",
 		"jest": "^30.4.2",
-		"knip": "^6.24.0",
 		"mongodb-memory-server-global": "^11.2.0",
 		"prettier": "^3.8.4",
 		"rimraf": "^6.1.3",
