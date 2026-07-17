@@ -34,4 +34,11 @@
       state: "{{ 'present' if WITH_H5P_SERVER else 'absent'}}"
     tags:
       - ingress
-    
+
+  - name: Add h5p-proxy default allow network policy
+    kubernetes.core.k8s:
+      kubeconfig: ~/.kube/config
+      namespace: "{{ NAMESPACE }}"
+      template: default-allow-networkpolicy.yml.j2
+    tags:
+      - networkPolicy

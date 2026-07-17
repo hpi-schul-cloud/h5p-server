@@ -26,3 +26,11 @@
       state: "{{ 'present' if WITH_H5P_SERVER is defined and WITH_H5P_SERVER|bool else 'absent'}}"
     tags:
       - deployment
+
+  - name: Add h5p-staticfiles-server-core default allow network policy
+    kubernetes.core.k8s:
+      kubeconfig: ~/.kube/config
+      namespace: "{{ NAMESPACE }}"
+      template: default-allow-networkpolicy.yml.j2
+    tags:
+      - networkPolicy
