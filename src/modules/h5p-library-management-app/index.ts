@@ -4,6 +4,3 @@
  * Do not use wildcard exports.                              *
  * Do not export *.app.module.ts here; import them directly. *
  *********************************************************** */
-
-export { CoreModule } from './core.module';
-export { GlobalValidationPipe } from './pipe';
