@@ -1,11 +1,11 @@
 import { ErrorUtils } from '@infra/error/utils';
-import { RpcError } from '@infra/rabbitmq';
 import {
 	BadRequestException,
 	ForbiddenException,
 	InternalServerErrorException,
 	UnprocessableEntityException,
 } from '@nestjs/common';
+import { RpcError } from './rpc-message';
 
 export class ErrorMapper {
 	public static mapRpcErrorResponseToDomainError(
