@@ -1,10 +1,25 @@
 # Use Debian "builder" for build stage
 FROM docker.io/debian:bullseye AS builder
 
-# Install git
-RUN apt-get update && \
-    apt-get --no-install-recommends install -y git ca-certificates && \
+# Prefer live Bullseye repos; fall back to a pinned snapshot if mirrors are inconsistent
+ARG DEBIAN_FALLBACK_SNAPSHOT=20260901T000000Z
+RUN set -eux; \
+    if apt-get update && apt-get --no-install-recommends install -y git ca-certificates; then \
+      echo "Installed from live Debian 11 (Bullseye) repositories"; \
+    else \
+      echo "Live Bullseye repos failed, switching to snapshot ${DEBIAN_FALLBACK_SNAPSHOT}"; \
+      printf '%s\n' \
+        "deb [check-valid-until=no] http://snapshot.debian.org/archive/debian/${DEBIAN_FALLBACK_SNAPSHOT} bullseye main" \
+        "deb [check-valid-until=no] http://snapshot.debian.org/archive/debian/${DEBIAN_FALLBACK_SNAPSHOT} bullseye-updates main" \
+        "deb [check-valid-until=no] http://snapshot.debian.org/archive/debian-security/${DEBIAN_FALLBACK_SNAPSHOT} bullseye-security main" \
+        > /etc/apt/sources.list; \
+      apt-get update; \
+      apt-get --no-install-recommends install -y git ca-certificates; \
+    fi; \
     rm -rf /var/lib/apt/lists/*
+
+# Keep clone destination compatible with existing COPY paths in final stage
+WORKDIR /
 
 # the last used version from Lumi
 ENV LAST_USED_H5P_LIBRARY=b5f527e140c17da2792283d369f621e9b3f969ff
