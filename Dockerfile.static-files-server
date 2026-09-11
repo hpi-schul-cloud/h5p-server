@@ -2,16 +2,16 @@
 FROM docker.io/debian:bullseye AS builder
 
 # Prefer live Bullseye repos; fall back to a pinned snapshot if mirrors are inconsistent
-ARG DEBIAN_SNAPSHOT=20260901T000000Z
+ARG DEBIAN_FALLBACK_SNAPSHOT=20260901T000000Z
 RUN set -eux; \
     if apt-get update && apt-get --no-install-recommends install -y git ca-certificates; then \
-      echo "Installed from live Bullseye repositories"; \
+      echo "Installed from live Debian 11 (Bullseye) repositories"; \
     else \
-      echo "Live Bullseye repos failed, switching to snapshot ${DEBIAN_SNAPSHOT}"; \
+      echo "Live Bullseye repos failed, switching to snapshot ${DEBIAN_FALLBACK_SNAPSHOT}"; \
       printf '%s\n' \
-        "deb [check-valid-until=no] http://snapshot.debian.org/archive/debian/${DEBIAN_SNAPSHOT} bullseye main" \
-        "deb [check-valid-until=no] http://snapshot.debian.org/archive/debian/${DEBIAN_SNAPSHOT} bullseye-updates main" \
-        "deb [check-valid-until=no] http://snapshot.debian.org/archive/debian-security/${DEBIAN_SNAPSHOT} bullseye-security main" \
+        "deb [check-valid-until=no] http://snapshot.debian.org/archive/debian/${DEBIAN_FALLBACK_SNAPSHOT} bullseye main" \
+        "deb [check-valid-until=no] http://snapshot.debian.org/archive/debian/${DEBIAN_FALLBACK_SNAPSHOT} bullseye-updates main" \
+        "deb [check-valid-until=no] http://snapshot.debian.org/archive/debian-security/${DEBIAN_FALLBACK_SNAPSHOT} bullseye-security main" \
         > /etc/apt/sources.list; \
       apt-get update; \
       apt-get --no-install-recommends install -y git ca-certificates; \
