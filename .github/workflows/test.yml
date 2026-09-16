@@ -41,7 +41,7 @@ jobs:
         uses: infleet/minio-action@d7e8e8b87654846dc56cc2352f3395f3064b2d79 # v0.0.2
         with:
           port: "9000"
-          version:  ${{ env.MINIO_VERSION }}
+          version: ${{ env.MINIO_VERSION }}
           username: "miniouser"
           password: "miniouser"
       - name: test:cov - test all with coverage
