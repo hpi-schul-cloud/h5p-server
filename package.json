@@ -83,7 +83,7 @@
 		"jsonwebtoken": "^9.0.3",
 		"keyv": "^5.6.0",
 		"mime": "^4.1.0",
-		"nest-winston": "^1.10.2",
+		"nest-winston": "^2.0.0",
 		"p-limit": "^7.3.1",
 		"passport-headerapikey": "^1.2.2",
 		"passport-jwt": "^4.0.1",
