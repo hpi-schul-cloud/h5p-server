@@ -17,7 +17,7 @@ const compat = new FlatCompat({
 
 export default [
 	{
-		ignores: ['**/eslint.config.mjs', '**/ansible', '**/.github'],
+		ignores: ['**/eslint.config.mjs', '**/ansible', '**/.github', 'src/infra/*client/**'],
 	},
 	...compat.extends('plugin:@typescript-eslint/stylistic-type-checked', 'plugin:prettier/recommended'),
 	{
