@@ -1,3 +1,4 @@
+/* tslint:disable */
 /* eslint-disable */
 /**
  * Schulcloud-Verbund-Software Server API
@@ -34,59 +35,14 @@ import type { MeUserResponse } from './me-user-response';
 // @ts-ignore
 import type { Permission } from './permission';
 
-/**
- * 
- * @export
- * @interface MeResponse
- */
 export interface MeResponse {
-    /**
-     * 
-     * @type {MeSchoolResponse}
-     * @memberof MeResponse
-     */
     'school': MeSchoolResponse;
-    /**
-     * 
-     * @type {MeUserResponse}
-     * @memberof MeResponse
-     */
     'user': MeUserResponse;
-    /**
-     * 
-     * @type {Array<MeRoleResponse>}
-     * @memberof MeResponse
-     */
     'roles': Array<MeRoleResponse>;
-    /**
-     * 
-     * @type {Array<Permission>}
-     * @memberof MeResponse
-     */
     'permissions': Array<Permission>;
-    /**
-     * 
-     * @type {LanguageType}
-     * @memberof MeResponse
-     */
     'language': LanguageType;
-    /**
-     * 
-     * @type {MePreferencesResponse}
-     * @memberof MeResponse
-     */
     'preferences': MePreferencesResponse;
-    /**
-     * 
-     * @type {MeAccountResponse}
-     * @memberof MeResponse
-     */
     'account': MeAccountResponse;
-    /**
-     * 
-     * @type {string}
-     * @memberof MeResponse
-     */
     'systemId'?: string;
 }
 
