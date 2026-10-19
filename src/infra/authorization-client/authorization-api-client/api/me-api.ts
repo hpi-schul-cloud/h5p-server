@@ -1,3 +1,4 @@
+/* tslint:disable */
 /* eslint-disable */
 /**
  * Schulcloud-Verbund-Software Server API
@@ -17,14 +18,13 @@ import type { AxiosPromise, AxiosInstance, RawAxiosRequestConfig } from 'axios';
 import globalAxios from 'axios';
 // Some imports not used depending on template conditions
 // @ts-ignore
-import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from '../common';
+import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction, replaceWithSerializableTypeIfNeeded } from '../common';
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 // @ts-ignore
 import type { MeResponse } from '../models';
 /**
  * MeApi - axios parameter creator
- * @export
  */
 export const MeApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
@@ -51,8 +51,8 @@ export const MeApiAxiosParamCreator = function (configuration?: Configuration) {
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
+            localVarHeaderParameter['Accept'] = 'application/json';
 
-    
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
@@ -67,7 +67,6 @@ export const MeApiAxiosParamCreator = function (configuration?: Configuration) {
 
 /**
  * MeApi - functional programming interface
- * @export
  */
 export const MeApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = MeApiAxiosParamCreator(configuration)
@@ -89,7 +88,6 @@ export const MeApiFp = function(configuration?: Configuration) {
 
 /**
  * MeApi - factory interface
- * @export
  */
 export const MeApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
     const localVarFp = MeApiFp(configuration)
@@ -100,7 +98,7 @@ export const MeApiFactory = function (configuration?: Configuration, basePath?: 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        meControllerMe(options?: any): AxiosPromise<MeResponse> {
+        meControllerMe(options?: RawAxiosRequestConfig): AxiosPromise<MeResponse> {
             return localVarFp.meControllerMe(options).then((request) => request(axios, basePath));
         },
     };
@@ -108,8 +106,6 @@ export const MeApiFactory = function (configuration?: Configuration, basePath?: 
 
 /**
  * MeApi - interface
- * @export
- * @interface MeApi
  */
 export interface MeApiInterface {
     /**
@@ -117,7 +113,6 @@ export interface MeApiInterface {
      * @summary Resolve jwt and response informations about the owner of the jwt.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof MeApiInterface
      */
     meControllerMe(options?: RawAxiosRequestConfig): AxiosPromise<MeResponse>;
 
@@ -125,9 +120,6 @@ export interface MeApiInterface {
 
 /**
  * MeApi - object-oriented interface
- * @export
- * @class MeApi
- * @extends {BaseAPI}
  */
 export class MeApi extends BaseAPI implements MeApiInterface {
     /**
@@ -135,7 +127,6 @@ export class MeApi extends BaseAPI implements MeApiInterface {
      * @summary Resolve jwt and response informations about the owner of the jwt.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof MeApi
      */
     public meControllerMe(options?: RawAxiosRequestConfig) {
         return MeApiFp(this.configuration).meControllerMe(options).then((request) => request(this.axios, this.basePath));

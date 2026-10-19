@@ -1,3 +1,4 @@
+/* tslint:disable */
 /* eslint-disable */
 /**
  * Schulcloud-Verbund-Software Server API
@@ -13,29 +14,20 @@
 
 
 
-/**
- * 
- * @export
- * @interface AuthorizationContextParams
- */
 export interface AuthorizationContextParams {
     /**
      * Define for which action the operation should be performend.
-     * @type {string}
-     * @memberof AuthorizationContextParams
      */
     'action': AuthorizationContextParamsAction;
     /**
      * User permissions that are needed to execute the operation.
-     * @type {Array<string>}
-     * @memberof AuthorizationContextParams
      */
     'requiredPermissions': Array<AuthorizationContextParamsRequiredPermissions>;
 }
 
 export const AuthorizationContextParamsAction = {
     READ: 'read',
-    WRITE: 'write'
+    WRITE: 'write',
 } as const;
 
 export type AuthorizationContextParamsAction = typeof AuthorizationContextParamsAction[keyof typeof AuthorizationContextParamsAction];
@@ -159,6 +151,7 @@ export const AuthorizationContextParamsRequiredPermissions = {
     ROOM_MANAGE_INVITATIONLINKS: 'ROOM_MANAGE_INVITATIONLINKS',
     ROOM_LIST_DRAFTS: 'ROOM_LIST_DRAFTS',
     ROOM_MANAGE_VIDEOCONFERENCES: 'ROOM_MANAGE_VIDEOCONFERENCES',
+    SCHOOL_ADD_EXTERNAL_PERSON_TO_ROOM: 'SCHOOL_ADD_EXTERNAL_PERSON_TO_ROOM',
     SCHOOL_ADMINISTRATE_ROOMS: 'SCHOOL_ADMINISTRATE_ROOMS',
     SCHOOL_CHAT_MANAGE: 'SCHOOL_CHAT_MANAGE',
     SCHOOL_CREATE: 'SCHOOL_CREATE',
@@ -178,6 +171,7 @@ export const AuthorizationContextParamsRequiredPermissions = {
     SCHOOL_DELETE_ROOM: 'SCHOOL_DELETE_ROOM',
     SCHOOL_LIST_DISCOVERABLE_TEACHERS: 'SCHOOL_LIST_DISCOVERABLE_TEACHERS',
     SCHOOL_LIST_ROOM_MEMBERS: 'SCHOOL_LIST_ROOM_MEMBERS',
+    SCHOOL_MANAGE_ROOM_APPLICANTS: 'SCHOOL_MANAGE_ROOM_APPLICANTS',
     SCHOOL_MANAGE_ROOM_INVITATIONLINKS: 'SCHOOL_MANAGE_ROOM_INVITATIONLINKS',
     SCOPE_PERMISSIONS_VIEW: 'SCOPE_PERMISSIONS_VIEW',
     START_MEETING: 'START_MEETING',
@@ -206,6 +200,7 @@ export const AuthorizationContextParamsRequiredPermissions = {
     TEAM_EDIT: 'TEAM_EDIT',
     TEAM_INVITE_EXTERNAL: 'TEAM_INVITE_EXTERNAL',
     TEAM_VIEW: 'TEAM_VIEW',
+    TEAM_EXPORT_TO_ROOM: 'TEAM_EXPORT_TO_ROOM',
     TOOL_ADMIN: 'TOOL_ADMIN',
     TOOL_CREATE: 'TOOL_CREATE',
     TOOL_EDIT: 'TOOL_EDIT',
@@ -225,7 +220,7 @@ export const AuthorizationContextParamsRequiredPermissions = {
     USER_LOGIN_MIGRATION_FORCE: 'USER_LOGIN_MIGRATION_FORCE',
     USER_MIGRATE: 'USER_MIGRATE',
     USER_UPDATE: 'USER_UPDATE',
-    YEARS_EDIT: 'YEARS_EDIT'
+    YEARS_EDIT: 'YEARS_EDIT',
 } as const;
 
 export type AuthorizationContextParamsRequiredPermissions = typeof AuthorizationContextParamsRequiredPermissions[keyof typeof AuthorizationContextParamsRequiredPermissions];
