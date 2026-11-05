@@ -269,11 +269,42 @@ export class H5PEditorUc {
 		}
 
 		const contentUtf8 = contentFile?.buffer.subarray(0, 9999).toString('utf8') ?? '';
-		if (/^\s*(?:<\?xml[^>]*\?>\s*)?(?:<!--[\s\S]*?-->\s*)*<svg[\s/>]/i.test(contentUtf8)) {
+		if (this.containsSvgTag(contentUtf8)) {
 			return true;
 		}
 
 		return false;
+	}
+
+	private containsSvgTag(chunk: string): boolean {
+		// remove BOM and whitespaces at the beginning, convert to lowercase
+		let text = chunk
+			.replace(/^\uFEFF/, '')
+			.trimStart()
+			.toLowerCase();
+
+		// loop to sequentially skip all allowed XML preambles
+		let hasChanged = true;
+		while (hasChanged) {
+			const lengthBefore = text.length;
+
+			if (text.startsWith('<?xml')) {
+				const end = text.indexOf('?>');
+				if (end !== -1) text = text.slice(end + 2).trimStart();
+			} else if (text.startsWith('<!--')) {
+				const end = text.indexOf('-->');
+				if (end !== -1) text = text.slice(end + 3).trimStart();
+			} else if (text.startsWith('<!doctype')) {
+				const end = text.indexOf('>');
+				if (end !== -1) text = text.slice(end + 1).trimStart();
+			}
+
+			// if the length hasn't changed, there's nothing more to skip
+			hasChanged = text.length < lengthBefore;
+		}
+
+		// check if the remaining text starts with the SVG tag
+		return /^<svg(\s|\/|>)/.test(text);
 	}
 
 	private async createTemporarySvgFile(contentFile: Express.Multer.File): Promise<string> {
