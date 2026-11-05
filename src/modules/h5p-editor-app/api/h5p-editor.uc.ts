@@ -256,9 +256,24 @@ export class H5PEditorUc {
 	}
 
 	private isSvgFile(contentFile?: Express.Multer.File): contentFile is Express.Multer.File {
-		const isSvgFile = !!contentFile && contentFile.originalname.endsWith('.svg');
+		if (!contentFile) {
+			return false;
+		}
 
-		return isSvgFile;
+		if (contentFile.originalname.toLowerCase().endsWith('.svg')) {
+			return true;
+		}
+
+		if (contentFile.mimetype.toLowerCase() === 'image/svg+xml') {
+			return true;
+		}
+
+		const contentUtf8 = contentFile?.buffer.subarray(0, 9999).toString('utf8') ?? '';
+		if (/^\s*(?:<\?xml[^>]*\?>\s*)?(?:<!--[\s\S]*?-->\s*)*<svg[\s/>]/i.test(contentUtf8)) {
+			return true;
+		}
+
+		return false;
 	}
 
 	private async createTemporarySvgFile(contentFile: Express.Multer.File): Promise<string> {
