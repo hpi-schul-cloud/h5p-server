@@ -2,7 +2,7 @@
 module.exports = {
 	extensionsToTreatAsEsm: ['.ts'],
 	transformIgnorePatterns: [
-		'/node_modules/(?!(mime|p-limit|yocto-queue|sanitize-html|htmlparser2|domhandler|domelementtype|domutils|dom-serializer|entities|css-select|css-what|nth-check)/)',
+		'/node_modules/(?!(mime|p-limit|yocto-queue|sanitize-html|htmlparser2|domhandler|domelementtype|domutils|dom-serializer|entities|css-select|css-what|nth-check|promise-breaker)/)',
 	],
 	transform: {
 		'^.+\\.(t|j)s?$': ['@swc/jest']
