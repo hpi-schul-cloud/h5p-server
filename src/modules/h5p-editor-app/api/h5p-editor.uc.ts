@@ -260,15 +260,15 @@ export class H5PEditorUc {
 			return false;
 		}
 
-		if (contentFile.originalname.toLowerCase().endsWith('.svg')) {
+		if (contentFile.originalname?.toLowerCase().endsWith('.svg')) {
 			return true;
 		}
 
-		if (contentFile.mimetype.toLowerCase() === 'image/svg+xml') {
+		if (contentFile.mimetype?.toLowerCase() === 'image/svg+xml') {
 			return true;
 		}
 
-		const contentUtf8 = contentFile?.buffer.subarray(0, 9999).toString('utf8') ?? '';
+		const contentUtf8 = contentFile.buffer?.subarray(0, 9999).toString('utf8') ?? '';
 		if (this.containsSvgTag(contentUtf8)) {
 			return true;
 		}
