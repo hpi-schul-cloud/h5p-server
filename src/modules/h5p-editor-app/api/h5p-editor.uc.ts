@@ -36,7 +36,7 @@ import {
 	HttpException,
 	Inject,
 	Injectable,
-	InternalServerErrorException,
+	// InternalServerErrorException,
 	NotAcceptableException,
 	NotFoundException,
 } from '@nestjs/common';
@@ -52,6 +52,8 @@ import { H5P_EDITOR_CONFIG_TOKEN, H5PEditorConfig } from '../h5p-editor-app.conf
 import { H5PUcErrorLoggable, H5PUcLoggable } from '../loggable';
 import { AjaxGetQueryParams, AjaxPostBodyParams, AjaxPostQueryParams, GetLibraryFile, H5PContentResponse } from './dto';
 import { H5PContentMapper } from './mapper/h5p-content.mapper';
+import * as fs from 'fs';
+import * as path from 'path';
 
 // As a workaround, we have to assign all files the type “unknown.type” as “tempFilePath,” otherwise the H5P library throws errors.
 // See: https://github.com/Lumieducation/H5P-Nodejs-library/blob/fb84581b3aa68cfd521e84b6438c0c177d34a4be/packages/h5p-server/src/H5PEditor.ts#L659
@@ -126,6 +128,27 @@ export class H5PEditorUc {
 		};
 	}
 
+	private logUploadDebug(stage: string, contentFile?: H5PUploadFile): void {
+		const filePath = contentFile?.tempFilePath;
+		const fileExists = filePath ? fs.existsSync(filePath) : false;
+
+		const tempFileSize = filePath && fileExists ? fs.statSync(filePath).size : undefined;
+
+		this.logger.debug({
+			getLogMessage: () => ({
+				message: `[SVG DEBUG] ${stage}`,
+				name: contentFile?.name,
+				mimetype: contentFile?.mimetype,
+				size: contentFile?.size,
+				hasData: !!contentFile?.data,
+				tempFilePath: filePath,
+				tempFileExists: fileExists,
+				tempFileSize,
+				extension: contentFile?.name ? path.extname(contentFile.name) : undefined,
+			}),
+		});
+	}
+
 	public async getAjax(
 		query: AjaxGetQueryParams,
 		currentUser: ICurrentUser
@@ -182,7 +205,10 @@ export class H5PEditorUc {
 			const user = this.changeUserType(currentUser.userId);
 			const language = await this.getUserLanguage();
 			contentUploadFile = await this.createContentUploadFile(contentFile);
+			this.logUploadDebug('AFTER CREATE CONTENT UPLOAD FILE', contentUploadFile);
 			const libraryUploadFile = this.createLibraryUploadFile(h5pFile);
+
+			this.logUploadDebug('BEFORE H5P POST AJAX', contentUploadFile);
 
 			const result = await this.h5pAjaxEndpoint.postAjax(
 				query.action,
@@ -195,11 +221,29 @@ export class H5PEditorUc {
 				libraryUploadFile
 			);
 
+			this.logger.debug({
+				getLogMessage: () => ({
+					message: '[SVG DEBUG] H5P POST AJAX SUCCESS',
+					action: query.action,
+				}),
+			});
+
 			return result;
 		} catch (err: unknown) {
-			console.error(err); // temporary logging for debugging purposes
-			const errorMessage = (err as Error)?.message ?? 'Error processing H5P AJAX request';
-			throw new InternalServerErrorException(errorMessage, { cause: err });
+			// console.error(err); // temporary logging for debugging purposes
+			// const errorMessage = (err as Error)?.message ?? 'Error processing H5P AJAX request';
+			this.logger.warning({
+				getLogMessage: () => ({
+					message: '[SVG DEBUG] H5P POST AJAX FAILED',
+					errorName: err instanceof Error ? err.name : undefined,
+					errorMessage: err instanceof Error ? err.message : String(err),
+					stack: err instanceof Error ? err.stack : undefined,
+					cause: err instanceof Error ? err.cause : undefined,
+				}),
+			});
+
+			throw err;
+			// throw new InternalServerErrorException(errorMessage, { cause: err });
 		} finally {
 			if (this.isTemporarySvgFile(contentUploadFile) && contentUploadFile.tempFilePath) {
 				this.deleteTemporarySvgFile(contentUploadFile.tempFilePath);
@@ -245,6 +289,16 @@ export class H5PEditorUc {
 			contentData = undefined;
 		}
 
+		this.logger.debug({
+			getLogMessage: () => ({
+				message: '[SVG DEBUG] AFTER SVG PROCESSING',
+				originalName: contentFile?.originalname,
+				mimetype: contentFile?.mimetype,
+				hasBuffer: !!contentData,
+				temporaryFilePath: contentTempFilePath,
+			}),
+		});
+
 		const contentUploadFile: H5PUploadFile | undefined = contentFile && {
 			data: contentData,
 			mimetype: contentFile.mimetype,
@@ -278,6 +332,14 @@ export class H5PEditorUc {
 		const contentTempFilePath = join(contentTempDir, contentTempFileName);
 		await writeFile(contentTempFilePath, contentFile.buffer, 'utf8');
 		this.logger.info(new H5PUcLoggable(`SVG file written to temporary location: ${contentTempFilePath}`));
+		this.logger.debug({
+			getLogMessage: () => ({
+				message: '[SVG DEBUG] TEMPORARY FILE CREATED',
+				filePath: contentTempFilePath,
+				exists: fs.existsSync(contentTempFilePath),
+				size: fs.statSync(contentTempFilePath).size,
+			}),
+		});
 
 		return contentTempFilePath;
 	}
