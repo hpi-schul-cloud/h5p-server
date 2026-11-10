@@ -197,6 +197,7 @@ export class H5PEditorUc {
 
 			return result;
 		} catch (err: unknown) {
+			console.error(err); // temporary logging for debugging purposes
 			const errorMessage = (err as Error)?.message ?? 'Error processing H5P AJAX request';
 			throw new InternalServerErrorException(errorMessage, { cause: err });
 		} finally {
