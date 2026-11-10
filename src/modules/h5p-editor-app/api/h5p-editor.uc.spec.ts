@@ -331,6 +331,47 @@ describe('H5PEditorUc', () => {
 
 				expect(fs.unlinkSync).toHaveBeenCalled();
 				expect(fs.rmSync).toHaveBeenCalled();
+				const uploadedContentFile = h5pAjaxEndpoint.postAjax.mock.calls[0][4];
+				expect(uploadedContentFile?.data).toBeUndefined();
+				expect(uploadedContentFile?.tempFilePath).toMatch(/\.svg$/);
+			});
+		});
+
+		describe('SVG file detection', () => {
+			it('should recognize the .svg extension case-insensitively', async () => {
+				const currentUser = createCurrentUser();
+				const file = createNonSvgFile();
+				file.originalname = 'test.SVG';
+				h5pAjaxEndpoint.postAjax.mockResolvedValue([]);
+
+				await uc.postAjax(currentUser, { action: 'libraries' }, {} as never, file);
+
+				expect(fs.unlinkSync).toHaveBeenCalled();
+				expect(fs.rmSync).toHaveBeenCalled();
+			});
+
+			it('should recognize the SVG MIME type regardless of extension or content', async () => {
+				const currentUser = createCurrentUser();
+				const file = createNonSvgFile();
+				file.mimetype = 'image/svg+xml';
+				h5pAjaxEndpoint.postAjax.mockResolvedValue([]);
+
+				await uc.postAjax(currentUser, { action: 'libraries' }, {} as never, file);
+
+				expect(fs.unlinkSync).toHaveBeenCalled();
+				expect(fs.rmSync).toHaveBeenCalled();
+			});
+
+			it('should not recognize a tag whose name only starts with svg', async () => {
+				const currentUser = createCurrentUser();
+				const file = createNonSvgFile();
+				file.buffer = Buffer.from('<svg-custom/>');
+				h5pAjaxEndpoint.postAjax.mockResolvedValue([]);
+
+				await uc.postAjax(currentUser, { action: 'libraries' }, {} as never, file);
+
+				expect(fs.unlinkSync).not.toHaveBeenCalled();
+				expect(fs.rmSync).not.toHaveBeenCalled();
 			});
 		});
 
@@ -375,6 +416,20 @@ describe('H5PEditorUc', () => {
 				h5pAjaxEndpoint.postAjax.mockResolvedValue([]);
 
 				await uc.postAjax(currentUser, { action: 'libraries' }, {} as never, pngFile);
+
+				expect(fs.unlinkSync).not.toHaveBeenCalled();
+				expect(fs.rmSync).not.toHaveBeenCalled();
+			});
+		});
+
+		describe('when an SVG root occurs outside the inspected content', () => {
+			it('should not treat the file as an SVG', async () => {
+				const currentUser = createCurrentUser();
+				const svgFile = createNonSvgFile();
+				svgFile.buffer = Buffer.concat([Buffer.alloc(9999, 0x20), Buffer.from('<svg></svg>')]);
+				h5pAjaxEndpoint.postAjax.mockResolvedValue([]);
+
+				await uc.postAjax(currentUser, { action: 'libraries' }, {} as never, svgFile);
 
 				expect(fs.unlinkSync).not.toHaveBeenCalled();
 				expect(fs.rmSync).not.toHaveBeenCalled();

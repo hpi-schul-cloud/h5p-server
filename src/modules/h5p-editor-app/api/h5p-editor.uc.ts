@@ -197,6 +197,7 @@ export class H5PEditorUc {
 
 			return result;
 		} catch (err: unknown) {
+			console.error(err); // temporary logging for debugging purposes
 			const errorMessage = (err as Error)?.message ?? 'Error processing H5P AJAX request';
 			throw new InternalServerErrorException(errorMessage, { cause: err });
 		} finally {
@@ -256,9 +257,19 @@ export class H5PEditorUc {
 	}
 
 	private isSvgFile(contentFile?: Express.Multer.File): contentFile is Express.Multer.File {
-		const isSvgFile = !!contentFile && contentFile.originalname.endsWith('.svg');
+		if (!contentFile) {
+			return false;
+		}
 
-		return isSvgFile;
+		if (contentFile.originalname?.toLowerCase().endsWith('.svg')) {
+			return true;
+		}
+
+		if (contentFile.mimetype?.toLowerCase() === 'image/svg+xml') {
+			return true;
+		}
+
+		return false;
 	}
 
 	private async createTemporarySvgFile(contentFile: Express.Multer.File): Promise<string> {
