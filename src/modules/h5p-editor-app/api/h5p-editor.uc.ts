@@ -208,7 +208,21 @@ export class H5PEditorUc {
 			this.logUploadDebug('AFTER CREATE CONTENT UPLOAD FILE', contentUploadFile);
 			const libraryUploadFile = this.createLibraryUploadFile(h5pFile);
 
-			this.logUploadDebug('BEFORE H5P POST AJAX', contentUploadFile);
+			this.logger.warning({
+				getLogMessage: () => ({
+					message: '[SVG DEBUG] BEFORE H5P POST AJAX',
+					action: query.action,
+					originalFilename: contentFile?.originalname,
+					originalMimeType: contentFile?.mimetype,
+					uploadedFilename: contentUploadFile?.name,
+					uploadedMimeType: contentUploadFile?.mimetype,
+					hasData: !!contentUploadFile?.data,
+					dataLength: contentUploadFile?.data?.length,
+					tempFilePath: contentUploadFile?.tempFilePath,
+					isTemporarySvg: this.isTemporarySvgFile(contentUploadFile),
+					libraryFileProvided: !!libraryUploadFile,
+				}),
+			});
 
 			const result = await this.h5pAjaxEndpoint.postAjax(
 				query.action,
@@ -235,10 +249,11 @@ export class H5PEditorUc {
 			this.logger.warning({
 				getLogMessage: () => ({
 					message: '[SVG DEBUG] H5P POST AJAX FAILED',
+					action: query.action,
 					errorName: err instanceof Error ? err.name : undefined,
 					errorMessage: err instanceof Error ? err.message : String(err),
 					stack: err instanceof Error ? err.stack : undefined,
-					cause: err instanceof Error ? err.cause : undefined,
+					cause: err instanceof Error ? String(err.cause) : undefined,
 				}),
 			});
 
