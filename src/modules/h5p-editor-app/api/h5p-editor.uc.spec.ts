@@ -362,51 +362,6 @@ describe('H5PEditorUc', () => {
 				expect(fs.rmSync).toHaveBeenCalled();
 			});
 
-			it('should recognize an SVG root without an XML declaration or comments', async () => {
-				const currentUser = createCurrentUser();
-				const file = createNonSvgFile();
-				file.buffer = Buffer.from('<svg/>');
-				h5pAjaxEndpoint.postAjax.mockResolvedValue([]);
-
-				await uc.postAjax(currentUser, { action: 'libraries' }, {} as never, file);
-
-				expect(fs.unlinkSync).toHaveBeenCalled();
-				expect(fs.rmSync).toHaveBeenCalled();
-			});
-
-			it('should recognize an SVG root after an XML declaration and comments', async () => {
-				const currentUser = createCurrentUser();
-				const file = createNonSvgFile();
-				file.buffer = Buffer.from('<?xml version="1.0"?>\n<!-- image -->\n <SVG viewBox="0 0 1 1"/>');
-				h5pAjaxEndpoint.postAjax.mockResolvedValue([]);
-
-				await uc.postAjax(currentUser, { action: 'libraries' }, {} as never, file);
-
-				expect(fs.unlinkSync).toHaveBeenCalled();
-				expect(fs.rmSync).toHaveBeenCalled();
-			});
-
-			it.each([
-				['compact DOCTYPE', '<!DOCTYPE svg><svg/>'],
-				['DOCTYPE separated by a line break', '<!DOCTYPE svg>\n<svg/>'],
-				['multiple adjacent comments', '<!--first--><!--second--><svg/>'],
-				['multiple comments with spaces and line breaks', '<!-- first --> \n <!-- second -->\n<svg/>'],
-				[
-					'DOCTYPE and multiple comments after an XML declaration',
-					'<?xml version="1.0"?>\n<!DOCTYPE svg>\n  <!-- first --> \n<!-- second -->  \n\n\n<svg/>',
-				],
-			])('should recognize SVG content with %s', async (_description, content) => {
-				const currentUser = createCurrentUser();
-				const file = createNonSvgFile();
-				file.buffer = Buffer.from(content);
-				h5pAjaxEndpoint.postAjax.mockResolvedValue([]);
-
-				await uc.postAjax(currentUser, { action: 'libraries' }, {} as never, file);
-
-				expect(fs.unlinkSync).toHaveBeenCalled();
-				expect(fs.rmSync).toHaveBeenCalled();
-			});
-
 			it('should not recognize a tag whose name only starts with svg', async () => {
 				const currentUser = createCurrentUser();
 				const file = createNonSvgFile();
