@@ -73,7 +73,7 @@ export const hasMatchingFileSignature = (filename: string, data: Buffer | undefi
 	const extension = extname(filename).slice(1).toLowerCase();
 	const matcher = FILE_SIGNATURES.get(extension);
 
-	if (!matcher) {
+	if (typeof matcher !== 'function') {
 		return true;
 	}
 
