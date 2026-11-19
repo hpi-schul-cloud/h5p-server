@@ -304,12 +304,14 @@ describe('H5PEditorUc', () => {
 				size: 11,
 			}) as Express.Multer.File;
 
+		const PNG_SIGNATURE = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
+
 		const createNonSvgFile = (): Express.Multer.File =>
 			({
 				originalname: 'test.png',
 				mimetype: 'image/png',
-				buffer: Buffer.from('png data'),
-				size: 8,
+				buffer: Buffer.concat([PNG_SIGNATURE, Buffer.from('png data')]),
+				size: 16,
 			}) as Express.Multer.File;
 
 		beforeEach(() => {
@@ -365,7 +367,7 @@ describe('H5PEditorUc', () => {
 			it('should not recognize a tag whose name only starts with svg', async () => {
 				const currentUser = createCurrentUser();
 				const file = createNonSvgFile();
-				file.buffer = Buffer.from('<svg-custom/>');
+				file.buffer = Buffer.concat([PNG_SIGNATURE, Buffer.from('<svg-custom/>')]);
 				h5pAjaxEndpoint.postAjax.mockResolvedValue([]);
 
 				await uc.postAjax(currentUser, { action: 'libraries' }, {} as never, file);
@@ -426,13 +428,27 @@ describe('H5PEditorUc', () => {
 			it('should not treat the file as an SVG', async () => {
 				const currentUser = createCurrentUser();
 				const svgFile = createNonSvgFile();
-				svgFile.buffer = Buffer.concat([Buffer.alloc(9999, 0x20), Buffer.from('<svg></svg>')]);
+				svgFile.buffer = Buffer.concat([PNG_SIGNATURE, Buffer.alloc(9999, 0x20), Buffer.from('<svg></svg>')]);
 				h5pAjaxEndpoint.postAjax.mockResolvedValue([]);
 
 				await uc.postAjax(currentUser, { action: 'libraries' }, {} as never, svgFile);
 
 				expect(fs.unlinkSync).not.toHaveBeenCalled();
 				expect(fs.rmSync).not.toHaveBeenCalled();
+			});
+		});
+
+		describe('when the content of an uploaded file does not match its extension', () => {
+			it('should throw a BadRequestException without calling postAjax', async () => {
+				const currentUser = createCurrentUser();
+				const file = createNonSvgFile();
+				file.buffer = Buffer.from('<svg onload="alert(1)"></svg>');
+
+				await expect(uc.postAjax(currentUser, { action: 'files' }, {} as never, file)).rejects.toThrow(
+					BadRequestException
+				);
+
+				expect(h5pAjaxEndpoint.postAjax).not.toHaveBeenCalled();
 			});
 		});
 

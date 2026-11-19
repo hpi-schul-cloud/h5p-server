@@ -52,6 +52,7 @@ import { H5P_EDITOR_CONFIG_TOKEN, H5PEditorConfig } from '../h5p-editor-app.conf
 import { H5PUcErrorLoggable, H5PUcLoggable } from '../loggable';
 import { AjaxGetQueryParams, AjaxPostBodyParams, AjaxPostQueryParams, GetLibraryFile, H5PContentResponse } from './dto';
 import { H5PContentMapper } from './mapper/h5p-content.mapper';
+import { hasMatchingFileSignature } from './validator/file-signature.validator';
 
 // As a workaround, we have to assign all files the type “unknown.type” as “tempFilePath,” otherwise the H5P library throws errors.
 // See: https://github.com/Lumieducation/H5P-Nodejs-library/blob/fb84581b3aa68cfd521e84b6438c0c177d34a4be/packages/h5p-server/src/H5PEditor.ts#L659
@@ -176,6 +177,7 @@ export class H5PEditorUc {
 		| undefined
 	> {
 		await this.checkUserIsAuthenticatedAndEnrolled(currentUser);
+		this.checkContentFileSignature(contentFile);
 
 		let contentUploadFile: H5PUploadFile | undefined;
 		try {
@@ -233,6 +235,12 @@ export class H5PEditorUc {
 		const result = { filename, passThrough };
 
 		return result;
+	}
+
+	private checkContentFileSignature(contentFile?: Express.Multer.File): void {
+		if (contentFile && !hasMatchingFileSignature(contentFile.originalname, contentFile.buffer)) {
+			throw new BadRequestException('File content does not match its file extension');
+		}
 	}
 
 	private async createContentUploadFile(contentFile?: Express.Multer.File): Promise<H5PUploadFile | undefined> {
