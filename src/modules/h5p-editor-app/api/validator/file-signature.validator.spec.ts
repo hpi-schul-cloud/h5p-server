@@ -38,11 +38,16 @@ describe('hasMatchingFileSignature', () => {
 	});
 
 	describe('when the extension has no known signature', () => {
-		it.each(['image.svg', 'data.json', 'notes.txt', 'subtitles.vtt', 'no-extension'])(
-			'should accept %s regardless of content',
-			(filename) => {
-				expect(hasMatchingFileSignature(filename, ascii('anything'))).toBe(true);
-			}
-		);
+		it.each([
+			'image.svg',
+			'data.json',
+			'notes.txt',
+			'subtitles.vtt',
+			'no-extension',
+			'file.constructor',
+			'file.__proto__',
+		])('should accept %s regardless of content', (filename) => {
+			expect(hasMatchingFileSignature(filename, ascii('anything'))).toBe(true);
+		});
 	});
 });
